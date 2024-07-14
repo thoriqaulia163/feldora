@@ -1,9 +1,9 @@
 import './global.css'
 import { Routes, Route } from 'react-router-dom'
-import Navbar from './components/navbar/Navbar'
-import Home from './pages/home/Home'
-import Search from './pages/search/Search'
-import About from './pages/about/About'
+import Navbar from '@components/Navbar/Navbar'
+import Home from '@pages/Home/Home'
+import Search from '@pages/Search/Search'
+import About from '@pages/About/About'
 
 function App() {
   return (

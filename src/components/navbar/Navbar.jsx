@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect } from 'react'
+import React, { useState, useLayoutEffect, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Box } from '@mui/material'
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
@@ -16,9 +16,20 @@ export default function Navbar() {
   const localTheme = localStorage.getItem('local-theme') ? localStorage.getItem('local-theme') : 'light'
   const [selectedTheme,setSelectedTheme] = useState(localTheme)
   useLayoutEffect(()=>{
-    console.log(localTheme)
     document.body.classList[localTheme === 'light' ? 'remove' : 'add']('dark-theme')
   },[])
+
+  // Add Traditional EventListener
+  useEffect(() => {
+    function handleScroll (){
+      const nav = document.getElementById('header')
+      if(this.scrollY >= 80) nav.classList.add('scroll-header'); else nav.classList.remove('scroll-header')
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   // Theme Changer Function
   function themeHandler() {
