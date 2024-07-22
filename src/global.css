@@ -164,6 +164,10 @@ img{
   background-color: var(--body-color);
 }
 
+.main{
+  min-height: 100vh;
+}
+
 /* Container size for small device */
 @media screen and (max-width:350px) {
   .container{
@@ -192,13 +196,13 @@ img{
   }
 }
 
-@media screen and (min-width:968px){
-  /* .header,
+/* @media screen and (min-width:968px){
+  .header,
   .main,
   .footer__container{
       padding: 0 1rem;
-  } */
-}
+  }
+} */
 
 /* @media screen and (min-width:1024px){
   .header,

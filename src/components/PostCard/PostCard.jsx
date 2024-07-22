@@ -1,5 +1,6 @@
 import React from 'react'
 import { Typography, Box } from '@mui/material'
+import { Link } from 'react-router-dom'
 
 export default function PostCard({ post }) {
   return (
@@ -25,7 +26,6 @@ export default function PostCard({ post }) {
         '&:hover': {
           boxShadow: '0 0 0 2px var(--first-color), 0 10px 60px 0 rgba(0, 0, 0, 0.1)',
           transform: 'scale(1.015)',
-          cursor: 'pointer',
           '::before': {
             filter: 'brightness(.5)',
             top: '-100%',
@@ -46,7 +46,7 @@ export default function PostCard({ post }) {
         }}
       />
       <Box sx={{ marginTop: '1rem' }}>
-        <Typography variant='h4' sx={{ color: 'var(--title-color)' }}>{post.title}</Typography>
+        <Link to={`/post/${post.title}`}><Typography variant='h4' sx={{ color: 'var(--title-color)' }}>{post.title}</Typography></Link>
         <Typography variant='body1' sx={{ color: 'var(--text-color)' }}>{post.content?post.content:'-'}</Typography>
       </Box>
     </Box>
