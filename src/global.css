@@ -4,7 +4,7 @@
   /* Notes: @Media-Pixel-Poin: 350px, 768px, 968px, 824px, 1024px */
   /* Colors =================== */
   /* Change favorite color | purple 250 - green 142 - blue 230 - pink 340  */
-  --hue-color: 225;
+  --hue-color: 220;
 
   /* HSL color mode  */
   --first-color: hsl(var(--hue-color),69%, 61%);
@@ -195,6 +195,7 @@ img{
     padding: 0 1rem;
   }
 }
+
 
 /* @media screen and (min-width:968px){
   .header,

@@ -18,7 +18,7 @@ function App() {
             <Route path='/about' element={<About />} />
             <Route path='/search' element={<Search />} />
             <Route path='/post/' element={<Posts />} />
-            <Route path='/post/:postId' element={<Post />} />
+            <Route path='/post/:slug' element={<Post />} />
         </Routes>
       </main>
       <Footer />

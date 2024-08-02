@@ -1,5 +1,5 @@
 import React, { useState, useLayoutEffect, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { Box } from '@mui/material'
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import HelpCenterOutlinedIcon from '@mui/icons-material/HelpCenterOutlined';
@@ -11,6 +11,12 @@ import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import './navbar.css';
 
 export default function Navbar() {
+
+  // Scroll To Top
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   // Set Default Theme
   const localTheme = localStorage.getItem('local-theme') ? localStorage.getItem('local-theme') : 'light'

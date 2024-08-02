@@ -1,13 +1,13 @@
 import React from 'react'
-import { Typography, Box } from '@mui/material'
-import { Link } from 'react-router-dom'
+import { Typography, Box, Link } from '@mui/material'
+import { Link as RouterLink } from 'react-router-dom'
 
 export default function PostCard({ post }) {
   return (
     <Box
       sx={{
         backdropFilter: 'blur(30px) saturate(200%)',
-        borderRadius: '12px',
+        borderRadius: '8px',
         boxShadow: '0 0 0 1px rgba(0, 0, 0, 0.05), 0 20px 50px 0 rgba(0, 0, 0, 0.1)',
         backgroundColor: 'rgba(255,255,255,0.1)',
         overflow: 'hidden',
@@ -35,19 +35,34 @@ export default function PostCard({ post }) {
       }}
     >
       <img
-        srcSet={`${post.img}?w=162&auto=format&dpr=2 2x`}
-        src={`${post.img}?w=162&auto=format`}
+        srcSet={`${post.featuredImage.url}?w=162&auto=format&dpr=2 2x`}
+        src={`${post.featuredImage.url}?w=162&auto=format`}
         alt={post.title}
-        loading="lazy"
         style={{
           display: 'block',
           width: '100%',
-          borderRadius: '12px',
+          borderRadius: '8px',
         }}
       />
-      <Box sx={{ marginTop: '1rem' }}>
-        <Link to={`/post/${post.title}`}><Typography variant='h4' sx={{ color: 'var(--title-color)' }}>{post.title}</Typography></Link>
-        <Typography variant='body1' sx={{ color: 'var(--text-color)' }}>{post.content?post.content:'-'}</Typography>
+      <Box sx={{ marginTop: '1rem', display:'flex', flexDirection:'column', gap:'1rem' }}>
+        <Typography variant='h5' fontWeight={'bold'} color={'var(--title-color)'} >{post.title}</Typography>
+        <Typography variant='body2' color={'var(--text-color)'} >{post.excerpt?post.excerpt:'-'}</Typography>
+        <Box sx={{display:'flex', justifyContent:'center', alignItems:'center'}}>
+          <Link 
+            component={RouterLink} 
+            to={`/post/${post.slug}`}
+            sx={{
+              textDecoration:'none', 
+              background:'var(--first-color)', 
+              padding:'0.75rem 0.75rem', 
+              color:'white', 
+              borderRadius:'4px',
+              '&:hover': {backgroundColor:'var(--first-color-alt)'}
+            }}
+          >
+            Continue Reading
+          </Link>
+        </Box>
       </Box>
     </Box>
   )
