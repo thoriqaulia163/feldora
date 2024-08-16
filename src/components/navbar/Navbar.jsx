@@ -70,8 +70,8 @@ export default function Navbar() {
               </Link>
             </li>
             <li className="nav__item">
-              <Link to="/search" className="nav__link">
-                <i className="nav__icon"><SearchRoundedIcon/></i> Search
+              <Link to="/log" className="nav__link">
+                <i className="nav__icon"><SearchRoundedIcon/></i> Log
               </Link>
             </li>
             <li className="nav__item">
@@ -79,16 +79,6 @@ export default function Navbar() {
                 <i className="nav__icon"><HelpCenterOutlinedIcon/></i> About
               </Link>
             </li>
-            {/* <li className="nav__item">
-              <Link to="/portfolio" className="nav__link">
-                <i className="uil uil-scenery nav__icon"></i> Portfolio
-              </Link>
-            </li>
-            <li className="nav__item">
-              <Link to="/contact" className="nav__link">
-                <i className="uil uil-message nav__icon"></i> Contact
-              </Link>
-            </li> */}
           </ul>
           <i className="nav__close" id="nav-close" onClick={() => handleMobileCloseMenu()}>
             <CloseRoundedIcon />

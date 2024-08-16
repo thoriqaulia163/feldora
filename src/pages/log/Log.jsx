@@ -1,12 +1,10 @@
 import React from 'react'
 import { Box } from '@mui/material'
 
-const About = () => {
+export default function Log () {
   return (
     <Box className='container page-top-padding'>
-      This is About Page, Available Soon
+      This Log Page
     </Box>
   )
 }
-
-export default About

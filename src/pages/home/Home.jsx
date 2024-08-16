@@ -12,8 +12,6 @@ import { useGetPosts } from '@lib/react-query/queries';
 // ]
 
 export default function Home() {
-  // const [posts, setPosts] = React.useState([])
-
   // Responsive column count for masonry list
   // isMedium >= 350 or 430, isBig .= 768 or 968 
   const isBig = useMediaQuery('(min-width:768px)');
@@ -21,17 +19,10 @@ export default function Home() {
 
   const { data:posts, isPending:loading } = useGetPosts();
 
-  // React.useEffect(() => {
-  //   getPosts().then((res) => {
-  //     console.log(res)
-  //     setPosts(res)
-  //   })
-  // }, [])
-
-  if(loading) return <Box className={'container'} sx={{ paddingTop: '6rem' }}>Loading ....</Box>
+  if(loading) return <Box className={'container page-top-padding'} >Loading ....</Box>
 
   return (
-    <Box className={'container'} sx={{ paddingTop: '6rem' }}>
+    <Box className={'container page-top-padding'} >
 
       <Masonry columns={isBig ? 3 : isMedium ? 2 : 1} spacing={2}>
         {posts?.map((item, index) => (

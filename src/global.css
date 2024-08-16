@@ -168,6 +168,10 @@ img{
   min-height: 100vh;
 }
 
+.page-top-padding{
+  padding-top: 6rem;
+}
+
 /* Container size for small device */
 @media screen and (max-width:350px) {
   .container{

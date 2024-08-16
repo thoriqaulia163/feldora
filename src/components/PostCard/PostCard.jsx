@@ -41,6 +41,7 @@ export default function PostCard({ post }) {
         style={{
           display: 'block',
           width: '100%',
+          minHeight:'100px',
           borderRadius: '8px',
         }}
       />
