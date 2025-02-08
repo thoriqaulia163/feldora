@@ -162,21 +162,21 @@ export default function Navbar({ }) {
                   >
                     {/* <ToggleColorMode mode={mode} toggleColorMode={toggleColorMode} /> */}
                   </Box>
-                  <Link to='/'>
+                  <Link to='/' onClick={()=>setOpen(false)}>
                     <MenuItem>
                       <Typography variant="body1" color="text.primary">
                         Home
                       </Typography>
                     </MenuItem>
                   </Link>
-                  <Link to='/about'>
+                  <Link to='/about' onClick={()=>setOpen(false)}>
                     <MenuItem>
                       <Typography variant="body1" color="text.primary">
                         About
                       </Typography>
                     </MenuItem>
                   </Link>
-                  <Link to='/log'>
+                  <Link to='/log' onClick={()=>setOpen(false)}>
                     <MenuItem>
                       <Typography variant="body1" color="text.primary">
                         Log
@@ -193,6 +193,7 @@ export default function Navbar({ }) {
                       target="_blank"
                       sx={{ width: '100%' }}
                       disabled
+                      onClick={()=>setOpen(false)}
                     >
                       Sign up
                     </Button>
@@ -206,6 +207,7 @@ export default function Navbar({ }) {
                       target="_blank"
                       sx={{ width: '100%' }}
                       disabled
+                      onClick={()=>setOpen(false)}
                     >
                       Sign in
                     </Button>
