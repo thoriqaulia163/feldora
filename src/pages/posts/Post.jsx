@@ -50,13 +50,16 @@ export default function Post() {
           </Typography>
         ))}
 
-        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', marginTop: '1rem' }}>
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', marginTop: '1rem', }}>
           <Box sx={{ width: { xs: '100%', md: `62%` } }}>
             <img src={post.featuredImage.url} style={{ width: '100%', height: 'auto' }} />
             <Box className='post-content' marginTop={'1rem'} dangerouslySetInnerHTML={{ __html: (post.content).html }}
               sx={{
+                marginBottom:'3rem',
+
                 '& img': {
-                  width: '100% '
+                  width: '100%',
+                  height:'auto'
                 },
                 '& ol':{
                   padding:'1rem 0 1rem 1rem'
@@ -88,7 +91,7 @@ export default function Post() {
               }}
             />
           </Box>
-          <Box sx={{ width: { xs: '100%', md: '34%' }, position: 'sticky', border: '1px solid', borderColor: 'divider', borderRadius: '12px', padding: '1rem',}}>
+          <Box sx={{ width: { xs: '100%', md: '34%' }, position: 'sticky', top:'6.5rem', border: '1px solid', borderColor: 'divider', borderRadius: '12px', padding: '1rem', height:'20rem'}}>
             this is featured Section Will available soon
           </Box>
         </Box>
