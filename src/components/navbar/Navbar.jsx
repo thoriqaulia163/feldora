@@ -21,7 +21,7 @@ const desktopMenuItemStyle = {
   borderRadius: '8px' 
 }
 
-function AppAppBar({ }) {
+export default function Navbar({ }) {
   const [open, setOpen] = React.useState(false);
 
   const toggleDrawer = (newOpen) => () => {
@@ -219,13 +219,6 @@ function AppAppBar({ }) {
     </div>
   );
 }
-
-AppAppBar.propTypes = {
-  mode: PropTypes.oneOf(['dark', 'light']).isRequired,
-  toggleColorMode: PropTypes.func.isRequired,
-};
-
-export default AppAppBar;
 
 //   return (
 //     <header className="header" id="header">
