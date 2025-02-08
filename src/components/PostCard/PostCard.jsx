@@ -57,10 +57,10 @@ export default function PostCard({ post }) {
       </Box>
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <Link
-
           component={RouterLink}
           to={`/post/${post.slug}`}
           sx={{
+            marginTop:'1rem',
             textDecoration:'none',
             textAlign:'center',
             background: 'transparet',
