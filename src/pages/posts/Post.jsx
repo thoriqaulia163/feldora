@@ -1,13 +1,14 @@
 import React from 'react'
 import { useParams } from 'react-router-dom'
-import { Typography, Box } from '@mui/material';
-import PostContent from '../../components/PostContent/PostContent';
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
+import Avatar from '@mui/material/Avatar';
 import { useGetPostDetail } from '../../lib/react-query/queries';
 import moment from 'moment'
 import { Helmet } from 'react-helmet-async';
 
 export default function Post() {
-  const suggestBoxWidth = 225;
   const { slug } = useParams();
   const { data: post, isPending: loading } = useGetPostDetail({ slug });
 
@@ -29,24 +30,69 @@ export default function Post() {
         </title>
       </Helmet>
 
-      <Box className='container page-top-padding' sx={{ display: 'flex', gap: '1.5rem', flexDirection: { xs: 'column', md: 'row' } }}>
-        <Box sx={{ width: { xs: '100%', md: `calc(100% - ${suggestBoxWidth}px)` } }}>
-          <Typography variant='h1' sx={{ fontSize: '3rem', fontWeight: '600', marginBottom: '1rem' }}>{post.title}</Typography>
-          <img
-            src={post.featuredImage.url}
-            style={{ width: '100%' }}
-          />
-          <Typography variant='body1'>{post?.author.name}</Typography>
-          {post?.category?.map((item, index) => (
-            <Typography key={index} variant='body2' color={'green'}>{item.name}</Typography>
-          ))}
-          {moment(post?.createdAt).format('MMM DD, YYYY')}
-          <PostContent content={post.content} />
+      <Container maxWidth='lg' sx={{ marginTop: '7rem', }}>
+        <Typography variant='h1'>{post.title}</Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: '1rem', my: '1rem' }}>
+          <Avatar />
+          <Box>
+            <Typography variant='body2' color={'InfoText'}>{post?.author.name}</Typography>
+            <Typography variant='body2' color={'GrayText'}>{moment(post?.createdAt).format('MMM DD, YYYY')}</Typography>
+          </Box>
         </Box>
-        <Box sx={{ width: { xs: '100%', md: suggestBoxWidth }, position: 'sticky', background: 'red', paddingTop: '0.5rem' }}>
-          this is featured post
+        {post?.category?.map((item, index) => (
+          <Typography key={index} variant='body2' sx={{
+            background: 'green',
+            display: 'inline-flex',
+            p: '4px 8px',
+            borderRadius: '999px',
+          }}>
+            {item.name}
+          </Typography>
+        ))}
+
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', marginTop: '1rem' }}>
+          <Box sx={{ width: { xs: '100%', md: `62%` } }}>
+            <img src={post.featuredImage.url} style={{ width: '100%', height: 'auto' }} />
+            <Box className='post-content' marginTop={'1rem'} dangerouslySetInnerHTML={{ __html: (post.content).html }}
+              sx={{
+                '& img': {
+                  width: '100% '
+                },
+                '& ol':{
+                  padding:'1rem 0 1rem 1rem'
+                },
+                '& ul':{
+                  listStyle:'square',
+                  padding:'1rem 0 1rem 1rem',
+                },
+                '& code':{
+                  borderRadius:'4px',
+                  background:'rgb(240, 249, 249)',
+                  border:'1px solid rgb(229, 229, 229)',
+                  padding:'4px',
+                },
+                '& pre':{
+                  borderRadius:'4px',
+                  background:'rgb(249, 249, 249)',
+                  border:'1px solid rgb(229, 229, 229)',
+                  padding:'1.5rem',
+                },
+                '& pre code':{
+                  border:'0',
+                  padding:'0'
+                },
+                '& blockquote':{
+                  paddingLeft:'1rem',
+                  borderLeft:'4px solid rgb(196, 196, 196)',
+                },
+              }}
+            />
+          </Box>
+          <Box sx={{ width: { xs: '100%', md: '34%' }, position: 'sticky', border: '1px solid', borderColor: 'divider', borderRadius: '12px', padding: '1rem',}}>
+            this is featured Section Will available soon
+          </Box>
         </Box>
-      </Box>
+      </Container>
     </>
   )
 }
