@@ -1,11 +1,21 @@
 import React from 'react'
-import { Box } from '@mui/material'
+import Container from '@mui/material/Container';
+import Box from '@mui/material/Box';
+import { Helmet } from 'react-helmet-async';
 
 const About = () => {
   return (
-    <Box className='container page-top-padding'>
-      This is About Page, Available Soon
+    <Box>
+      <Helmet>
+        <title>
+          Feldora | About
+        </title>
+      </Helmet>
+      <Container maxWidth='xl' sx={{ marginTop: '7rem' }}>
+        This is About Page, Available Soon
+      </Container>
     </Box>
+
   )
 }
 

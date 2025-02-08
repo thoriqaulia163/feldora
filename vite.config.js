@@ -11,6 +11,7 @@ export default defineConfig({
       '@components': "/src/components",
       '@services': "/src/services",
       '@lib': "/src/lib",
+      '@assets': "/src/assets",
     },
   },
 })

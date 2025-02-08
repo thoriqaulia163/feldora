@@ -1,7 +1,5 @@
 import React from 'react'
 import { Box } from '@mui/material'
-import './postContent.css'
-
 
 export default function PostContent ({content}){
   return (

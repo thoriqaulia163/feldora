@@ -1,10 +1,9 @@
 import React from 'react'
 import Box from '@mui/material/Box';
-import { Typography } from '@mui/material';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import Masonry from '@mui/lab/Masonry';
+import Container from '@mui/material/Container';
 import PostCard from '@components/PostCard/PostCard'
 import { useGetPosts } from '@lib/react-query/queries';
+import { Helmet } from 'react-helmet-async';
 
 // const posts = [
 //   {title:'First Post', excerpt:'learning by doin yada yada lol'},
@@ -12,23 +11,33 @@ import { useGetPosts } from '@lib/react-query/queries';
 // ]
 
 export default function Home() {
-  // Responsive column count for masonry list
-  // isMedium >= 350 or 430, isBig .= 768 or 968 
-  const isBig = useMediaQuery('(min-width:768px)');
-  const isMedium = useMediaQuery('(min-width:468px)');
 
-  const { data:posts, isPending:loading } = useGetPosts();
+  const { data: posts, isPending: loading } = useGetPosts();
 
-  if(loading) return <Box className={'container page-top-padding'} >Loading ....</Box>
+  if (loading) return (
+    <Box className={'container page-top-padding'}>
+      <Helmet>
+        <title>
+          Feldora | Home
+        </title>
+      </Helmet>
+      Loading ....
+    </Box>
+  )
 
   return (
-    <Box className={'container page-top-padding'} >
+    <Box>
+      <Helmet>
+        <title>
+          Feldora | Home
+        </title>
+      </Helmet>
 
-      <Masonry columns={isBig ? 3 : isMedium ? 2 : 1} spacing={2}>
+      <Container maxWidth='xl' sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', gap: '1.5rem', marginTop: '7rem' }}>
         {posts?.map((item, index) => (
-         <PostCard key={index} post={item.node}/>
+          <PostCard key={index} post={item.node} />
         ))}
-      </Masonry>
+      </Container>
     </Box>
   )
 }
