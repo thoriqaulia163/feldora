@@ -23,6 +23,10 @@ export default function Log() {
       <Container maxWidth='xl' sx={{ marginTop: '7rem' }}>
         <Box sx={logBoxStyle}>
           <Typography variant='body2'>8 Februari 2025</Typography>
+          <Typography variant='h6'>Fixing post page layout, body-content-HTML, and post card</Typography>
+        </Box>
+        <Box sx={logBoxStyle}>
+          <Typography variant='body2'>8 Februari 2025</Typography>
           <Typography variant='h6'>Revamp UI, styling, and layout. Add log. add new webLogo. Add page animation. Implement React-helmet</Typography>
         </Box>
         <KeyboardDoubleArrowUpRoundedIcon />

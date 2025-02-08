@@ -13,7 +13,7 @@ export default function PostCard({ post }) {
         overflow: 'hidden',
         transition: 'ease-in-out 0.2s',
         padding: '1rem',
-        flex: { xs:'0 0 100%', sm:'0 0 calc(50% - 0.75rem)', md:'0 0 calc(33.3333% - 1rem)', lg:'0 0 calc(25% - 1.125rem)'},
+        flex: { xs: '0 0 100%', sm: '0 0 calc(50% - 0.75rem)', md: '0 0 calc(33.3333% - 1rem)', lg: '0 0 calc(25% - 1.125rem)' },
         '::before': {
           position: 'fixed',
           content: '""',
@@ -26,7 +26,7 @@ export default function PostCard({ post }) {
         },
         '&:hover': {
           boxShadow: '0 0 0 2px rgb(244,245,247), 0 10px 60px 0 rgba(0, 0, 0, 0.1)',
-          transform: 'scale(1.015)',
+          // transform: 'scale(1.015)',
           '::before': {
             filter: 'brightness(.5)',
             top: '-100%',
@@ -42,29 +42,42 @@ export default function PostCard({ post }) {
         style={{
           display: 'block',
           width: '100%',
-          minHeight:'100px',
+          height: '200px',
+          objectFit: 'cover',
           borderRadius: '8px',
         }}
       />
-      <Box sx={{ marginTop: '1rem', display:'flex', flexDirection:'column', gap:'1rem' }}>
-        <Typography variant='h5' fontWeight={'bold'} >{post.title}</Typography>
-        <Typography variant='body2'>{post.excerpt?post.excerpt:'-'}</Typography>
-        <Box sx={{display:'flex', justifyContent:'center', alignItems:'center'}}>
-          <Link 
-            component={RouterLink} 
-            to={`/post/${post.slug}`}
-            sx={{
-              textDecoration:'none', 
-              background:'rgb(184, 184, 184)', 
-              padding:'0.75rem 0.75rem', 
-              color:'white', 
-              borderRadius:'4px',
-              '&:hover': {backgroundColor:'rgb(139, 139, 139)'}
-            }}
-          >
-            Continue Reading
-          </Link>
-        </Box>
+      <Box sx={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem', height:'10rem',}}>
+        <Typography variant='h5'>
+          {post.title}
+        </Typography>
+        <Typography variant='body2'>
+          {post.excerpt ? post.excerpt : '-'} 
+        </Typography>
+      </Box>
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <Link
+
+          component={RouterLink}
+          to={`/post/${post.slug}`}
+          sx={{
+            textDecoration:'none',
+            textAlign:'center',
+            background: 'transparet',
+            padding: '0.75rem 0.75rem',
+            color: 'black',
+            border:'3px solid black',
+            borderRadius: '999px',
+            width:'100%',
+            transition: 'all .2s ease-in-out',
+            '&:hover': {
+              transform: 'scale(1.05)'
+
+            },
+          }}
+        >
+          Read More ...
+        </Link>
       </Box>
     </Box>
   )
