@@ -7,6 +7,7 @@ import Avatar from '@mui/material/Avatar';
 import { useGetPostDetail } from '../../lib/react-query/queries';
 import moment from 'moment'
 import { Helmet } from 'react-helmet-async';
+import PostBodyContent from '@components/Post/PostBodyContent/PostBodyContent';
 
 export default function Post() {
   const { slug } = useParams();
@@ -52,44 +53,8 @@ export default function Post() {
 
         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', marginTop: '1rem', }}>
           <Box sx={{ width: { xs: '100%', md: `62%` } }}>
-            <img src={post.featuredImage.url} style={{ width: '100%', height: 'auto' }} />
-            <Box className='post-content' marginTop={'1rem'} dangerouslySetInnerHTML={{ __html: (post.content).html }}
-              sx={{
-                marginBottom:'3rem',
-
-                '& img': {
-                  width: '100%',
-                  height:'auto'
-                },
-                '& ol':{
-                  padding:'1rem 0 1rem 1rem'
-                },
-                '& ul':{
-                  listStyle:'square',
-                  padding:'1rem 0 1rem 1rem',
-                },
-                '& code':{
-                  borderRadius:'4px',
-                  background:'rgb(240, 249, 249)',
-                  border:'1px solid rgb(229, 229, 229)',
-                  padding:'4px',
-                },
-                '& pre':{
-                  borderRadius:'4px',
-                  background:'rgb(249, 249, 249)',
-                  border:'1px solid rgb(229, 229, 229)',
-                  padding:'1.5rem',
-                },
-                '& pre code':{
-                  border:'0',
-                  padding:'0'
-                },
-                '& blockquote':{
-                  paddingLeft:'1rem',
-                  borderLeft:'4px solid rgb(196, 196, 196)',
-                },
-              }}
-            />
+            <img src={post.featuredImage.url} style={{ width: '100%', height: 'auto', marginBottom:"1.5rem" }} />
+            <PostBodyContent content={post.content}/>
           </Box>
           <Box sx={{ width: { xs: '100%', md: '34%' }, position: 'sticky', top:'6.5rem', border: '1px solid', borderColor: 'divider', borderRadius: '12px', padding: '1rem', height:'20rem'}}>
             this is featured Section Will available soon
