@@ -13,14 +13,14 @@ export default function Post() {
   const { data: post, isPending: loading } = useGetPostDetail({ slug });
 
   if (loading) return (
-    <Box className={'container page-top-padding'}>
+    <Container maxWidth='lg' sx={{ marginTop: '7rem', }}>
       <Helmet>
         <title>
           Feldora | Post
         </title>
       </Helmet>
       Loading ....
-    </Box>
+    </Container>
   )
   return (
     <>

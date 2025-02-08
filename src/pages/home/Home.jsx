@@ -15,14 +15,14 @@ export default function Home() {
   const { data: posts, isPending: loading } = useGetPosts();
 
   if (loading) return (
-    <Box className={'container page-top-padding'}>
+    <Container maxWidth='xl' sx={{ marginTop: '7rem' }}>
       <Helmet>
         <title>
           Feldora | Home
         </title>
       </Helmet>
       Loading ....
-    </Box>
+    </Container>
   )
 
   return (
