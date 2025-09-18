@@ -83,7 +83,7 @@ const theme = createTheme({
   },
 
   typography: {
-    fontFamily: "Roboto, sans-serif",
+    fontFamily: "circular-web, general, robert-medium, robert-regular, zentry",
     h1: {
       fontSize: "36px", // Mobile font size for h1
       fontWeight: "600",

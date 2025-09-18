@@ -4,6 +4,7 @@ import Box from '@mui/material/Box';
 import { Helmet } from 'react-helmet-async';
 import Typography from '@mui/material/Typography';
 import KeyboardDoubleArrowUpRoundedIcon from '@mui/icons-material/KeyboardDoubleArrowUpRounded';
+import { WEB_UPDATE_LOG } from '../../constants/updateLog';
 
 const logBoxStyle = {
   background: 'rgb(212, 212, 212)',
@@ -21,41 +22,15 @@ export default function Log() {
       </Helmet>
 
       <Container maxWidth='xl' sx={{ marginTop: '7rem' }}>
-        <Box sx={logBoxStyle}>
-          <Typography variant='body2'>9 Februari 2025</Typography>
-          <Typography variant='h6'>update post-body-content</Typography>
-        </Box>
-        <KeyboardDoubleArrowUpRoundedIcon />
-        <Box sx={logBoxStyle}>
-          <Typography variant='body2'>9 Februari 2025</Typography>
-          <Typography variant='h6'>Fixing Loading and vercel go-to-specific-routes bug</Typography>
-        </Box>
-        <KeyboardDoubleArrowUpRoundedIcon />
-        <Box sx={logBoxStyle}>
-          <Typography variant='body2'>8 Februari 2025</Typography>
-          <Typography variant='h6'>Fixing post page layout, body-content-HTML, and post card</Typography>
-        </Box>
-        <KeyboardDoubleArrowUpRoundedIcon />
-        <Box sx={logBoxStyle}>
-          <Typography variant='body2'>8 Februari 2025</Typography>
-          <Typography variant='h6'>Revamp UI, styling, and layout. Add log. add new webLogo. Add page animation. Implement React-helmet</Typography>
-        </Box>
-        <KeyboardDoubleArrowUpRoundedIcon />
-        <Box sx={logBoxStyle}>
-          <Typography variant='body2'>2 Agustus 2024</Typography>
-          <Typography variant='h6'>Implement Getpost and post page using react-query and graphQL</Typography>
-        </Box>
-        <KeyboardDoubleArrowUpRoundedIcon />
-        <Box sx={logBoxStyle}>
-          <Typography variant='body2'>22 Juli 2024</Typography>
-          <Typography variant='h6'>Initialize react-query</Typography>
-        </Box>
-        <KeyboardDoubleArrowUpRoundedIcon />
-        <Box sx={logBoxStyle}>
-          <Typography variant='body2'>9 Juli 2024</Typography>
-          <Typography variant='h6'>Initialize Project</Typography>
-        </Box>
-
+        {WEB_UPDATE_LOG.map((value, key) => (
+          <Box key={key}>
+            <Box sx={logBoxStyle} >
+              <Typography variant='body2'>{value.tanggal}</Typography>
+              <Typography variant='h6'>{value.update}</Typography>
+            </Box>
+            <KeyboardDoubleArrowUpRoundedIcon />
+          </Box>
+        ))}
       </Container>
     </Box>
   )
