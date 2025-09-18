@@ -3,7 +3,9 @@ import react from '@vitejs/plugin-react'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+  ],
   resolve: {
     alias: {
       '@': "/src",
@@ -12,6 +14,7 @@ export default defineConfig({
       '@services': "/src/services",
       '@lib': "/src/lib",
       '@assets': "/src/assets",
+      '@constants': "/src/constants",
     },
   },
 })

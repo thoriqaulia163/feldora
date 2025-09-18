@@ -1,7 +1,7 @@
 import './global.css'
 import { Routes, Route, useLocation } from 'react-router-dom'
-import { AnimatePresence } from 'framer-motion'
-import BasicTransition from '@components/PageTransition/BasicTransition'
+// import { AnimatePresence } from 'framer-motion'
+// import BasicTransition from '@components/PageTransition/BasicTransition'
 import Navbar from '@components/navbar/Navbar'
 import Footer from '@components/footer/Footer'
 import Home from '@pages/home/Home'
@@ -13,17 +13,17 @@ export default function App() {
   const location = useLocation()
 
   return (
-    <AnimatePresence mode='wait'>
+    <div>
       <Navbar />
-      <main className='main'>
+      <main className='relative min-h-screen w-screen overflow-x-hidden'>
         <Routes location={location} key={location.pathname}>
-          <Route path='/' element={<BasicTransition><Home /></BasicTransition>} />
-          <Route path='/log' element={<BasicTransition><Log /></BasicTransition>} />
-          <Route path='/about' element={<BasicTransition><About /></BasicTransition>} />
-          <Route path='/post/:slug' element={<BasicTransition><Post /></BasicTransition>} />
+          <Route path='/' element={<Home />} />
+          <Route path='/log' element={<Log />} />
+          <Route path='/about' element={<About />} />
+          <Route path='/post/:slug' element={<Post />} />
         </Routes>
       </main>
       <Footer />
-    </AnimatePresence>
+    </div>
   )
 }

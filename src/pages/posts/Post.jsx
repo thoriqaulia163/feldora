@@ -1,27 +1,23 @@
 import React from 'react'
 import { useParams } from 'react-router-dom'
-import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import Avatar from '@mui/material/Avatar';
 import { useGetPostDetail } from '../../lib/react-query/queries';
-import moment from 'moment'
+// import moment from 'moment'
 import { Helmet } from 'react-helmet-async';
-import PostBodyContent from '@components/Post/PostBodyContent/PostBodyContent';
+// import PostBodyContent from '@components/Post/PostBodyContent/PostBodyContent';
 
 export default function Post() {
   const { slug } = useParams();
   const { data: post, isPending: loading } = useGetPostDetail({ slug });
 
   if (loading) return (
-    <Container maxWidth='lg' sx={{ marginTop: '7rem', }}>
+    <div >
       <Helmet>
         <title>
           Feldora | Post
         </title>
       </Helmet>
       Loading ....
-    </Container>
+    </div>
   )
   return (
     <>
@@ -31,7 +27,7 @@ export default function Post() {
         </title>
       </Helmet>
 
-      <Container maxWidth='lg' sx={{ marginTop: '7rem', }}>
+      {/* <Container maxWidth='lg' sx={{ marginTop: '7rem', }}>
         <Typography variant='h1'>{post.title}</Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '1rem', my: '1rem' }}>
           <Avatar />
@@ -60,7 +56,7 @@ export default function Post() {
             this is featured Section Will available soon
           </Box>
         </Box>
-      </Container>
+      </Container> */}
     </>
   )
 }

@@ -1,10 +1,9 @@
 import React from 'react'
-import Box from '@mui/material/Box';
 
 export default function PostBodyContent({ content }) {
   return (
-    <Box marginTop={'1rem'} dangerouslySetInnerHTML={{ __html: content.html }}
-      sx={{
+    <div marginTop={'1rem'} dangerouslySetInnerHTML={{ __html: content.html }}
+      style={{
         marginBottom: '3rem',
         '& img': {
           display:'block',
