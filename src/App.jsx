@@ -8,6 +8,7 @@ import Home from '@pages/home/Home'
 import About from '@pages/about/About'
 import Post from '@pages/posts/Post'
 import Log from '@pages/log/Log'
+import Canvas from '@pages/canvas/Canvas'
 
 export default function App() {
   const location = useLocation()
@@ -19,6 +20,7 @@ export default function App() {
         <Routes location={location} key={location.pathname}>
           <Route path='/' element={<Home />} />
           <Route path='/log' element={<Log />} />
+          <Route path='/canvas' element={<Canvas />} />
           <Route path='/about' element={<About />} />
           <Route path='/post/:slug' element={<Post />} />
         </Routes>

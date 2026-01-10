@@ -14,17 +14,17 @@ export default {
         "robert-regular": ["robert-regular", "sans-serif"],
       },
       colors: {
-        blue: {
+        blueCustom: {
           50: "#DFDFF0",
           75: "#dfdff2",
           100: "#F0F2FA",
           200: "#010101",
           300: "#4FB7DD",
         },
-        violet: {
+        violetCustom: {
           300: "#5724ff",
         },
-        yellow: {
+        yellowCustom: {
           100: "#8e983f",
           300: "#edff66",
         },
