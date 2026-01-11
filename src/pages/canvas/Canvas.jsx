@@ -24,8 +24,9 @@ export default function Canvas() {
           Feldora | Canvas
         </title>
       </Helmet>
-      <div className=' bg-gradient-to-r from-[#0474A8] to-[#0459A850] h-[13.25rem] text-[#6F00FF] font-bold m-2 p-2 flex flex-col items-end justify-between md:flex-row md:items-start'>
+      <div className='mt-24 bg-gradient-to-r from-[#0474A8] to-[#0459A850] h-[13.25rem] text-[#6F00FF] font-bold m-2 p-2 flex flex-col items-end justify-between md:flex-row md:items-start'>
         <div className='bg-yellow-400'>ini 13.25rem</div>
+        <button onClick={()=>alert('clicked')} className='bg-purple-600'>click me !</button>
         <div className='bg-blue-400'>kocak</div>
       </div>
       <div className='bg-red-400 h-[13.25rem] text-[#6F00FF] font-bold m-2 p-2 grid grid-cols-10 md:grid-rows-5'>

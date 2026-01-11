@@ -63,7 +63,7 @@ body {
   }
 
   .navbar-heading {
-    @apply uppercase font-zentry font-medium text-2xl tracking-wide;
+    @apply uppercase font-zentry font-medium text-2xl tracking-wider;
   }
 
   .hero-heading {

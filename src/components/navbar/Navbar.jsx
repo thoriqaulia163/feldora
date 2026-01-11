@@ -1,33 +1,69 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCompass } from '@fortawesome/free-solid-svg-icons';
+import {
+  faCompass,
+  faHouse,
+  faPaintBrush,
+  faBook,
+  faCircleInfo,
+  faNewspaper,
+} from '@fortawesome/free-solid-svg-icons';
 
 // import ToggleColorMode from './ToggleColorMode';
 import webLogo from '@assets/feldora-logo-2.webp'
 
-const desktopMenuItemStyle = { 
-  py: '6px', 
-  px: '12px', 
-  borderRadius: '8px' 
-}
+const navLinkStyle = 'flex items-center gap-4 text-white hover:text-gray-200 font-bold'
 
 export default function Navbar({ }) {
-  const [open, setOpen] = React.useState(false);
-
-  const toggleDrawer = (newOpen) => () => {
-    setOpen(newOpen);
-  };
+  const [openMenu, setOpenMenu] = React.useState(false);
 
   return (
-    <div className='fixed bg-yellowCustom-300 w-full z-10 h-16 px-4 py-2 box-border flex justify-between items-center'>
-      <Link to={'/'} className='special-font navbar-heading'>
-        F<b>E</b>LD<b>O</b>R<b>A</b>
-      </Link>
-      <button className='bg-blue-400 rounded-xl h-12 w-12 '>
-        <FontAwesomeIcon icon={faCompass} size='xl'/>
-      </button>
-    </div>
+    <>
+      <div className='fixed bg-yellowCustom-300 w-full z-20 h-16 px-4 py-2 box-border flex justify-between items-center'>
+        <Link to={'/'} className='special-font navbar-heading'>
+          F<b>E</b>LDOR<b>A</b>
+        </Link>
+        <button onClick={() => setOpenMenu(!openMenu)} className='bg-blue-400 rounded-xl h-12 w-12'>
+          <FontAwesomeIcon icon={faCompass} size='xl' className={`${openMenu && '-rotate-90'} transition duration-300 ease-in-out`} />
+        </button>
+      </div>
+
+      <div className={`fixed z-10 w-full h-screen ${openMenu ? "bg-black/50 top-16" : "bg-black/0 -top-[100vh]"} box-border overflow-hidden transition-all duration-300 ease-in-out`}>
+        <div className={`flex flex-col w-full h-full gap-4 items-end pt-4 px-4`}>
+          <Link to={'/'} className={navLinkStyle} >
+            <p>Home</p>
+            <div className='bg-blue-400 rounded-full h-12 w-12 flex justify-center items-center'>
+              <FontAwesomeIcon icon={faHouse} size='xl' />
+            </div>
+          </Link>
+          <Link to={'/canvas'} className={navLinkStyle} >
+            <p>Canvas</p>
+            <div className='bg-blue-400 rounded-full h-12 w-12 flex justify-center items-center'>
+              <FontAwesomeIcon icon={faPaintBrush} size='xl' />
+            </div>
+          </Link>
+          <Link to={'/log'} className={navLinkStyle} >
+            <p>Log</p>
+            <div className='bg-blue-400 rounded-full h-12 w-12 flex justify-center items-center'>
+              <FontAwesomeIcon icon={faBook} size='xl' />
+            </div>
+          </Link>
+          <Link to={'/about'} className={navLinkStyle} >
+            <p>About</p>
+            <div className='bg-blue-400 rounded-full h-12 w-12 flex justify-center items-center'>
+              <FontAwesomeIcon icon={faCircleInfo} size='xl' />
+            </div>
+          </Link>
+          <Link to={'#'} className={navLinkStyle} >
+            <p>Blog</p>
+            <div className='bg-blue-400 rounded-full h-12 w-12 flex justify-center items-center'>
+              <FontAwesomeIcon icon={faNewspaper} size='xl' />
+            </div>
+          </Link>
+        </div>
+      </div>
+    </>
   );
 }
 
