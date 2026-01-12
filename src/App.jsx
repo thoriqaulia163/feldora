@@ -16,7 +16,7 @@ export default function App() {
   return (
     <div>
       <Navbar />
-      <main className='relative min-h-screen w-screen overflow-x-hidden box-border pt-16'>
+      <main className='relative min-h-screen w-screen overflow-x-hidden box-border'>
         <Routes location={location} key={location.pathname}>
           <Route path='/' element={<Home />} />
           <Route path='/log' element={<Log />} />

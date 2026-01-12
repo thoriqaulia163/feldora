@@ -24,8 +24,14 @@ export default {
         violetCustom: {
           300: "#5724ff",
         },
+        purpleCustom: {
+          300: "#7d69f5",
+          400: "#6f4deb",
+          500: "#673de6",
+        },
         yellowCustom: {
           100: "#8e983f",
+          200: "#CCFF00",
           300: "#edff66",
         },
       },

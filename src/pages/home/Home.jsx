@@ -19,7 +19,7 @@ export default function Home() {
   )
 
   return (
-    <div className='min-h-screen'>
+    <div className='min-h-screen pt-16'>
       <Helmet>
         <title>
           Feldora | Home
