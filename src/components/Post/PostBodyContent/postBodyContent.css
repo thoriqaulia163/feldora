@@ -6,13 +6,16 @@
 /* First Letter Styling */
 .postContentFormat> :first-child::first-letter {
   float: left;
+  margin-right: 0.5rem;
   line-height: 1;
-  font-size: 300%;
+  font-size: 3rem;
   font-weight: bold;
   color: #8A2BE2;
+}
 
-  /* For mozila only */
-  @-moz-document url-prefix() {
+/* For mozila only */
+@-moz-document url-prefix() {
+  .postContentFormat> :first-child::first-letter {
     padding-top: 0.5rem;
   }
 }
