@@ -1,5 +1,5 @@
 import React from 'react'
-import './PostBodyContent.css'
+import './postBodyContent.css'
 
 export default function PostBodyContent({ content }) {
   return (
