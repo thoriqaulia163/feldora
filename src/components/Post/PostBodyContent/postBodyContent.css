@@ -1,29 +1,38 @@
 .postContentFormat {
   @apply font-mono;
   margin-bottom: 3rem;
-  initial-letter: 6;
 }
 
+/* First Letter Styling */
 .postContentFormat> :first-child::first-letter {
   float: left;
-  padding-top: 0.5rem;
+  line-height: 1;
   font-size: 300%;
   font-weight: bold;
   color: #8A2BE2;
+
+  /* For mozila only */
+  @-moz-document url-prefix() {
+    padding-top: 0.5rem;
+  }
 }
 
+/* URL button Styling */
 .postContentFormat a {
   @apply text-purple-600;
 }
 
+/* ordered list Styling */
 .postContentFormat ol {
   @apply list-decimal list-outside pl-[1.75rem];
 }
 
+/* unordered list Styling */
 .postContentFormat ul {
   @apply list-disc pl-[1rem];
 }
 
+/* image Styling */
 .postContentFormat img {
   display: block;
   max-width: 100%;
@@ -32,6 +41,7 @@
   margin: 1.5rem auto;
 }
 
+/* mini code Styling */
 .postContentFormat code {
   border-radius: 4px;
   background: rgb(243, 240, 249);
@@ -39,6 +49,7 @@
   padding: 4px;
 }
 
+/* box code Styling */
 .postContentFormat pre {
   border-radius: 0.25rem;
   background: rgb(243, 240, 249);
@@ -47,12 +58,14 @@
   margin: 0.75rem 0
 }
 
+/* code in box Styling */
 .postContentFormat pre code {
   border: 0;
   padding: 0;
   background: transparent;
 }
 
+/* quote Styling */
 .postContentFormat blockquote {
   margin-left: 0.2rem;
   padding-left: 1rem;

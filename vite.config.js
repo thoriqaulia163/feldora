@@ -15,6 +15,7 @@ export default defineConfig({
       '@lib': "/src/lib",
       '@assets': "/src/assets",
       '@constants': "/src/constants",
+      '@public': "/public",
     },
   },
 })

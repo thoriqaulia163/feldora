@@ -11,7 +11,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 // import ToggleColorMode from './ToggleColorMode';
-import webLogo from '@assets/feldora-logo-2.webp'
+// import webLogo from '@assets/feldora-logo-2.webp'
 
 const navLinkStyle = 'flex items-center gap-4 text-white hover:text-gray-200 font-bold'
 
