@@ -41,7 +41,11 @@ export const getPostDetail = async (slug) =>{
         name
         id
         bio
+        photo{
+          url
+        }
       }
+      updatedAt
       createdAt
       slug
       title
@@ -52,6 +56,7 @@ export const getPostDetail = async (slug) =>{
       category {
         name
         slug
+        color
       }
       content {
         raw

@@ -79,24 +79,26 @@ export default function Canvas() {
       </div>
       <h2>Custom Color</h2>
       <div className='flex'>
-        <div className='w-4 h-4 m-1 bg-yellowCustom-100'></div>
-        <div className='w-4 h-4 m-1 bg-yellowCustom-200'></div>
-        <div className='w-4 h-4 m-1 bg-yellowCustom-300'></div>
+        <div className='w-4 h-4 m-1 bg-customYellow-100'></div>
+        <div className='w-4 h-4 m-1 bg-customYellow-200'></div>
+        <div className='w-4 h-4 m-1 bg-customYellow-300'></div>
       </div>
       <div className='flex'>
-        <div className='w-4 h-4 m-1 bg-blueCustom-50'></div>
-        <div className='w-4 h-4 m-1 bg-blueCustom-75'></div>
-        <div className='w-4 h-4 m-1 bg-blueCustom-100'></div>
-        <div className='w-4 h-4 m-1 bg-blueCustom-200'></div>
-        <div className='w-4 h-4 m-1 bg-blueCustom-300'></div>
+        <div className='w-4 h-4 m-1 bg-customBlue-50'></div>
+        <div className='w-4 h-4 m-1 bg-customBlue-75'></div>
+        <div className='w-4 h-4 m-1 bg-customBlue-100'></div>
+        <div className='w-4 h-4 m-1 bg-customBlue-200'></div>
+        <div className='w-4 h-4 m-1 bg-customBlue-300'></div>
       </div>
       <div className='flex'>
-        <div className='w-4 h-4 m-1 bg-violetCustom-300'></div>      
+        <div className='w-4 h-4 m-1 bg-customViolet-300'></div>      
       </div>
       <div className='flex'>
-        <div className='w-4 h-4 m-1 bg-purpleCustom-300'></div>
-        <div className='w-4 h-4 m-1 bg-purpleCustom-400'></div>
-        <div className='w-4 h-4 m-1 bg-purpleCustom-500'></div>
+        <div className='w-4 h-4 m-1 bg-customPurple-100'></div>
+        <div className='w-4 h-4 m-1 bg-customPurple-300'></div>
+        <div className='w-4 h-4 m-1 bg-customPurple-400'></div>
+        <div className='w-4 h-4 m-1 bg-customPurple-500'></div>
+        <div className='w-4 h-4 m-1 bg-customPurple-900'></div>
       </div>
       {/* <Container maxWidth='xl' sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', gap: '1.5rem', marginTop: '7rem' }}>
         {posts?.map((item, index) => (

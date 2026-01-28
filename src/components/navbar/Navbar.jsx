@@ -20,12 +20,12 @@ export default function Navbar({ }) {
 
   return (
     <>
-      <div className='fixed bg-yellowCustom-200 w-full z-20 h-14 px-4 py-2 box-border flex justify-between items-center'>
+      <div className='fixed bg-customYellow-200 w-full z-20 h-14 px-4 py-2 box-border flex justify-between items-center'>
         <Link to={'/'} className='special-font navbar-heading'>
           F<b>E</b>LDOR<b>A</b>
         </Link>
-        <button onClick={() => setOpenMenu(!openMenu)} className='bg-purpleCustom-300 rounded-xl h-10 w-10'>
-          <FontAwesomeIcon icon={faCompass} size='lg' className={`${openMenu && '-rotate-90'} transition duration-300 ease-in-out`} />
+        <button onClick={() => setOpenMenu(!openMenu)} className='bg-purple-500 rounded-xl h-10 w-10'>
+          <FontAwesomeIcon icon={faCompass} size='lg' className={`${openMenu && '-rotate-90'} transition duration-300 ease-in-out text-purple-200 `} />
         </button>
       </div>
 
@@ -33,31 +33,31 @@ export default function Navbar({ }) {
         <div className={`flex flex-col w-full h-full gap-4 items-end pt-4 px-4`}>
           <Link to={'/'} className={navLinkStyle} >
             <p>Home</p>
-            <div className='bg-purpleCustom-300 rounded-full h-10 w-10 flex justify-center items-center'>
+            <div className='bg-customPurple-300 rounded-full h-10 w-10 flex justify-center items-center'>
               <FontAwesomeIcon icon={faHouse} size='lg' />
             </div>
           </Link>
           <Link to={'/canvas'} className={navLinkStyle} >
             <p>Canvas</p>
-            <div className='bg-purpleCustom-300 rounded-full h-10 w-10 flex justify-center items-center'>
+            <div className='bg-customPurple-300 rounded-full h-10 w-10 flex justify-center items-center'>
               <FontAwesomeIcon icon={faPaintBrush} size='lg' />
             </div>
           </Link>
           <Link to={'/log'} className={navLinkStyle} >
             <p>Log</p>
-            <div className='bg-purpleCustom-300 rounded-full h-10 w-10 flex justify-center items-center'>
+            <div className='bg-customPurple-300 rounded-full h-10 w-10 flex justify-center items-center'>
               <FontAwesomeIcon icon={faBook} size='lg' />
             </div>
           </Link>
           <Link to={'/about'} className={navLinkStyle} >
             <p>About</p>
-            <div className='bg-purpleCustom-300 rounded-full h-10 w-10 flex justify-center items-center'>
+            <div className='bg-customPurple-300 rounded-full h-10 w-10 flex justify-center items-center'>
               <FontAwesomeIcon icon={faCircleInfo} size='lg' />
             </div>
           </Link>
           <Link to={'#'} className={navLinkStyle} >
             <p>Blog</p>
-            <div className='bg-purpleCustom-300 rounded-full h-10 w-10 flex justify-center items-center'>
+            <div className='bg-customPurple-300 rounded-full h-10 w-10 flex justify-center items-center'>
               <FontAwesomeIcon icon={faNewspaper} size='lg' />
             </div>
           </Link>

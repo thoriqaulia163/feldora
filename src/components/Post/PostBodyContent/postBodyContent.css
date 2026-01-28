@@ -1,0 +1,60 @@
+.postContentFormat {
+  @apply font-mono;
+  margin-bottom: 3rem;
+  initial-letter: 6;
+}
+
+.postContentFormat> :first-child::first-letter {
+  float: left;
+  padding-top: 0.5rem;
+  font-size: 300%;
+  font-weight: bold;
+  color: #8A2BE2;
+}
+
+.postContentFormat a {
+  @apply text-purple-600;
+}
+
+.postContentFormat ol {
+  @apply list-decimal list-outside pl-[1.75rem];
+}
+
+.postContentFormat ul {
+  @apply list-disc pl-[1rem];
+}
+
+.postContentFormat img {
+  display: block;
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+  margin: 1.5rem auto;
+}
+
+.postContentFormat code {
+  border-radius: 4px;
+  background: rgb(243, 240, 249);
+  border: 1px solid rgb(182, 182, 182);
+  padding: 4px;
+}
+
+.postContentFormat pre {
+  border-radius: 0.25rem;
+  background: rgb(243, 240, 249);
+  border: 1px solid rgb(182, 182, 182);
+  padding: 1.5rem;
+  margin: 0.75rem 0
+}
+
+.postContentFormat pre code {
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.postContentFormat blockquote {
+  margin-left: 0.2rem;
+  padding-left: 1rem;
+  border-left: 4px solid rgb(196, 196, 196);
+}
