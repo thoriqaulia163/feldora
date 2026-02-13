@@ -62,8 +62,25 @@ body {
     font-feature-settings: "ss01" on;
   }
 
+  .special-font-full {
+    font-family: "Zentry";
+    font-feature-settings: "ss01" on;
+  }
+
   .navbar-heading {
     @apply uppercase font-zentry font-medium text-2xl tracking-wider;
+  }
+
+  .hero-heading-xsmall {
+    @apply uppercase font-zentry font-black text-5xl tracking-wider ;
+  }
+
+  .hero-heading-small {
+    @apply uppercase font-zentry font-black text-5xl sm:right-10 sm:text-7xl tracking-wider ;
+  }
+
+  .hero-heading-medium {
+    @apply uppercase font-zentry font-black text-5xl sm:right-10 sm:text-7xl md:text-9xl tracking-wider;
   }
 
   .hero-heading {
