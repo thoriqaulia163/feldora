@@ -14,6 +14,9 @@ export default {
         "robert-regular": ["robert-regular", "sans-serif"],
       },
       colors: {
+        customWhite: {
+          100: "#dfdff0",
+        },
         customBlue: {
           50: "#DFDFF0",
           75: "#dfdff2",

@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* BASE ====================================== */
+html {
+  scroll-behavior: smooth;
+  box-sizing: border-box;
+}
 body {
   width: 100dvw;
   overflow-x: hidden;
@@ -68,7 +73,7 @@ body {
   }
 
   .navbar-heading {
-    @apply uppercase font-zentry font-medium text-2xl tracking-wider;
+    @apply uppercase font-zentry font-medium text-2xl tracking-widest;
   }
 
   .hero-heading-xsmall {
@@ -158,18 +163,6 @@ body {
   }
 }
 
-
-/* BASE ====================================== */
-html {
-  scroll-behavior: smooth;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: "General Sans", sans-serif;
-  width: 100dvw;
-  background-color: #dfdff0;
-}
 
 /* ul {
   list-style: none;
