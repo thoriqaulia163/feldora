@@ -1,18 +1,14 @@
 import * as React from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCompass,
-  faHouse,
-  faPaintBrush,
-  faBook,
-  faCircleInfo,
-  faNewspaper,
-} from "@fortawesome/free-solid-svg-icons";
+import { faCompass } from "@fortawesome/free-solid-svg-icons";
 import { NAVIGATION_LINK } from "../../constants/navigationLink";
 
 // import ToggleColorMode from './ToggleColorMode';
 // import webLogo from '@assets/feldora-logo-2.webp'
+
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 const navLinkStyle =
   "flex items-center gap-4 text-purple-300 hover:text-gray-200 font-bold font-mono";
@@ -21,6 +17,12 @@ const navIconStyle =
 
 export default function Navbar({}) {
   const [openMenu, setOpenMenu] = React.useState(false);
+  const { pathname } = useLocation();
+
+  // Scroll To Top Effect
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   return (
     <>
