@@ -20,24 +20,23 @@ export default function Blog() {
     );
 
   return (
-    <div className="min-h-screen ">
+    <div className="min-h-screen mb-8">
       <Helmet>
         <title>Feldora | Home</title>
       </Helmet>
       <div className="bg-black px-4 pt-24 pb-8">
         <div className=" w-full max-w-5xl flex justify-center items-center gap-4 px-4 flex-col-reverse md:flex-row mx-auto">
           <div className="text-white w-full md:w-1/2 flex flex-col gap-4 ">
-            <h2 className="font-light">Personal Statement</h2>
+            <h2 className="font-light">Read & Write</h2>
             <h1 className="hero-heading-xsmall special-font-full text-white">
-              AI will controls nothing of me !!!
+              Read and Write are very important!
             </h1>
             <p className="font-mono text-[0.75rem] lg:text-[1rem]">
-              AI is changing the web, and people want very different things from
-              it. We’ve heard from many who want nothing to do with AI. We’ve
-              also heard from others who want AI tools that are genuinely
-              useful. Listening to our community, alongside our ongoing
-              commitment to offer choice, led us to build AI controls. Starting
-              ...
+              AI is changing the way People gather information, and people
+              getting addicted to it. We’ve heard and see people read and belief
+              what AI summarize. AI tools are genuinely useful, but overuse it
+              make us lack of basic skills. alongside our ongoing commitment to
+              led us to control AI, not otherwhise. Starting ...
             </p>
           </div>
 

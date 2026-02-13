@@ -17,7 +17,7 @@ import { NAVIGATION_LINK } from "../../constants/navigationLink";
 const navLinkStyle =
   "flex items-center gap-4 text-purple-300 hover:text-gray-200 font-bold font-mono";
 const navIconStyle =
-  "bg-customYellow-200 text-black rounded-full h-10 w-10 flex justify-center items-center";
+  "bg-customYellow-300 text-black rounded-full h-10 w-10 flex justify-center items-center";
 
 export default function Navbar({}) {
   const [openMenu, setOpenMenu] = React.useState(false);
@@ -27,13 +27,13 @@ export default function Navbar({}) {
       <div className="fixed bg-black w-full z-20 h-14 px-4 py-2 box-border flex justify-between items-center">
         <Link
           to={"/"}
-          className="special-font navbar-heading text-transparent bg-clip-text bg-gradient-to-br to-customYellow-300 from-customWhite-100"
+          className="special-font-full navbar-heading text-transparent bg-clip-text bg-gradient-to-br to-customYellow-300 from-customWhite-100"
         >
-          F<b>E</b>LDOR<b>A</b>
+          FELDORA
         </Link>
         <button
           onClick={() => setOpenMenu(!openMenu)}
-          className="bg-customYellow-200 rounded-xl h-10 w-10"
+          className="bg-gradient-to-tl to-customYellow-300 from-customWhite-100 rounded-xl h-10 w-10"
         >
           <FontAwesomeIcon
             icon={faCompass}
