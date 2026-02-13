@@ -10,6 +10,7 @@ import Post from "@pages/posts/Post";
 import Log from "@pages/log/Log";
 import Canvas from "@pages/canvas/Canvas";
 import Blog from "./pages/posts/Blog";
+import ErrorNotFound from "./components/Error/ErrorNotFound";
 
 export default function App() {
   const location = useLocation();
@@ -25,6 +26,8 @@ export default function App() {
           <Route path="/about" element={<About />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/post/:slug" element={<Post />} />
+
+          <Route path="*" element={<ErrorNotFound />} />
         </Routes>
       </main>
       <Footer />
