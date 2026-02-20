@@ -1,19 +1,7 @@
 import React from 'react'
-import { useGetPosts } from '@lib/react-query/queries';
 import { Helmet } from 'react-helmet-async';
 
 export default function Canvas() {
-
-  if (loading) return (
-    <div >
-      <Helmet>
-        <title>
-          Feldora | Canvas
-        </title>
-      </Helmet>
-      Loading ....
-    </div>
-  )
 
   return (
     <div className='min-h-screen'>
@@ -98,11 +86,6 @@ export default function Canvas() {
         <div className='w-4 h-4 m-1 bg-customPurple-500'></div>
         <div className='w-4 h-4 m-1 bg-customPurple-900'></div>
       </div>
-      {/* <Container maxWidth='xl' sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-start', gap: '1.5rem', marginTop: '7rem' }}>
-        {posts?.map((item, index) => (
-          <PostCard key={index} post={item.node} />
-        ))}
-      </Container> */}
     </div>
   )
 }
