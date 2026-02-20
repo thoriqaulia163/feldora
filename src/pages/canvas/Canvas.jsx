@@ -4,8 +4,6 @@ import { Helmet } from 'react-helmet-async';
 
 export default function Canvas() {
 
-  const { data: posts, isPending: loading } = useGetPosts();
-
   if (loading) return (
     <div >
       <Helmet>
