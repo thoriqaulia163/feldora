@@ -1,3 +1,5 @@
+import { Link } from '@tanstack/react-router'
+
 export function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
@@ -64,12 +66,12 @@ export function HeroSection() {
 
             {/* CTA Buttons */}
             <div className="mt-10 flex flex-wrap items-center gap-4 animate-fade-up" style={{ animationDelay: '0.3s' }}>
-              <a href="/story" className="btn-angular-primary">
+              <Link to="/story" className="btn-angular-primary">
                 Explore Stories
-              </a>
-              <a href="/about" className="btn-angular-outline">
+              </Link>
+              <Link to="/about" className="btn-angular-outline">
                 Learn More
-              </a>
+              </Link>
             </div>
           </div>
 

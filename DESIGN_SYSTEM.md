@@ -289,3 +289,7 @@ npm run lint     # TypeScript type check (tsc --noEmit)
 6. **404 Page** — Di-handle via `notFoundComponent` di `__root.tsx`. Menampilkan "404" besar dengan corner accent merah, pesan "Lost in the void", dan tombol "Return Home". Tidak perlu file route terpisah — TanStack Router otomatis menampilkan component ini untuk semua route yang tidak dikenali.
 
 7. **Nitro plugin** — Wajib untuk deployment Vercel. Tanpa `nitro()` di vite plugins, build output tidak compatible dengan Vercel serverless.
+
+8. **Routing links:**
+   - Internal route (mengarah ke halaman website sendiri) → **WAJIB** menggunakan `<Link>` dari `@tanstack/react-router`. Ini memastikan client-side navigation tanpa full page reload. Gunakan `<a>` hanya jika ada kebutuhan spesifik yang tidak bisa di-cover oleh `<Link>`.
+   - External route (mengarah ke domain luar seperti GitHub, Discord, dll) → boleh menggunakan tag `<a>` biasa dengan `target="_blank"` dan `rel="noopener noreferrer"`.
