@@ -1,0 +1,144 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-feldora-bg text-feldora-text font-sans;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    @apply bg-feldora-accent/30 text-white;
+  }
+}
+
+@layer components {
+  /* Diamond accent marker */
+  .diamond-marker {
+    @apply w-3 h-3 rotate-45 bg-feldora-accent inline-block;
+  }
+
+  /* Polygon card with corner cut */
+  .card-polygon {
+    @apply relative bg-feldora-surface border border-feldora-border/50 overflow-hidden;
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%);
+    transition: border-color 0.3s ease;
+  }
+  .card-polygon::after {
+    content: '';
+    @apply absolute bottom-0 right-0 w-[28px] h-[28px] border-t border-feldora-border/50;
+    transform: rotate(45deg) translate(7px, 7px);
+  }
+
+  /* Angular buttons */
+  .btn-angular {
+    @apply relative px-8 py-3 font-bold uppercase tracking-wider text-sm overflow-hidden;
+    clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+  }
+  .btn-angular-primary {
+    @apply btn-angular bg-feldora-accent text-white hover:bg-red-700 transition-colors duration-300;
+  }
+  .btn-angular-outline {
+    @apply btn-angular bg-transparent text-feldora-text border-2 border-feldora-border hover:border-feldora-accent/60 transition-colors duration-300;
+  }
+
+  /* Panel frame with corner accents */
+  .panel-frame {
+    @apply relative border-2 border-feldora-border;
+  }
+  .panel-frame::before {
+    content: '';
+    @apply absolute -top-[2px] -left-[2px] w-6 h-6 border-t-2 border-l-2 border-feldora-accent;
+  }
+  .panel-frame::after {
+    content: '';
+    @apply absolute -bottom-[2px] -right-[2px] w-6 h-6 border-b-2 border-r-2 border-feldora-accent;
+  }
+
+  /* Hex badge */
+  .hex-badge {
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+    @apply bg-feldora-accent flex items-center justify-center;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-white to-feldora-text-secondary;
+  }
+
+  .text-gradient-accent {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-feldora-accent to-red-400;
+  }
+
+  .border-glow {
+    @apply border border-feldora-accent/20 shadow-[0_0_15px_rgba(220,38,38,0.1)];
+  }
+
+  .surface-elevated {
+    @apply bg-feldora-surface border border-feldora-border/50;
+  }
+
+  .cinematic-shadow {
+    box-shadow:
+      0 25px 50px -12px rgba(0, 0, 0, 0.8),
+      0 0 30px rgba(220, 38, 38, 0.05);
+  }
+
+  .clip-notch-br {
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 24px), calc(100% - 24px) 100%, 0 100%);
+  }
+
+  .clip-arrow-right {
+    clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%);
+  }
+
+  .clip-parallelogram {
+    clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
+  }
+}
+
+/* Story content prose styling */
+.prose-feldora {
+  @apply text-feldora-text-secondary leading-relaxed;
+}
+.prose-feldora h1, .prose-feldora h2, .prose-feldora h3, .prose-feldora h4 {
+  @apply text-feldora-text font-bold mt-8 mb-4;
+}
+.prose-feldora h1 { @apply text-3xl; }
+.prose-feldora h2 { @apply text-2xl; }
+.prose-feldora h3 { @apply text-xl; }
+.prose-feldora p { @apply mb-4 leading-relaxed; }
+.prose-feldora a { @apply text-feldora-accent hover:underline; }
+.prose-feldora ul { @apply list-disc pl-6 mb-4; }
+.prose-feldora ol { @apply list-decimal pl-6 mb-4; }
+.prose-feldora li { @apply mb-2; }
+.prose-feldora blockquote {
+  @apply border-l-2 border-feldora-accent/30 pl-4 italic text-feldora-muted my-6;
+}
+.prose-feldora code {
+  @apply bg-feldora-surface-light text-feldora-accent px-1.5 py-0.5 text-sm rounded font-mono;
+}
+.prose-feldora pre {
+  @apply bg-feldora-surface border border-feldora-border p-4 rounded my-6 overflow-x-auto;
+}
+.prose-feldora pre code {
+  @apply bg-transparent p-0 text-feldora-text-secondary;
+}
+.prose-feldora img { @apply w-full rounded my-6; }
+.prose-feldora > :first-child::first-letter {
+  @apply text-5xl font-bold text-feldora-accent float-left mr-2 leading-none;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0a0a0f; }
+::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #dc2626; }
