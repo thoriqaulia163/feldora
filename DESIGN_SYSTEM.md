@@ -69,6 +69,7 @@ src/
 | `/log` | Log | Changelog/update history (timeline) |
 | `/story` | Story List | Grid card articles (dari Hygraph atau placeholder) |
 | `/story/:slug` | Story Detail | Full article — title, meta, image, content HTML |
+| `*` (catch-all) | 404 Not Found | Error page untuk route yang tidak ada |
 
 Route `/story` berfungsi sebagai layout route (`<Outlet />`), dengan child:
 - `/story/` → `story.index.tsx` (list)
@@ -246,23 +247,30 @@ npm run lint     # TypeScript type check (tsc --noEmit)
 
 **Platform:** Vercel (auto-deploy dari GitHub repo)
 
-Alur:
+**Setup:**
+1. Install `nitro` sebagai dependency: `npm i nitro`
+2. Tambahkan plugin `nitro()` di `vite.config.ts`:
+   ```ts
+   import { nitro } from 'nitro/vite'
+   // ...
+   plugins: [tanstackStart(), nitro(), react()]
+   ```
+3. `vercel.json` dibiarkan kosong `{}` — Vercel auto-detect dari `.output/nitro.json`
+4. Di Vercel Dashboard → Framework Preset: pilih **TanStack Start**
+
+**Alur deploy:**
 1. Push ke GitHub → Vercel otomatis build & deploy
-2. Vercel mendeteksi framework via `vercel.json` (`"framework": "tanstack-start"`)
-3. Build menghasilkan SSR serverless functions + static client assets
-4. Setiap route di-handle server-side (bukan SPA rewrite)
+2. `npm run build` menghasilkan `.output/` directory (format Nitro/Vercel)
+3. Vercel membaca `.output/nitro.json` dan deploy sebagai serverless SSR
 
-File `vercel.json`:
-```json
-{
-  "framework": "tanstack-start"
-}
-```
+**Environment Variables (Vercel Dashboard → Settings → Environment Variables):**
+- `VITE_GRAPH_CMS_ENDPOINT` — Hygraph GraphQL endpoint
 
-Catatan:
-- **Tidak perlu** `"rewrites"` seperti project SPA lama — TanStack Start SSR menangani routing di server.
-- Vercel secara native support TanStack Start sehingga konfigurasi minimal.
-- Environment variable `VITE_GRAPH_CMS_ENDPOINT` perlu di-set di Vercel Dashboard → Settings → Environment Variables.
+**Catatan:**
+- Tanpa plugin `nitro`, build output ke `dist/` yang tidak dipahami Vercel untuk SSR
+- Dengan plugin `nitro`, build output ke `.output/` yang merupakan format standar Vercel
+- `vercel.json` TIDAK perlu rewrites — SSR menangani semua routing di server
+- Jangan gunakan `"framework": "vite"` di vercel.json — itu untuk static site saja
 
 ---
 
@@ -277,3 +285,7 @@ Catatan:
 4. **Design adalah dark-only** — Tidak ada light theme. Background selalu `#0a0a0f`. Semua warna di-hardcode di Tailwind config, bukan CSS variables.
 
 5. **Clip-path components** — Card dan button menggunakan CSS `clip-path`. Ini berarti `border-radius` tidak berlaku pada elemen-elemen ini. Visual "rounded" diganti dengan "angular cut".
+
+6. **404 Page** — Di-handle via `notFoundComponent` di `__root.tsx`. Menampilkan "404" besar dengan corner accent merah, pesan "Lost in the void", dan tombol "Return Home". Tidak perlu file route terpisah — TanStack Router otomatis menampilkan component ini untuk semua route yang tidak dikenali.
+
+7. **Nitro plugin** — Wajib untuk deployment Vercel. Tanpa `nitro()` di vite plugins, build output tidak compatible dengan Vercel serverless.
