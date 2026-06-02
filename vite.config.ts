@@ -1,6 +1,7 @@
-import { defineConfig } from 'vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
+import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { nitro } from 'nitro/vite'
 import path from 'node:path'
 
 export default defineConfig({
@@ -12,5 +13,5 @@ export default defineConfig({
       '~': path.resolve(__dirname, './src'),
     },
   },
-  plugins: [tanstackStart(), react()],
+  plugins: [tanstackStart(), nitro(), react()],
 })
