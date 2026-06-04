@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { WEB_UPDATE_LOG } from '~/constants/updateLog'
+import { LogCard } from '~/components/ui/LogCard'
 
 export function LatestUpdates() {
   const latestEntries = WEB_UPDATE_LOG.slice(0, 4)
@@ -34,25 +35,11 @@ export function LatestUpdates() {
 
         <div className="space-y-3">
           {latestEntries.map((entry, i) => (
-            <div
+            <LogCard
               key={i}
-              className="group relative clip-notch-br bg-feldora-surface border border-feldora-border/40 hover:border-feldora-accent/30 transition-all duration-300 p-5 pl-6"
-            >
-              <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-feldora-accent/0 group-hover:bg-feldora-accent transition-colors duration-300" />
-              <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
-                <div className="flex items-center gap-3 shrink-0">
-                  <div className="hex-badge w-8 h-8 text-[9px] font-bold text-white shrink-0">
-                    {WEB_UPDATE_LOG.length - i}
-                  </div>
-                  <span className="text-feldora-muted font-mono text-xs sm:w-36">
-                    {entry.tanggal}
-                  </span>
-                </div>
-                <p className="text-feldora-text text-sm group-hover:text-white transition-colors duration-300">
-                  {entry.update}
-                </p>
-              </div>
-            </div>
+              entry={entry}
+              number={WEB_UPDATE_LOG.length - i}
+            />
           ))}
         </div>
       </div>

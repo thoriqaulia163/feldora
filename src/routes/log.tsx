@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { WEB_UPDATE_LOG } from '~/constants/updateLog'
+import { LogCard } from '~/components/ui/LogCard'
 
 export const Route = createFileRoute('/log')({
   head: () => ({
@@ -38,19 +39,11 @@ function LogPage() {
                   <div className="absolute inset-[2px] bg-feldora-accent rotate-0" />
                 )}
               </div>
-              <div className="clip-notch-br bg-feldora-surface border border-feldora-border/40 hover:border-feldora-accent/30 transition-all duration-300 p-5">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-5">
-                  <div className="flex items-center gap-3 shrink-0">
-                    <div className="hex-badge w-7 h-7 text-[9px] font-bold text-white shrink-0">
-                      {WEB_UPDATE_LOG.length - index}
-                    </div>
-                    <span className="text-feldora-muted font-mono text-xs">{entry.tanggal}</span>
-                  </div>
-                  <p className="text-feldora-text text-sm leading-relaxed group-hover:text-white transition-colors duration-300">
-                    {entry.update}
-                  </p>
-                </div>
-              </div>
+              <LogCard
+                entry={entry}
+                number={WEB_UPDATE_LOG.length - index}
+                showAccentBar
+              />
             </div>
           ))}
         </div>
