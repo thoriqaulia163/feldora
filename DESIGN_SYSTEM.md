@@ -431,11 +431,13 @@ Props:
 
 ### Alur Error di Story Pages
 
-**StoryList:**
-1. Loading → `SkeletonCardGrid`
+**StoryList (Infinite Scroll):**
+1. Initial loading → `SkeletonCardGrid` (12 cards)
 2. Error → `ErrorState` dengan retry
 3. Empty → `ErrorState` pesan "Belum ada cerita"
-4. Success → render story cards
+4. Success → render story cards (12 per page)
+5. Scroll ke bawah → `Spinner` + auto-fetch next page
+6. Semua loaded → "All stories loaded" text
 
 **StoryDetail:**
 1. Cek placeholder dulu — kalau slug cocok, langsung render tanpa tunggu API
@@ -443,6 +445,35 @@ Props:
 3. Error (tanpa placeholder) → `ErrorState` dengan retry + back
 4. Not found → 404 UI
 5. Success → render artikel
+
+---
+
+## Infinite Scroll (`StoryList`)
+
+Story list menggunakan `useInfiniteQuery` dari React Query dengan pagination 12 post per page.
+
+### Mekanisme
+- `IntersectionObserver` pada div trigger di bawah grid
+- Saat trigger element terlihat di viewport (threshold 0.1), otomatis `fetchNextPage()`
+- Loading next page menampilkan `Spinner` (circle loader)
+- Berhenti fetch saat `hasNextPage === false`
+- `allPosts` di-memoize dengan `useMemo` agar flatMap hanya di-recalculate saat data berubah, bukan setiap render
+
+### Data Source
+- **Production**: Hygraph GraphQL (akan di-migrate ke paginated query)
+- **Development/Mock**: `src/lib/mockPosts.ts` — 36 mock posts, 800ms simulated delay
+
+### Spinner Component (`src/components/ui/Spinner.tsx`)
+
+Reusable circle loader dengan props:
+- `size` — Tailwind width/height classes (default: `"w-6 h-6"`)
+- `className` — tambahan class (misal `"border-4"` untuk lebih tebal)
+
+```tsx
+<Spinner />                  // default
+<Spinner size="w-4 h-4" />   // kecil
+<Spinner size="w-10 h-10" /> // besar
+```
 
 ---
 
@@ -456,7 +487,8 @@ Queries:
 - `getPostDetail(slug)` — Detail post (+ content HTML, author photo)
 
 ### React Query Hooks
-- `useGetPosts()` — staleTime 1 hour
+- `useGetPosts()` — staleTime 1 hour (legacy, non-paginated)
+- `useGetPostsPaginated()` — `useInfiniteQuery`, 12 posts per page, staleTime 1 hour
 - `useGetPostDetail(slug)` — enabled only when slug exists
 
 Fallback: Jika API endpoint tidak tersedia, Story page menampilkan placeholder articles.

@@ -13,6 +13,14 @@ export interface UpdateEntry {
 export const WEB_UPDATE_LOG: UpdateEntry[] = [
   {
     date: '4 June 2026',
+    title: 'Infinite scroll on StoryList & Spinner component',
+    status: 'moderate',
+    type: 'update',
+    version: '1.4.0',
+    description: 'Implemented infinite scroll on StoryList using useInfiniteQuery with IntersectionObserver. Fetches 12 posts per page with auto-loading on scroll. Created reusable Spinner component with configurable size. Added mock API (36 posts, 800ms delay) for development testing. Used useMemo for flattened posts array to avoid unnecessary recalculations on every render.',
+  },
+  {
+    date: '4 June 2026',
     title: 'Centralize copywriting to dedicated directory',
     status: 'minor',
     type: 'refactor',
