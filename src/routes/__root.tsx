@@ -23,6 +23,7 @@ export const Route = createRootRoute({
     links: [
       { rel: 'stylesheet', href: appCss },
       { rel: 'icon', href: '/feldora-logo-2.webp' },
+      { rel: 'manifest', href: '/manifest.json' },
       {
         rel: 'preconnect',
         href: 'https://fonts.googleapis.com',
@@ -74,6 +75,11 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       <body>
         {children}
         <Scripts />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js')}`,
+          }}
+        />
       </body>
     </html>
   )

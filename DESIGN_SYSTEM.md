@@ -24,6 +24,7 @@ Kesan yang ingin dicapai:
 | API | GraphQL via `graphql-request` |
 | CMS | Hygraph (headless CMS) |
 | Build Tool | Vite 7 |
+| PWA | Manual (manifest + service worker) |
 | Deployment | Vercel-ready |
 
 ---
@@ -32,17 +33,20 @@ Kesan yang ingin dicapai:
 
 ```
 src/
-├── components/          # UI components
+├── components/
 │   ├── home/            # Homepage sections (Hero, Featured, Updates, CTA)
 │   ├── layout/          # Navbar, Footer (persistent layout)
-│   └── story/           # Story list & detail components
-├── constants/           # Static data (navigation links, update log)
-├── lib/                 # API & data layer
+│   ├── story/           # Story list & detail components
+│   └── ui/              # Reusable UI components (LogCard)
+├── constants/
+│   ├── navigation.ts    # Navigation links array
+│   └── updateLog.ts     # Update log data & types
+├── lib/
 │   ├── graphql.ts       # GraphQL queries & types (Hygraph)
 │   ├── queries.ts       # React Query hooks (useGetPosts, useGetPostDetail)
 │   └── queryClient.ts   # Query client factory
-├── routes/              # TanStack Router file-based routes
-│   ├── __root.tsx       # Root layout (Navbar + Footer + QueryProvider)
+├── routes/
+│   ├── __root.tsx       # Root layout (Navbar + Footer + QueryProvider + SW register)
 │   ├── index.tsx        # Home page
 │   ├── about.tsx        # About page
 │   ├── log.tsx          # Changelog page
@@ -56,6 +60,13 @@ src/
 ├── env.d.ts             # Type declarations (Vite env, CSS modules)
 ├── router.tsx           # Router configuration
 └── routeTree.gen.ts     # Auto-generated route tree (DO NOT EDIT)
+
+public/
+├── manifest.json        # PWA manifest
+├── sw.js                # Service worker (offline support)
+├── offline.html         # Custom offline fallback page
+├── feldora-logo-2.webp  # Logo / PWA icon
+└── fonts/               # Custom font files
 ```
 
 ---
@@ -116,19 +127,9 @@ Elemen visual angular/geometric yang menjadi identitas Feldora:
 
 ### Diamond Marker (`.diamond-marker`)
 Kotak kecil dirotasi 45° — digunakan sebagai bullet/indicator section.
-```
-◆ Section Title
-```
 
 ### Card Polygon (`.card-polygon`)
 Card dengan sudut kanan bawah terpotong (clip-path). Memberikan kesan sci-fi panel.
-```
-┌────────────────────┐
-│                    │
-│     Content        │
-│                  ╱ │
-└─────────────────╱──┘
-```
 
 ### Hex Badge (`.hex-badge`)
 Badge heksagonal untuk nomor versi/ranking. Menggunakan clip-path polygon.
@@ -191,6 +192,163 @@ Hover transitions:
 
 ---
 
+## Update Log System
+
+### Data Structure (`src/constants/updateLog.ts`)
+
+```typescript
+type UpdateStatus = 'minor' | 'moderate' | 'major'
+type UpdateCategory = 'update' | 'fixing' | 'refactor' | 'revamp'
+
+interface UpdateEntry {
+  date: string          // Tanggal update (format: "2 June 2026")
+  title: string         // Judul/ringkasan update
+  status: UpdateStatus  // Level dampak update
+  type: UpdateCategory  // Kategori jenis perubahan
+  version: string       // Versi (format semver: "1.0.0")
+  description: string   // Deskripsi detail (ditampilkan di accordion)
+}
+```
+
+### Status Mapping (Warna Tag)
+
+| Status | Label | Warna | Class |
+|--------|-------|-------|-------|
+| `minor` | Minor | Abu-abu | `border-feldora-muted text-feldora-muted` |
+| `moderate` | Moderate | Kuning-orange | `border-amber-400/60 text-amber-400` |
+| `major` | Major | Merah | `border-feldora-accent text-feldora-accent` |
+
+Tag status memiliki fixed width `w-16` agar konsisten antar value yang berbeda.
+
+### Type Mapping (Icon & Warna)
+
+| Type | Label | Icon | Warna |
+|------|-------|------|-------|
+| `update` | Update | Circle-up / arrow up dalam lingkaran (Heroicons, stroke) | Hijau (`text-emerald-400`) |
+| `fixing` | Fixing | Wrench + screwdriver menyilang (Heroicons, stroke) | Merah (`text-red-400`) |
+| `refactor` | Refactor | Broom / sapu (Font Awesome, filled) | Orange (`text-orange-400`) |
+| `revamp` | Revamp | Sparkles / bintang-bintang (Heroicons, stroke) | Biru (`text-sky-400`) |
+
+Icon ditampilkan tanpa border/background, hanya icon berwarna. Saat di-hover, muncul tooltip di sebelah kanan icon yang menampilkan label type.
+
+---
+
+## LogCard Component (`src/components/ui/LogCard.tsx`)
+
+Komponen reusable untuk menampilkan satu entry update log. Digunakan di:
+- **Home page** (`LatestUpdates.tsx`) — tanpa accent bar
+- **Update Log page** (`log.tsx`) — dengan accent bar
+
+### Props
+
+| Prop | Type | Default | Deskripsi |
+|------|------|---------|-----------|
+| `entry` | `UpdateEntry` | required | Data entry dari `WEB_UPDATE_LOG` |
+| `number` | `number` | required | Nomor urut (ditampilkan di hex badge) |
+| `showAccentBar` | `boolean` | `false` | Tampilkan garis vertikal merah di kiri saat hover |
+
+### Perilaku
+
+- **Accordion** — Card bisa di-click untuk expand/collapse description
+- **Truncate** — Title di-truncate saat card tertutup, tampil penuh saat terbuka
+- **Arrow indicator** — Chevron di ujung kanan, rotate 180° saat open
+- **Keyboard accessible** — Support Enter & Space untuk toggle
+
+### Layout
+
+**Desktop (sm+):**
+```
+[Hex#] [Date/Version] [Status Tag] [Type Icon] | Title... | [▼]
+```
+
+**Mobile (<sm):**
+```
+[Hex#] [Date/Version] ........... [Status Tag] [Type Icon]
+Title...
+```
+
+Pada mobile, status & type icon di-push ke ujung kanan (`ml-auto`) sejajar dengan nomor dan date/version.
+
+### Styling
+
+- Container: `clip-notch-br bg-feldora-surface border border-feldora-border/40`
+- Hover: `hover:border-feldora-accent/30`
+- Accent bar (optional): `w-[3px]` di sisi kiri, transparan → merah saat hover
+- Accordion content: border-top separator, padding internal
+- Version: ditampilkan di bawah date dengan font lebih kecil (`text-[10px]`) dan warna lebih muted
+
+---
+
+## PWA (Progressive Web App)
+
+Feldora diimplementasikan sebagai PWA untuk pengalaman installable dan offline support.
+
+### File PWA
+
+| File | Lokasi | Fungsi |
+|------|--------|--------|
+| `manifest.json` | `public/manifest.json` | Metadata app (nama, icon, display mode, warna) |
+| `sw.js` | `public/sw.js` | Service worker — caching & offline fallback |
+| `offline.html` | `public/offline.html` | Halaman custom saat user offline dan cache tidak tersedia |
+
+### Manifest
+
+```json
+{
+  "short_name": "Feldora",
+  "name": "FELDORA — A Cinematic Digital Universe",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#0a0a0f",
+  "background_color": "#0a0a0f",
+  "orientation": "portrait-primary"
+}
+```
+
+- `display: standalone` — app terbuka tanpa browser UI (address bar hilang)
+- Warna theme & background menggunakan `feldora-bg` agar splash screen konsisten
+
+### Service Worker Strategy
+
+| Resource | Strategy | Alasan |
+|----------|----------|--------|
+| Same-origin pages & assets | **Network-first, cache fallback** | Selalu coba fresh content, offline serve dari cache |
+| Cross-origin (API, CDN) | **Network-only** | Tidak di-cache untuk menghindari stale data dari third-party |
+| Halaman belum pernah dikunjungi | **Fallback ke `offline.html`** | Custom offline page dengan styling Feldora |
+
+### Precache
+
+Halaman-halaman utama di-precache saat install:
+- `/`, `/about`, `/log`, `/story`
+- `/offline.html`, `/feldora-logo-2.webp`
+
+### Registration
+
+Service worker di-register via inline script di `__root.tsx`:
+```js
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js')
+}
+```
+
+### Offline Page (`public/offline.html`)
+
+Halaman static HTML dengan styling Feldora (dark bg, diamond markers, angular button).
+Ditampilkan saat user offline dan navigasi ke halaman yang belum pernah di-cache.
+
+### Cache Versioning
+
+Ubah `CACHE_NAME` di `sw.js` (e.g., `feldora-v1` → `feldora-v2`) saat deploy perubahan besar.
+Service worker akan otomatis hapus cache lama saat activate.
+
+### Splash Screen
+
+- **Android**: Auto-generated dari manifest (`name` + `icons[512]` + `background_color`)
+- **iOS**: Tidak otomatis — perlu `apple-touch-startup-image` meta tags (belum diimplementasi)
+- **Desktop**: Tidak ada splash screen
+
+---
+
 ## API Architecture
 
 ### GraphQL (Hygraph CMS)
@@ -227,7 +385,8 @@ Styling via `.prose-feldora` class yang men-style:
 - **Automatic code splitting** — setiap route di-lazy-load
 - **CSS-only animations** — tanpa Framer Motion atau runtime library
 - **Lazy loading images** — `loading="lazy"` pada semua non-critical images
-- **Minimal dependencies** — hanya 7 production deps
+- **Minimal dependencies** — hanya 8 production deps
+- **PWA caching** — halaman yang pernah dikunjungi tersedia offline
 - **No client-side routing waterfall** — React Query hanya untuk dynamic Story data
 
 ---
@@ -293,3 +452,5 @@ npm run lint     # TypeScript type check (tsc --noEmit)
 8. **Routing links:**
    - Internal route (mengarah ke halaman website sendiri) → **WAJIB** menggunakan `<Link>` dari `@tanstack/react-router`. Ini memastikan client-side navigation tanpa full page reload. Gunakan `<a>` hanya jika ada kebutuhan spesifik yang tidak bisa di-cover oleh `<Link>`.
    - External route (mengarah ke domain luar seperti GitHub, Discord, dll) → boleh menggunakan tag `<a>` biasa dengan `target="_blank"` dan `rel="noopener noreferrer"`.
+
+9. **PWA & Service Worker** — Service worker (`public/sw.js`) di-register di `__root.tsx`. Saat develop, unregister SW jika perubahan tidak terlihat (DevTools → Application → Service Workers → Unregister). Ubah `CACHE_NAME` saat deploy perubahan besar.
