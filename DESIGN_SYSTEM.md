@@ -50,8 +50,15 @@ src/
 │   ├── story/           # Story list & detail components
 │   └── ui/              # Reusable UI components (LogCard)
 ├── constants/
-│   ├── navigation.ts    # Navigation links array
-│   └── updateLog.ts     # Update log data & types
+│   ├── copy/              # Copywriting terpusat per halaman
+│   │   ├── index.ts       # Barrel export
+│   │   ├── home.ts        # Hero, Featured, Updates, CTA
+│   │   ├── about.ts       # Header, Philosophy, Platform, Values, Creator
+│   │   ├── log.ts         # Header
+│   │   └── story.ts       # Header, Error states, Detail page
+│   ├── navigation.ts      # Navigation links array
+│   ├── placeholderStories.ts  # Static placeholder articles
+│   └── updateLog.ts       # Update log data & types
 ├── lib/
 │   ├── graphql.ts       # GraphQL queries & types (Hygraph)
 │   ├── queries.ts       # React Query hooks (useGetPosts, useGetPostDetail)
@@ -544,3 +551,5 @@ npm run lint     # TypeScript type check (tsc --noEmit)
    - External route (mengarah ke domain luar seperti GitHub, Discord, dll) → boleh menggunakan tag `<a>` biasa dengan `target="_blank"` dan `rel="noopener noreferrer"`.
 
 9. **PWA & Service Worker** — Service worker (`public/sw.js`) hanya di-register di production (bukan localhost). Saat develop, SW tidak aktif sehingga perubahan langsung terlihat. Ubah `CACHE_NAME` di `sw.js` saat deploy perubahan besar agar cache lama terhapus.
+
+10. **Copywriting terpusat** — Semua teks/copy di-manage dari `src/constants/copy/`. Setiap halaman punya file sendiri (`home.ts`, `about.ts`, `log.ts`, `story.ts`). Untuk ubah teks di website, cukup edit file di directory ini tanpa perlu sentuh komponen.

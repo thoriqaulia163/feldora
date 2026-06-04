@@ -3,6 +3,7 @@ import { useGetPostDetail } from '~/lib/queries'
 import { getPlaceholderStory } from '~/constants/placeholderStories'
 import { SkeletonArticle } from '~/components/ui/Skeleton'
 import { ErrorState } from '~/components/ui/ErrorState'
+import { STORY_COPY } from '~/constants/copy'
 import { formatDate } from '~/utils/formatDate'
 
 interface StoryDetailProps {
@@ -32,10 +33,10 @@ export function StoryDetail({ slug }: StoryDetailProps) {
     return (
       <div className="min-h-screen pt-24 pb-20 px-6 flex items-center justify-center">
         <ErrorState
-          title="Gagal memuat artikel"
+          title={STORY_COPY.detail.error.title}
           onRetry={() => refetch()}
           backTo="/story"
-          backText="Kembali"
+          backText={STORY_COPY.detail.backLink}
         />
       </div>
     )
@@ -45,16 +46,16 @@ export function StoryDetail({ slug }: StoryDetailProps) {
     return (
       <div className="min-h-screen pt-24 pb-20 px-6 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-6xl font-bold text-feldora-accent mb-4">404</h1>
-          <p className="text-xl text-feldora-text mb-2">Story Not Found</p>
+          <h1 className="text-6xl font-bold text-feldora-accent mb-4">{STORY_COPY.detail.notFound.code}</h1>
+          <p className="text-xl text-feldora-text mb-2">{STORY_COPY.detail.notFound.title}</p>
           <p className="text-feldora-text-secondary mb-8">
-            This story doesn't exist or has been removed.
+            {STORY_COPY.detail.notFound.message}
           </p>
           <Link
             to="/story"
             className="px-6 py-3 bg-feldora-accent text-white font-medium uppercase tracking-wider text-sm hover:bg-red-700 transition-colors duration-300"
           >
-            Back to Stories
+            {STORY_COPY.detail.notFound.cta}
           </Link>
         </div>
       </div>
@@ -70,7 +71,7 @@ export function StoryDetail({ slug }: StoryDetailProps) {
           className="inline-flex items-center gap-2 text-feldora-text-secondary text-sm hover:text-feldora-accent transition-colors duration-200 mb-8 group"
         >
           <span className="group-hover:-translate-x-1 transition-transform duration-200">←</span>
-          Back to Stories
+          {STORY_COPY.detail.backLink}
         </Link>
 
         {/* Category badges */}
@@ -161,7 +162,7 @@ export function StoryDetail({ slug }: StoryDetailProps) {
             className="inline-flex items-center gap-2 text-feldora-text-secondary text-sm hover:text-feldora-accent transition-colors duration-200 group"
           >
             <span className="group-hover:-translate-x-1 transition-transform duration-200">←</span>
-            Back to all stories
+            {STORY_COPY.detail.backLinkAll}
           </Link>
         </div>
       </div>

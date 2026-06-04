@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import { WEB_UPDATE_LOG } from '~/constants/updateLog'
 import { LogCard } from '~/components/ui/LogCard'
+import { HOME_COPY } from '~/constants/copy'
 
 export function LatestUpdates() {
   const latestEntries = WEB_UPDATE_LOG.slice(0, 4)
@@ -21,15 +22,15 @@ export function LatestUpdates() {
             <div className="flex items-center gap-3 mb-3">
               <div className="diamond-marker" />
               <span className="text-feldora-accent font-mono text-xs uppercase tracking-[0.3em]">
-                Changelog
+                {HOME_COPY.updates.label}
               </span>
             </div>
             <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tight">
-              Latest <span className="text-feldora-accent">Updates</span>
+              {HOME_COPY.updates.heading} <span className="text-feldora-accent">{HOME_COPY.updates.headingAccent}</span>
             </h2>
           </div>
           <Link to="/log" className="btn-angular-outline text-xs">
-            View All
+            {HOME_COPY.updates.cta}
           </Link>
         </div>
 

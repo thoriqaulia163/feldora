@@ -2,6 +2,7 @@ import { useGetPosts } from '~/lib/queries'
 import { SkeletonCardGrid } from '~/components/ui/Skeleton'
 import { ErrorState } from '~/components/ui/ErrorState'
 import { StoryCard } from '~/components/story/StoryCard'
+import { STORY_COPY } from '~/constants/copy'
 
 export function StoryList() {
   const { data: posts, isPending, isError, refetch } = useGetPosts()
@@ -13,7 +14,7 @@ export function StoryList() {
   if (isError) {
     return (
       <ErrorState
-        title="Gagal memuat cerita"
+        title={STORY_COPY.error.title}
         onRetry={() => refetch()}
       />
     )
@@ -22,9 +23,9 @@ export function StoryList() {
   if (!posts || posts.length === 0) {
     return (
       <ErrorState
-        label="No Stories"
-        title="Belum ada cerita"
-        message="Cerita baru akan segera hadir."
+        label={STORY_COPY.error.empty.label}
+        title={STORY_COPY.error.empty.title}
+        message={STORY_COPY.error.empty.message}
       />
     )
   }

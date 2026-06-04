@@ -1,5 +1,6 @@
 import { PLACEHOLDER_STORIES } from '~/constants/placeholderStories'
 import { StoryCard } from '~/components/story/StoryCard'
+import { HOME_COPY } from '~/constants/copy'
 
 export function FeaturedSection() {
   return (
@@ -14,11 +15,11 @@ export function FeaturedSection() {
             <div className="flex items-center gap-3 mb-3">
               <div className="diamond-marker" />
               <span className="text-feldora-accent font-mono text-xs uppercase tracking-[0.3em]">
-                Featured
+                {HOME_COPY.featured.label}
               </span>
             </div>
             <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tight">
-              Explore <span className="text-feldora-accent">Feldora</span>
+              {HOME_COPY.featured.heading} <span className="text-feldora-accent">{HOME_COPY.featured.headingAccent}</span>
             </h2>
           </div>
           <div className="hidden md:block h-px flex-1 bg-gradient-to-r from-feldora-border to-transparent" />

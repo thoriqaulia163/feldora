@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { WEB_UPDATE_LOG } from '~/constants/updateLog'
 import { LogCard } from '~/components/ui/LogCard'
 import { PageHeader } from '~/components/ui/PageHeader'
+import { LOG_COPY } from '~/constants/copy'
 
 export const Route = createFileRoute('/log')({
   head: () => ({
@@ -16,9 +17,9 @@ function LogPage() {
       <section className="px-6 md:px-12 lg:px-20 max-w-5xl mx-auto">
         <div className="mb-16 relative">
           <PageHeader
-            label="Changelog"
-            title={<>Update <span className="text-feldora-accent">Log</span></>}
-            description="Every iteration brings Feldora closer to its vision. Track the evolution."
+            label={LOG_COPY.header.label}
+            title={<>{LOG_COPY.header.heading} <span className="text-feldora-accent">{LOG_COPY.header.headingAccent}</span></>}
+            description={LOG_COPY.header.description}
           />
         </div>
 

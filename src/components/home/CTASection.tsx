@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router'
+import { HOME_COPY } from '~/constants/copy'
 
 export function CTASection() {
   return (
@@ -15,21 +16,21 @@ export function CTASection() {
         </div>
 
         <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tight leading-[0.85]">
-          <span className="text-feldora-text">Ready to</span>
+          <span className="text-feldora-text">{HOME_COPY.cta.heading}</span>
           <br />
-          <span className="text-gradient-accent">Explore?</span>
+          <span className="text-gradient-accent">{HOME_COPY.cta.headingAccent}</span>
         </h2>
 
         <p className="mt-6 text-feldora-text-secondary text-lg max-w-xl mx-auto">
-          Dive into stories crafted at the intersection of technology and creativity.
+          {HOME_COPY.cta.description}
         </p>
 
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link to="/story" className="btn-angular-primary">
-            Read Stories
+            {HOME_COPY.cta.primary}
           </Link>
           <Link to="/log" className="btn-angular-outline">
-            View Changelog
+            {HOME_COPY.cta.secondary}
           </Link>
         </div>
       </div>

@@ -13,6 +13,14 @@ export interface UpdateEntry {
 export const WEB_UPDATE_LOG: UpdateEntry[] = [
   {
     date: '4 June 2026',
+    title: 'Centralize copywriting to dedicated directory',
+    status: 'minor',
+    type: 'refactor',
+    version: '1.3.2',
+    description: 'Moved all hardcoded text/copy from components into src/constants/copy/ directory with separate files per page (home.ts, about.ts, log.ts, story.ts). Components now import text from centralized copy files, making content changes easier without touching UI code.',
+  },
+  {
+    date: '4 June 2026',
     title: 'Fixing UI & Refactor Code',
     status: 'minor',
     type: 'fixing',
@@ -49,15 +57,15 @@ export const WEB_UPDATE_LOG: UpdateEntry[] = [
     status: 'major',
     type: 'refactor',
     version: '1.0.0',
-    description: 'Lorem ipsum dolor sit amet consectetur adipiscing elit sed do',
+    description: 'Complete platform migration from React SPA to TanStack Start with SSR, file-based routing, and Nitro for Vercel deployment. Implemented cinematic dark-only design system inspired by Riot Games — angular geometry, bold typography (Inter + JetBrains Mono), and CSS-only animations. Built with development orientations: security & privacy (env vars protected, least-privilege), high performance & lightweight (SSR, minimal deps, no runtime animation libs), modular & scalable (reusable components, structured folder architecture), and maintainable & fixable (TypeScript strict, DESIGN_SYSTEM.md as source of truth, clear separation of concerns).',
   },
   {
     date: '18 September 2025',
-    title: 'Installing new fonts + change update log data',
+    title: 'Installing new fonts + change update log data to constant',
     status: 'minor',
-    type: 'refactor',
+    type: 'update',
     version: '0.4.3',
-    description: 'Installing new fonts for better visual * change update log data to constant',
+    description: 'Added custom fonts (Inter, JetBrains Mono) and migrated update log data from inline to a dedicated constants file for better maintainability.',
   },
   {
     date: '9 Februari 2025',

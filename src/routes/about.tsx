@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { PageHeader } from '~/components/ui/PageHeader'
+import { ABOUT_COPY } from '~/constants/copy'
 
 export const Route = createFileRoute('/about')({
   head: () => ({
@@ -15,9 +16,9 @@ function AboutPage() {
       <section className="relative px-6 md:px-12 lg:px-20 max-w-7xl mx-auto mb-24 overflow-hidden">
         <div className="absolute -right-40 top-0 w-[500px] h-[500px] border border-feldora-accent/[0.04] rotate-45 hidden lg:block" />
         <PageHeader
-          label="About"
-          title={<><span className="text-feldora-text">The</span>{' '}<span className="text-feldora-accent">Vision</span></>}
-          description="Feldora is a digital universe crafted at the intersection of technology, creativity, and cinematic storytelling. We believe that the web should feel immersive — not just functional, but experiential."
+          label={ABOUT_COPY.header.label}
+          title={<><span className="text-feldora-text">{ABOUT_COPY.header.heading}</span>{' '}<span className="text-feldora-accent">{ABOUT_COPY.header.headingAccent}</span></>}
+          description={ABOUT_COPY.header.description}
         />
       </section>
 
@@ -27,31 +28,25 @@ function AboutPage() {
           <div className="card-polygon p-8">
             <div className="flex items-center gap-2 mb-4">
               <div className="diamond-marker !w-2 !h-2" />
-              <h2 className="text-xl font-bold uppercase tracking-wider">Our Philosophy</h2>
+              <h2 className="text-xl font-bold uppercase tracking-wider">{ABOUT_COPY.philosophy.title}</h2>
             </div>
             <p className="text-feldora-text-secondary leading-relaxed mb-4">
-              Every pixel is deliberate. Every interaction tells a story. We don't build
-              websites — we craft digital experiences that resonate with the same intensity
-              as a cinematic masterpiece.
+              {ABOUT_COPY.philosophy.paragraphs[0]}
             </p>
             <p className="text-feldora-text-secondary leading-relaxed">
-              Performance isn't sacrificed for aesthetics. We prove that premium design and
-              lightning-fast load times aren't mutually exclusive.
+              {ABOUT_COPY.philosophy.paragraphs[1]}
             </p>
           </div>
           <div className="card-polygon p-8">
             <div className="flex items-center gap-2 mb-4">
               <div className="diamond-marker !w-2 !h-2" />
-              <h2 className="text-xl font-bold uppercase tracking-wider">The Platform</h2>
+              <h2 className="text-xl font-bold uppercase tracking-wider">{ABOUT_COPY.platform.title}</h2>
             </div>
             <p className="text-feldora-text-secondary leading-relaxed mb-4">
-              Feldora serves as a living showcase — a platform where modern web technology
-              meets bold visual design. It's a space for stories, experiments, and
-              digital craftsmanship.
+              {ABOUT_COPY.platform.paragraphs[0]}
             </p>
             <p className="text-feldora-text-secondary leading-relaxed">
-              Built with cutting-edge tools yet designed to be maintainable by a single
-              developer. Scalable architecture without enterprise-level complexity.
+              {ABOUT_COPY.platform.paragraphs[1]}
             </p>
           </div>
         </div>
@@ -70,7 +65,7 @@ function AboutPage() {
             <div className="hidden md:block h-px flex-1 bg-gradient-to-r from-feldora-border to-transparent" />
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {values.map((value, i) => (
+            {ABOUT_COPY.values.map((value, i) => (
               <div key={i} className="group clip-notch-br bg-feldora-surface border border-feldora-border/40 p-6 hover:border-feldora-accent/30 transition-all duration-300">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="hex-badge w-7 h-7 text-[9px] font-bold text-white">{i + 1}</div>
@@ -97,13 +92,11 @@ function AboutPage() {
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <div className="diamond-marker !w-2 !h-2" />
-                <span className="text-feldora-accent font-mono text-[10px] uppercase tracking-wider">Creator</span>
+                <span className="text-feldora-accent font-mono text-[10px] uppercase tracking-wider">{ABOUT_COPY.creator.label}</span>
               </div>
-              <h3 className="text-xl font-bold uppercase tracking-wide mb-3">Feldora Developer</h3>
+              <h3 className="text-xl font-bold uppercase tracking-wide mb-3">{ABOUT_COPY.creator.name}</h3>
               <p className="text-feldora-text-secondary leading-relaxed">
-                A solo developer passionate about the intersection of cinematic design
-                and web performance. Building Feldora as a creative platform that pushes
-                the boundaries of what a personal website can be.
+                {ABOUT_COPY.creator.bio}
               </p>
             </div>
           </div>
@@ -113,11 +106,4 @@ function AboutPage() {
   )
 }
 
-const values = [
-  { title: 'Performance First', description: 'Every decision is measured against its impact on load time and runtime performance.' },
-  { title: 'Cinematic Quality', description: 'Visual storytelling that elevates the web experience beyond conventional design.' },
-  { title: 'Clean Architecture', description: 'Maintainable, readable code that scales without unnecessary complexity.' },
-  { title: 'Bold Simplicity', description: 'Premium aesthetics achieved through restraint and angular precision.' },
-  { title: 'Immersive Experience', description: 'Every interaction should feel intentional and contribute to the narrative.' },
-  { title: 'Future Ready', description: 'Built on modern foundations that embrace the evolving web platform.' },
-]
+

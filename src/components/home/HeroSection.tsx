@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router'
+import { HOME_COPY } from '~/constants/copy'
 
 export function HeroSection() {
   return (
@@ -42,7 +43,7 @@ export function HeroSection() {
             <div className="flex items-center gap-3 mb-6 animate-fade-in">
               <div className="diamond-marker" />
               <span className="text-feldora-accent font-mono text-xs uppercase tracking-[0.4em]">
-                Enter the Universe
+                {HOME_COPY.hero.label}
               </span>
               <div className="h-px flex-1 bg-gradient-to-r from-feldora-accent/40 to-transparent max-w-24" />
             </div>
@@ -59,18 +60,17 @@ export function HeroSection() {
             {/* Subtitle */}
             <div className="mt-6 pl-4 border-l-2 border-feldora-accent/60 animate-fade-up" style={{ animationDelay: '0.15s' }}>
               <p className="text-feldora-text-secondary text-base md:text-lg max-w-lg leading-relaxed">
-                A cinematic digital platform where technology meets bold storytelling.
-                Explore stories, discover updates, and experience the future of the web.
+                {HOME_COPY.hero.subtitle}
               </p>
             </div>
 
             {/* CTA Buttons */}
             <div className="mt-10 flex flex-wrap items-center gap-4 animate-fade-up" style={{ animationDelay: '0.3s' }}>
               <Link to="/story" className="btn-angular-primary">
-                Explore Stories
+                {HOME_COPY.hero.cta.primary}
               </Link>
               <Link to="/about" className="btn-angular-outline">
-                Learn More
+                {HOME_COPY.hero.cta.secondary}
               </Link>
             </div>
           </div>
