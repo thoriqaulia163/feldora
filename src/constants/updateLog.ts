@@ -13,6 +13,14 @@ export interface UpdateEntry {
 export const WEB_UPDATE_LOG: UpdateEntry[] = [
   {
     date: '4 June 2026',
+    title: 'New icon',
+    status: 'minor',
+    type: 'revamp',
+    version: '1.4.1',
+    description: 'Replaced webp logo with proper PNG icons (192x192 and 512x512) for PWA manifest and browser favicon compatibility across all devices.',
+  },
+  {
+    date: '4 June 2026',
     title: 'Infinite scroll on StoryList & Spinner component',
     status: 'moderate',
     type: 'update',
