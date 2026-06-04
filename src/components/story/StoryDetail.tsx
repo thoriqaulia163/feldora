@@ -1,5 +1,8 @@
 import { Link } from '@tanstack/react-router'
 import { useGetPostDetail } from '~/lib/queries'
+import { getPlaceholderStory } from '~/constants/placeholderStories'
+import { SkeletonArticle } from '~/components/ui/Skeleton'
+import { ErrorState } from '~/components/ui/ErrorState'
 import { formatDate } from '~/utils/formatDate'
 
 interface StoryDetailProps {
@@ -7,32 +10,38 @@ interface StoryDetailProps {
 }
 
 export function StoryDetail({ slug }: StoryDetailProps) {
-  const { data: post, isPending } = useGetPostDetail(slug)
+  const { data: post, isPending, isError, refetch } = useGetPostDetail(slug)
 
-  if (isPending) {
+  // Cek placeholder dulu — kalau ada, langsung serve tanpa tunggu API
+  const placeholderPost = getPlaceholderStory(slug)
+
+  // Fallback to placeholder if API returns nothing
+  const resolvedPost = post || placeholderPost || null
+
+  // Hanya tampilkan skeleton kalau isPending DAN tidak ada placeholder fallback
+  if (isPending && !placeholderPost) {
     return (
       <div className="min-h-screen pt-24 pb-20 px-6 max-w-3xl mx-auto">
-        <div className="animate-pulse space-y-6">
-          <div className="h-3 w-24 bg-feldora-surface-light rounded" />
-          <div className="h-8 w-3/4 bg-feldora-surface-light rounded" />
-          <div className="flex items-center gap-3 mt-4">
-            <div className="w-8 h-8 rounded-full bg-feldora-surface-light" />
-            <div className="h-3 w-32 bg-feldora-surface-light rounded" />
-          </div>
-          <div className="h-64 w-full bg-feldora-surface-light rounded" />
-          <div className="space-y-3">
-            <div className="h-4 w-full bg-feldora-surface-light rounded" />
-            <div className="h-4 w-5/6 bg-feldora-surface-light rounded" />
-            <div className="h-4 w-4/6 bg-feldora-surface-light rounded" />
-            <div className="h-4 w-full bg-feldora-surface-light rounded" />
-            <div className="h-4 w-3/4 bg-feldora-surface-light rounded" />
-          </div>
-        </div>
+        <SkeletonArticle />
       </div>
     )
   }
 
-  if (!post) {
+  // API error dan tidak ada placeholder — tampilkan error state
+  if (isError && !resolvedPost) {
+    return (
+      <div className="min-h-screen pt-24 pb-20 px-6 flex items-center justify-center">
+        <ErrorState
+          title="Gagal memuat artikel"
+          onRetry={() => refetch()}
+          backTo="/story"
+          backText="Kembali"
+        />
+      </div>
+    )
+  }
+
+  if (!resolvedPost) {
     return (
       <div className="min-h-screen pt-24 pb-20 px-6 flex items-center justify-center">
         <div className="text-center">
@@ -65,9 +74,9 @@ export function StoryDetail({ slug }: StoryDetailProps) {
         </Link>
 
         {/* Category badges */}
-        {post.category && post.category.length > 0 && (
+        {resolvedPost.category && resolvedPost.category.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-4">
-            {post.category.map((cat, i) => (
+            {resolvedPost.category.map((cat, i) => (
               <span
                 key={i}
                 className="text-feldora-accent font-mono text-[10px] uppercase tracking-wider border border-feldora-accent/20 bg-feldora-accent-glow px-2.5 py-1"
@@ -80,16 +89,16 @@ export function StoryDetail({ slug }: StoryDetailProps) {
 
         {/* Title */}
         <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-tight mb-6">
-          {post.title}
+          {resolvedPost.title}
         </h1>
 
         {/* Meta info */}
         <div className="flex flex-wrap items-center gap-4 mb-8 pb-6 border-b border-feldora-border/30">
           <div className="flex items-center gap-3">
-            {post.author?.photo?.url ? (
+            {resolvedPost.author?.photo?.url ? (
               <img
-                src={post.author.photo.url}
-                alt={post.author.name}
+                src={resolvedPost.author.photo.url}
+                alt={resolvedPost.author.name}
                 className="w-9 h-9 rounded-full object-cover border border-feldora-border"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement
@@ -99,38 +108,38 @@ export function StoryDetail({ slug }: StoryDetailProps) {
               />
             ) : null}
             <div
-              className={`w-9 h-9 rounded-full bg-feldora-surface-light border border-feldora-border flex items-center justify-center ${post.author?.photo?.url ? 'hidden' : ''}`}
+              className={`w-9 h-9 rounded-full bg-feldora-surface-light border border-feldora-border flex items-center justify-center ${resolvedPost.author?.photo?.url ? 'hidden' : ''}`}
             >
               <span className="text-xs font-bold text-feldora-accent">
-                {post.author?.name?.charAt(0) ?? 'F'}
+                {resolvedPost.author?.name?.charAt(0) ?? 'F'}
               </span>
             </div>
             <div className="flex flex-col">
               <span className="text-sm text-feldora-text font-medium">
-                {post.author?.name}
+                {resolvedPost.author?.name}
               </span>
             </div>
           </div>
           <span className="text-feldora-border hidden sm:block">|</span>
           <span className="text-feldora-muted font-mono text-xs">
-            {formatDate(post.createdAt)}
+            {formatDate(resolvedPost.createdAt)}
           </span>
-          {post.updatedAt && post.updatedAt !== post.createdAt && (
+          {resolvedPost.updatedAt && resolvedPost.updatedAt !== resolvedPost.createdAt && (
             <>
               <span className="text-feldora-border hidden sm:block">|</span>
               <span className="text-feldora-muted font-mono text-xs">
-                Updated {formatDate(post.updatedAt)}
+                Updated {formatDate(resolvedPost.updatedAt)}
               </span>
             </>
           )}
         </div>
 
         {/* Featured Image */}
-        {post.featuredImage?.url && (
+        {resolvedPost.featuredImage?.url && (
           <div className="relative mb-10 overflow-hidden border border-feldora-border/20">
             <img
-              src={post.featuredImage.url}
-              alt={post.title}
+              src={resolvedPost.featuredImage.url}
+              alt={resolvedPost.title}
               className="w-full aspect-video object-cover"
             />
             <div className="absolute inset-0 border border-white/5 pointer-events-none" />
@@ -138,10 +147,10 @@ export function StoryDetail({ slug }: StoryDetailProps) {
         )}
 
         {/* Post Content Body */}
-        {post.content?.html && (
+        {resolvedPost.content?.html && (
           <div
             className="prose-feldora"
-            dangerouslySetInnerHTML={{ __html: post.content.html }}
+            dangerouslySetInnerHTML={{ __html: resolvedPost.content.html }}
           />
         )}
 

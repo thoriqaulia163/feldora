@@ -1,61 +1,35 @@
 import { Link } from '@tanstack/react-router'
 import { useGetPosts } from '~/lib/queries'
-
-const PLACEHOLDER_STORIES = [
-  {
-    slug: 'building-the-future-of-web',
-    title: 'Building the Future of Web Experiences',
-    excerpt: 'Exploring how modern frameworks and cinematic design principles are reshaping what we expect from the web.',
-    createdAt: '2025-09-18T00:00:00.000Z',
-    featuredImage: { url: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=400&fit=crop' },
-    category: [{ name: 'Technology', slug: 'technology' }],
-    author: { name: 'Feldora' },
-  },
-  {
-    slug: 'design-philosophy-of-immersion',
-    title: 'The Design Philosophy of Immersion',
-    excerpt: 'How restraint and precision create a sense of premium quality that loud, overloaded interfaces never achieve.',
-    createdAt: '2025-08-12T00:00:00.000Z',
-    featuredImage: { url: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=600&h=400&fit=crop' },
-    category: [{ name: 'Design', slug: 'design' }],
-    author: { name: 'Feldora' },
-  },
-  {
-    slug: 'performance-without-compromise',
-    title: 'Performance Without Compromise',
-    excerpt: 'Premium aesthetics and fast load times are not mutually exclusive. Here is how we achieve both.',
-    createdAt: '2025-07-20T00:00:00.000Z',
-    featuredImage: { url: 'https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=600&h=400&fit=crop' },
-    category: [{ name: 'Engineering', slug: 'engineering' }],
-    author: { name: 'Feldora' },
-  },
-]
-
-type Story = typeof PLACEHOLDER_STORIES[number]
+import { SkeletonCardGrid } from '~/components/ui/Skeleton'
+import { ErrorState } from '~/components/ui/ErrorState'
 
 export function StoryList() {
-  const { data: posts, isPending } = useGetPosts()
+  const { data: posts, isPending, isError, refetch } = useGetPosts()
 
-  const stories: Story[] = posts
-    ? posts.map((edge: { node: Story }) => edge.node)
-    : PLACEHOLDER_STORIES
+  if (isPending) {
+    return <SkeletonCardGrid count={3} />
+  }
 
-  if (isPending && !stories.length) {
+  if (isError) {
     return (
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="card-polygon animate-pulse">
-            <div className="h-52 bg-feldora-surface-light" />
-            <div className="p-6 space-y-3">
-              <div className="h-3 w-20 bg-feldora-surface-light rounded" />
-              <div className="h-5 w-3/4 bg-feldora-surface-light rounded" />
-              <div className="h-3 w-full bg-feldora-surface-light rounded" />
-            </div>
-          </div>
-        ))}
-      </div>
+      <ErrorState
+        title="Gagal memuat cerita"
+        onRetry={() => refetch()}
+      />
     )
   }
+
+  if (!posts || posts.length === 0) {
+    return (
+      <ErrorState
+        label="No Stories"
+        title="Belum ada cerita"
+        message="Cerita baru akan segera hadir."
+      />
+    )
+  }
+
+  const stories = posts.map((edge) => edge.node)
 
   return (
     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">

@@ -349,6 +349,83 @@ Service worker akan otomatis hapus cache lama saat activate.
 
 ---
 
+## Error & Loading State Handling
+
+Sistem penanganan error dan loading state untuk UX yang konsisten di seluruh app.
+
+### Komponen
+
+| Komponen | Lokasi | Fungsi |
+|----------|--------|--------|
+| `GlobalLoader` | `src/components/ui/GlobalLoader.tsx` | Loading bar merah di top saat route transition |
+| `Skeleton` | `src/components/ui/Skeleton.tsx` | Reusable skeleton blocks & presets (card, article, grid) |
+| `ErrorState` | `src/components/ui/ErrorState.tsx` | Reusable error UI dengan retry & back button |
+| `ErrorPage` | `src/components/layout/ErrorPage.tsx` | Global error boundary — runtime crash fallback |
+| `NotFoundPage` | `src/components/layout/NotFoundPage.tsx` | 404 page untuk route yang tidak dikenali |
+| `OfflineBanner` | `src/components/ui/OfflineBanner.tsx` | Notifikasi dismissible saat koneksi terputus |
+| `ToastProvider` | `src/components/ui/Toast.tsx` | Notification system (success/error/warning/info) |
+
+### Global Loader
+
+- Loading bar merah 3px di paling atas halaman (`z-[100]`)
+- Muncul otomatis saat navigasi antar route (listen `onBeforeNavigate` & `onResolved`)
+- Animasi `loading-bar` (translateX loop)
+- Dipasang di `__root.tsx` di atas Navbar
+
+### Skeleton Components
+
+- `Skeleton` — block dasar (ukuran via className)
+- `SkeletonCard` — skeleton story card (image + text)
+- `SkeletonArticle` — skeleton halaman artikel
+- `SkeletonCardGrid` — grid skeleton cards (prop `count`)
+
+### ErrorState (Reusable)
+
+Props:
+- `label` — label kecil (default: "Connection Error")
+- `title` — judul error
+- `message` — deskripsi
+- `onRetry` — callback retry
+- `backTo` / `backText` — tombol navigasi kembali
+
+### Error Boundary
+
+- Dipasang via `errorComponent` di root route
+- Menangkap runtime render errors di semua child routes
+- Tampilkan tombol "Try Again" (invalidate router) dan "Return Home"
+
+### Offline Banner
+
+- Posisi: fixed top-right (di bawah navbar)
+- Muncul otomatis saat `navigator.onLine === false`
+- Dismissible via tombol X
+- Reset saat koneksi kembali lalu putus lagi
+
+### Toast System
+
+- Provider: `ToastProvider` membungkus seluruh app di `__root.tsx`
+- Hook: `useToast()` → `toast(message, type)`
+- 4 tipe: `success` (hijau), `error` (merah), `warning` (kuning), `info` (biru)
+- Auto dismiss 4 detik, bisa dismiss manual
+- Posisi: fixed bottom-right, stack vertikal
+
+### Alur Error di Story Pages
+
+**StoryList:**
+1. Loading → `SkeletonCardGrid`
+2. Error → `ErrorState` dengan retry
+3. Empty → `ErrorState` pesan "Belum ada cerita"
+4. Success → render story cards
+
+**StoryDetail:**
+1. Cek placeholder dulu — kalau slug cocok, langsung render tanpa tunggu API
+2. Loading (tanpa placeholder) → `SkeletonArticle`
+3. Error (tanpa placeholder) → `ErrorState` dengan retry + back
+4. Not found → 404 UI
+5. Success → render artikel
+
+---
+
 ## API Architecture
 
 ### GraphQL (Hygraph CMS)

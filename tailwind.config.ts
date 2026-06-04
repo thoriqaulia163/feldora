@@ -36,6 +36,7 @@ export default {
         'slide-in': 'slideIn 0.5s ease-out forwards',
         glow: 'glow 2s ease-in-out infinite alternate',
         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'loading-bar': 'loadingBar 1.5s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
@@ -53,6 +54,11 @@ export default {
         glow: {
           '0%': { boxShadow: '0 0 5px rgba(220,38,38,0.2)' },
           '100%': { boxShadow: '0 0 20px rgba(220,38,38,0.4)' },
+        },
+        loadingBar: {
+          '0%': { transform: 'translateX(-100%)' },
+          '50%': { transform: 'translateX(0%)' },
+          '100%': { transform: 'translateX(100%)' },
         },
       },
       skew: {

@@ -1,12 +1,8 @@
 const CACHE_NAME = 'feldora-v1'
 const OFFLINE_PAGE = '/offline.html'
 
-// Precache essential pages and assets
+// Precache essential static assets
 const PRECACHE_URLS = [
-  '/',
-  '/about',
-  '/log',
-  '/story',
   '/offline.html',
   '/feldora-logo-2.webp',
 ]
@@ -31,36 +27,40 @@ self.addEventListener('activate', (event) => {
   self.clients.claim()
 })
 
-// Fetch: network-first with cache fallback
+// Fetch: only cache static assets, skip navigation requests
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return
 
-  // Skip cross-origin requests (e.g., Hygraph API, Google Fonts CDN)
-  if (!event.request.url.startsWith(self.location.origin)) {
-    // For cross-origin, try network only — don't cache
+  // Skip cross-origin requests
+  if (!event.request.url.startsWith(self.location.origin)) return
+
+  // Skip navigation requests — let TanStack Router handle client-side routing
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request).catch(() =>
+        caches.match(OFFLINE_PAGE).then((cached) => cached || new Response('Offline', { status: 503 }))
+      )
+    )
     return
   }
 
+  // For static assets: cache-first strategy
   event.respondWith(
-    fetch(event.request)
-      .then((response) => {
-        // Only cache successful responses
-        if (response.status === 200) {
+    caches.match(event.request).then((cached) => {
+      if (cached) return cached
+
+      return fetch(event.request).then((response) => {
+        // Only cache successful responses for static assets
+        if (response.status === 200 && isStaticAsset(event.request.url)) {
           const clone = response.clone()
           caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone))
         }
         return response
-      })
-      .catch(() =>
-        // Network failed: try cache, then fallback to offline page
-        caches.match(event.request).then((cached) => {
-          if (cached) return cached
-          // For navigation requests, show offline page
-          if (event.request.mode === 'navigate') {
-            return caches.match(OFFLINE_PAGE)
-          }
-          return new Response('', { status: 503 })
-        })
-      )
+      }).catch(() => new Response('', { status: 503 }))
+    })
   )
 })
+
+function isStaticAsset(url) {
+  return /\.(js|css|woff2?|png|jpg|jpeg|webp|svg|ico)(\?.*)?$/.test(url)
+}
