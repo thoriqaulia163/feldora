@@ -37,6 +37,11 @@ export function StoryList() {
     return () => observer.disconnect()
   }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
+  const allPosts = useMemo(
+    () => data?.pages.flatMap((page) => page.posts) ?? [],
+    [data]
+  )
+
   if (isPending) {
     return <SkeletonCardGrid count={12} />
   }
@@ -49,11 +54,6 @@ export function StoryList() {
       />
     )
   }
-
-  const allPosts = useMemo(
-    () => data?.pages.flatMap((page) => page.posts) ?? [],
-    [data]
-  )
 
   if (allPosts.length === 0) {
     return (

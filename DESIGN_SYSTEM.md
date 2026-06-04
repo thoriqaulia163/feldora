@@ -460,8 +460,8 @@ Story list menggunakan `useInfiniteQuery` dari React Query dengan pagination 12 
 - `allPosts` di-memoize dengan `useMemo` agar flatMap hanya di-recalculate saat data berubah, bukan setiap render
 
 ### Data Source
-- **Production**: Hygraph GraphQL (akan di-migrate ke paginated query)
-- **Development/Mock**: `src/lib/mockPosts.ts` — 36 mock posts, 800ms simulated delay
+- **Production**: Hygraph GraphQL — `getPostsPaginated(page, perPage)` menggunakan `first`, `skip`, dan `pageInfo.hasNextPage`
+- **Mock (testing)**: `src/lib/mockPosts.ts` — 36 mock posts, 800ms simulated delay, tersedia untuk development/testing di masa depan
 
 ### Spinner Component (`src/components/ui/Spinner.tsx`)
 

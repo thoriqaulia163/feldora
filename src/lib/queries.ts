@@ -1,6 +1,5 @@
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
-import { getPosts, getPostDetail } from './graphql'
-import { getMockPostsPaginated } from './mockPosts'
+import { getPosts, getPostDetail, getPostsPaginated } from './graphql'
 
 export function useGetPosts() {
   return useQuery({
@@ -10,10 +9,10 @@ export function useGetPosts() {
   })
 }
 
-export function useGetPostsPaginated() {
+export function useGetPostsPaginated(perPage: number = 12) {
   return useInfiniteQuery({
-    queryKey: ['posts-paginated'],
-    queryFn: ({ pageParam = 0 }) => getMockPostsPaginated(pageParam, 12),
+    queryKey: ['posts-paginated', perPage],
+    queryFn: ({ pageParam = 0 }) => getPostsPaginated(pageParam, perPage),
     getNextPageParam: (lastPage, _, lastPageParam) =>
       lastPage.hasNextPage ? (lastPageParam as number) + 1 : undefined,
     initialPageParam: 0,

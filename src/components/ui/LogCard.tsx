@@ -129,7 +129,7 @@ export function LogCard({ entry, number, showAccentBar = false }: LogCardProps) 
 
       {/* Accordion content */}
       <div
-        className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}
+        className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
       >
         <div className="px-6 pb-5 pt-0 border-t border-feldora-border/30 ml-6 mr-6">
           <p className="text-feldora-text-secondary text-sm leading-relaxed pt-4">

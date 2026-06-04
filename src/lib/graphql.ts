@@ -59,6 +59,55 @@ export async function getPosts(): Promise<PostEdge[]> {
   return result.postsConnection.edges
 }
 
+export interface PaginatedPostsResult {
+  posts: Post[]
+  hasNextPage: boolean
+}
+
+export async function getPostsPaginated(page: number, perPage: number = 12): Promise<PaginatedPostsResult> {
+  if (!GRAPHQL_ENDPOINT) return { posts: [], hasNextPage: false }
+
+  const skip = page * perPage
+
+  const query = gql`
+    query GetPostsPaginated($first: Int!, $skip: Int!) {
+      postsConnection(first: $first, skip: $skip, orderBy: createdAt_DESC) {
+        edges {
+          node {
+            author {
+              name
+              id
+              bio
+            }
+            createdAt
+            slug
+            title
+            excerpt
+            featuredImage {
+              url
+            }
+            category {
+              name
+              slug
+            }
+          }
+        }
+        pageInfo {
+          hasNextPage
+        }
+      }
+    }
+  `
+  const result = await request<{
+    postsConnection: { edges: PostEdge[]; pageInfo: { hasNextPage: boolean } }
+  }>(GRAPHQL_ENDPOINT, query, { first: perPage, skip })
+
+  return {
+    posts: result.postsConnection.edges.map((edge) => edge.node),
+    hasNextPage: result.postsConnection.pageInfo.hasNextPage,
+  }
+}
+
 export async function getPostDetail(slug: string): Promise<Post | null> {
   if (!GRAPHQL_ENDPOINT) return null
 
