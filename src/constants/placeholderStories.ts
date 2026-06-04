@@ -45,7 +45,7 @@ export const PLACEHOLDER_STORIES: PlaceholderStory[] = [
     title: 'The Design Philosophy of Immersion',
     excerpt: 'How restraint and precision create a sense of premium quality that loud, overloaded interfaces never achieve.',
     createdAt: '2025-08-12T00:00:00.000Z',
-    featuredImage: { url: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=600&h=400&fit=crop' },
+    featuredImage: { url: 'https://images.unsplash.com/photo-1609921212029-bb5a28e60960?w=600&h=400&fit=crop' },
     category: [{ name: 'Design', slug: 'design' }],
     author: { name: 'Feldora' },
     content: {

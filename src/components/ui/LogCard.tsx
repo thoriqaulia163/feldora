@@ -67,7 +67,7 @@ export function LogCard({ entry, number, showAccentBar = false }: LogCardProps) 
     <div
       role="button"
       tabIndex={0}
-      className="group relative clip-notch-br bg-feldora-surface border border-feldora-border/40 hover:border-feldora-accent/30 transition-all duration-300 cursor-pointer select-none"
+      className="group relative clip-notch-br bg-feldora-surface border border-feldora-border/40 hover:border-feldora-accent/30 transition-all duration-300 cursor-pointer select-none overflow-hidden"
       onClick={() => setIsOpen(!isOpen)}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -104,7 +104,7 @@ export function LogCard({ entry, number, showAccentBar = false }: LogCardProps) 
                 <div className="flex items-center justify-center w-6 h-6 shrink-0">
                   <CategoryIcon type={entry.type} />
                 </div>
-                <div className="absolute top-1/2 -translate-y-1/2 left-full ml-2 px-2 py-1 bg-feldora-surface-light border border-feldora-border rounded text-[10px] font-mono uppercase tracking-wider text-feldora-text whitespace-nowrap opacity-0 group-hover/type:opacity-100 transition-opacity duration-200 pointer-events-none z-50">
+                <div className="absolute top-1/2 -translate-y-1/2 right-full mr-2 px-2 py-1 bg-feldora-surface-light border border-feldora-border rounded text-[10px] font-mono uppercase tracking-wider text-feldora-text whitespace-nowrap opacity-0 group-hover/type:opacity-100 transition-opacity duration-200 pointer-events-none z-50">
                   {categoryConfig.label}
                 </div>
               </div>

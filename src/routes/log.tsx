@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { WEB_UPDATE_LOG } from '~/constants/updateLog'
 import { LogCard } from '~/components/ui/LogCard'
+import { PageHeader } from '~/components/ui/PageHeader'
 
 export const Route = createFileRoute('/log')({
   head: () => ({
@@ -14,19 +15,11 @@ function LogPage() {
     <div className="min-h-screen pt-24 pb-20">
       <section className="px-6 md:px-12 lg:px-20 max-w-5xl mx-auto">
         <div className="mb-16 relative">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="diamond-marker" />
-            <span className="text-feldora-accent font-mono text-xs uppercase tracking-[0.3em]">Changelog</span>
-            <div className="h-px flex-1 bg-gradient-to-r from-feldora-accent/30 to-transparent max-w-32" />
-          </div>
-          <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tight">
-            Update <span className="text-feldora-accent">Log</span>
-          </h1>
-          <div className="mt-4 pl-4 border-l-2 border-feldora-accent/50 max-w-lg">
-            <p className="text-feldora-text-secondary">
-              Every iteration brings Feldora closer to its vision. Track the evolution.
-            </p>
-          </div>
+          <PageHeader
+            label="Changelog"
+            title={<>Update <span className="text-feldora-accent">Log</span></>}
+            description="Every iteration brings Feldora closer to its vision. Track the evolution."
+          />
         </div>
 
         <div className="relative space-y-3">

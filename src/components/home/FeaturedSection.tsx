@@ -1,26 +1,5 @@
-const features = [
-  {
-    tag: 'Stories',
-    title: 'Digital Narratives',
-    description:
-      'Deep-dive articles exploring technology, creativity, and the craft of building for the web.',
-    image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&h=400&fit=crop',
-  },
-  {
-    tag: 'Updates',
-    title: 'Platform Evolution',
-    description:
-      'Track every iteration and improvement as Feldora evolves into its full vision.',
-    image: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=600&h=400&fit=crop',
-  },
-  {
-    tag: 'Vision',
-    title: 'Cinematic Web',
-    description:
-      'Pushing the boundaries of what a web platform can feel like — immersive, bold, and performant.',
-    image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&h=400&fit=crop',
-  },
-]
+import { PLACEHOLDER_STORIES } from '~/constants/placeholderStories'
+import { StoryCard } from '~/components/story/StoryCard'
 
 export function FeaturedSection() {
   return (
@@ -46,42 +25,17 @@ export function FeaturedSection() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
-          {features.map((feature, i) => (
-            <div
-              key={i}
-              className="group card-polygon hover:border-feldora-accent/40 transition-all duration-500"
-            >
-              <div className="relative h-52 overflow-hidden">
-                <img
-                  src={feature.image}
-                  alt={feature.title}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-feldora-surface via-feldora-surface/60 to-transparent" />
-                <div className="absolute top-4 left-0">
-                  <div className="clip-arrow-right bg-feldora-accent px-4 pr-6 py-1">
-                    <span className="font-mono text-[10px] uppercase tracking-wider text-white font-bold">
-                      {feature.tag}
-                    </span>
-                  </div>
-                </div>
-                <div className="absolute bottom-3 right-3 w-5 h-5 border-b border-r border-feldora-accent/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              </div>
-
-              <div className="p-6 relative">
-                <h3 className="text-xl font-bold mb-3 group-hover:text-feldora-accent transition-colors duration-300 uppercase tracking-wide">
-                  {feature.title}
-                </h3>
-                <p className="text-feldora-text-secondary text-sm leading-relaxed">
-                  {feature.description}
-                </p>
-                <div className="mt-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
-                  <div className="h-px w-8 bg-feldora-accent" />
-                  <span className="text-feldora-accent font-mono text-[10px] uppercase">Discover</span>
-                </div>
-              </div>
-            </div>
+          {PLACEHOLDER_STORIES.map((story) => (
+            <StoryCard
+              key={story.slug}
+              slug={story.slug}
+              title={story.title}
+              excerpt={story.excerpt}
+              createdAt={story.createdAt}
+              imageUrl={story.featuredImage.url}
+              category={story.category[0]?.name}
+              showDate={false}
+            />
           ))}
         </div>
       </div>

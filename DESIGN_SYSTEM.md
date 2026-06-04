@@ -13,6 +13,17 @@ Kesan yang ingin dicapai:
 
 ---
 
+## Orientasi Pengembangan
+
+Prinsip yang menjadi panduan dalam setiap keputusan teknis dan arsitektural Feldora:
+
+- **Security & Privacy** — Data user dilindungi, environment variables tidak ter-expose ke client tanpa prefix `VITE_`, dan semua third-party integration mengikuti least-privilege principle.
+- **High Performance & Lightweight** — SSR by default, CSS-only animations, minimal dependencies, lazy loading, dan zero runtime animation libraries. Setiap byte dan millisecond diperhitungkan.
+- **Modular & Scalable** — Komponen reusable (StoryCard, LogCard, Skeleton, ErrorState, Toast), folder architecture terstruktur, dan separation of concerns yang jelas antara UI, data layer, dan routing.
+- **Maintainable & Fixable** — Code yang readable, TypeScript strict mode, naming conventions konsisten, DESIGN_SYSTEM.md sebagai single source of truth, dan error handling yang informatif untuk debugging cepat.
+
+---
+
 ## Tech Stack
 
 | Layer | Teknologi |
@@ -324,12 +335,14 @@ Halaman-halaman utama di-precache saat install:
 
 ### Registration
 
-Service worker di-register via inline script di `__root.tsx`:
+Service worker di-register via inline script di `__root.tsx`, **hanya di production** (bukan localhost):
 ```js
-if ('serviceWorker' in navigator) {
+if ('serviceWorker' in navigator && location.hostname !== 'localhost') {
   navigator.serviceWorker.register('/sw.js')
 }
 ```
+
+Ini mencegah caching yang mengganggu saat development. Di localhost, perubahan code langsung terlihat tanpa perlu unregister SW.
 
 ### Offline Page (`public/offline.html`)
 
@@ -530,4 +543,4 @@ npm run lint     # TypeScript type check (tsc --noEmit)
    - Internal route (mengarah ke halaman website sendiri) → **WAJIB** menggunakan `<Link>` dari `@tanstack/react-router`. Ini memastikan client-side navigation tanpa full page reload. Gunakan `<a>` hanya jika ada kebutuhan spesifik yang tidak bisa di-cover oleh `<Link>`.
    - External route (mengarah ke domain luar seperti GitHub, Discord, dll) → boleh menggunakan tag `<a>` biasa dengan `target="_blank"` dan `rel="noopener noreferrer"`.
 
-9. **PWA & Service Worker** — Service worker (`public/sw.js`) di-register di `__root.tsx`. Saat develop, unregister SW jika perubahan tidak terlihat (DevTools → Application → Service Workers → Unregister). Ubah `CACHE_NAME` saat deploy perubahan besar.
+9. **PWA & Service Worker** — Service worker (`public/sw.js`) hanya di-register di production (bukan localhost). Saat develop, SW tidak aktif sehingga perubahan langsung terlihat. Ubah `CACHE_NAME` di `sw.js` saat deploy perubahan besar agar cache lama terhapus.

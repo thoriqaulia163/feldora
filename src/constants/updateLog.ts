@@ -13,6 +13,14 @@ export interface UpdateEntry {
 export const WEB_UPDATE_LOG: UpdateEntry[] = [
   {
     date: '4 June 2026',
+    title: 'Fixing UI & Refactor Code',
+    status: 'minor',
+    type: 'fixing',
+    version: '1.3.1',
+    description: 'Extracted StoryCard as reusable component shared between FeaturedSection and StoryList. Fixed mobile horizontal scroll on log page by moving tooltip to left side and adding overflow-hidden on LogCard. Replaced broken placeholder image. Made FeaturedSection cards clickable with navigation to story detail. Extracted NotFoundPage to separate component. Disabled service worker registration on localhost for smoother development. Added development orientation principles to DESIGN_SYSTEM.md. Created reusable PageHeader component and applied it to About, Log, and Story pages.',
+  },
+  {
+    date: '4 June 2026',
     title: 'Error & Loading State handling',
     status: 'moderate',
     type: 'update',
@@ -45,11 +53,11 @@ export const WEB_UPDATE_LOG: UpdateEntry[] = [
   },
   {
     date: '18 September 2025',
-    title: 'Installing new fonts + change update log data to constant',
+    title: 'Installing new fonts + change update log data',
     status: 'minor',
-    type: 'update',
+    type: 'refactor',
     version: '0.4.3',
-    description: 'Lorem ipsum dolor sit amet consectetur adipiscing elit sed do',
+    description: 'Installing new fonts for better visual * change update log data to constant',
   },
   {
     date: '9 Februari 2025',
@@ -57,7 +65,7 @@ export const WEB_UPDATE_LOG: UpdateEntry[] = [
     status: 'minor',
     type: 'update',
     version: '0.4.2',
-    description: 'Lorem ipsum dolor sit amet consectetur adipiscing elit sed do',
+    description: 'update post page formating',
   },
   {
     date: '9 Februari 2025',
@@ -65,7 +73,7 @@ export const WEB_UPDATE_LOG: UpdateEntry[] = [
     status: 'minor',
     type: 'fixing',
     version: '0.4.1',
-    description: 'Lorem ipsum dolor sit amet consectetur adipiscing elit sed do',
+    description: 'fixing vercel configuration for routing',
   },
   {
     date: '8 Februari 2025',
@@ -73,15 +81,23 @@ export const WEB_UPDATE_LOG: UpdateEntry[] = [
     status: 'moderate',
     type: 'fixing',
     version: '0.4.0',
-    description: 'Lorem ipsum dolor sit amet consectetur adipiscing elit sed do',
+    description: 'fixing format in post page, so it match data from rich-text-editor',
   },
   {
     date: '8 Februari 2025',
-    title: 'Revamp UI, styling, and layout. Add log. Add new webLogo. Add page animation. Implement React-helmet',
+    title: 'Add Update log & Implement React-helmet',
     status: 'moderate',
-    type: 'refactor',
+    type: 'update',
     version: '0.3.0',
-    description: 'Lorem ipsum dolor sit amet consectetur adipiscing elit sed do',
+    description: 'Add log page for tracking website update and implement react-helmet for async title',
+  },
+  {
+    date: '8 Februari 2025',
+    title: 'Revamp UI, styling, and layout. Add new webLogo & page animation',
+    status: 'minor',
+    type: 'refactor',
+    version: '0.2.1',
+    description: 'Revamp UI & Layout and add Add log. Add new webLogo of Feldora and page animation.',
   },
   {
     date: '2 Agustus 2024',
@@ -89,7 +105,7 @@ export const WEB_UPDATE_LOG: UpdateEntry[] = [
     status: 'moderate',
     type: 'update',
     version: '0.2.0',
-    description: 'Lorem ipsum dolor sit amet consectetur adipiscing elit sed do',
+    description: 'Integrate React-Query with api from GraphQL (Hygraph)',
   },
   {
     date: '22 Juli 2024',
@@ -97,7 +113,7 @@ export const WEB_UPDATE_LOG: UpdateEntry[] = [
     status: 'moderate',
     type: 'update',
     version: '0.1.0',
-    description: 'Lorem ipsum dolor sit amet consectetur adipiscing elit sed do',
+    description: 'Install and setup React-Query in the project. Set rules & standard for development',
   },
   {
     date: '9 Juli 2024',
@@ -105,6 +121,6 @@ export const WEB_UPDATE_LOG: UpdateEntry[] = [
     status: 'major',
     type: 'update',
     version: '0.0.0',
-    description: 'Lorem ipsum dolor sit amet consectetur adipiscing elit sed do',
+    description: 'Initializing Feldora Project and Setup. Created with Vite + React. Plan to use react-query as data fetching & state maintainers',
   },
 ]
