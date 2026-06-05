@@ -7,13 +7,13 @@ export function NotFoundPage() {
         {/* Large 404 with geometric accents */}
         <div className="relative inline-block mb-8">
           {/* Corner accents */}
-          <div className="absolute -top-3 -left-3 w-6 h-6 border-t-2 border-l-2 border-feldora-accent" />
-          <div className="absolute -top-3 -right-3 w-6 h-6 border-t-2 border-r-2 border-feldora-accent" />
-          <div className="absolute -bottom-3 -left-3 w-6 h-6 border-b-2 border-l-2 border-feldora-accent" />
-          <div className="absolute -bottom-3 -right-3 w-6 h-6 border-b-2 border-r-2 border-feldora-accent" />
+          <div className="absolute -top-3 -left-3 w-6 h-6 border-t-2 border-l-2 border-feldora-accent-secondary" />
+          <div className="absolute -top-3 -right-3 w-6 h-6 border-t-2 border-r-2 border-feldora-accent-secondary" />
+          <div className="absolute -bottom-3 -left-3 w-6 h-6 border-b-2 border-l-2 border-feldora-accent-secondary" />
+          <div className="absolute -bottom-3 -right-3 w-6 h-6 border-b-2 border-r-2 border-feldora-accent-secondary" />
 
           <h1 className="text-[8rem] md:text-[10rem] font-black leading-none tracking-tighter text-feldora-text">
-            4<span className="text-feldora-accent">0</span>4
+            4<span className="text-feldora-accent-secondary">0</span>4
           </h1>
         </div>
 

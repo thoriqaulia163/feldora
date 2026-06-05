@@ -12,8 +12,8 @@ export function HeroSection() {
         className="absolute inset-0 opacity-[0.04]"
         style={{
           backgroundImage: `
-            linear-gradient(30deg, rgba(220,38,38,0.3) 1px, transparent 1px),
-            linear-gradient(-30deg, rgba(220,38,38,0.3) 1px, transparent 1px)
+            linear-gradient(30deg, rgba(139,92,246,0.3) 1px, transparent 1px),
+            linear-gradient(-30deg, rgba(139,92,246,0.3) 1px, transparent 1px)
           `,
           backgroundSize: '80px 80px',
         }}
@@ -42,23 +42,23 @@ export function HeroSection() {
             {/* Accent tag */}
             <div className="flex items-center gap-3 mb-6 animate-fade-in">
               <div className="diamond-marker" />
-              <span className="text-feldora-accent font-mono text-xs uppercase tracking-[0.4em]">
+              <span className="text-feldora-accent-secondary font-mono text-xs uppercase tracking-[0.4em]">
                 {HOME_COPY.hero.label}
               </span>
-              <div className="h-px flex-1 bg-gradient-to-r from-feldora-accent/40 to-transparent max-w-24" />
+              <div className="h-px flex-1 bg-gradient-to-r from-feldora-accent-secondary/40 to-transparent max-w-24" />
             </div>
 
             {/* Main title */}
             <h1 className="text-7xl md:text-8xl lg:text-[7rem] xl:text-[9rem] font-black uppercase leading-[0.8] tracking-tighter animate-fade-up">
               <span className="text-feldora-text">FEL</span>
-              <span className="text-feldora-accent">D</span>
+              <span className="text-feldora-accent-secondary">D</span>
               <span className="text-feldora-text">O</span>
               <span className="text-feldora-accent">R</span>
               <span className="text-feldora-text">A</span>
             </h1>
 
             {/* Subtitle */}
-            <div className="mt-6 pl-4 border-l-2 border-feldora-accent/60 animate-fade-up" style={{ animationDelay: '0.15s' }}>
+            <div className="mt-6 pl-4 border-l-2 border-feldora-accent-secondary/60 animate-fade-up" style={{ animationDelay: '0.15s' }}>
               <p className="text-feldora-text-secondary text-base md:text-lg max-w-lg leading-relaxed">
                 {HOME_COPY.hero.subtitle}
               </p>

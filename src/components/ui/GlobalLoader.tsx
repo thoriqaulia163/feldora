@@ -25,7 +25,7 @@ export function GlobalLoader() {
   return (
     <div className="fixed top-0 left-0 right-0 z-[100] h-[3px]">
       <div className="h-full w-full bg-feldora-surface overflow-hidden">
-        <div className="h-full bg-feldora-accent animate-loading-bar" />
+        <div className="h-full bg-gradient-to-r from-feldora-accent to-feldora-accent-secondary animate-loading-bar" />
       </div>
     </div>
   )

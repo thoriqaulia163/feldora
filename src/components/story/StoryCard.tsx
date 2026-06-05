@@ -35,7 +35,7 @@ export function StoryCard({
         <div className="absolute inset-0 bg-gradient-to-t from-feldora-surface via-feldora-surface/50 to-transparent" />
         {category && (
           <div className="absolute top-4 left-0">
-            <div className="clip-arrow-right bg-feldora-accent/90 px-3 pr-5 py-1">
+            <div className="clip-arrow-right bg-feldora-accent-secondary/90 px-3 pr-5 py-1">
               <span className="font-mono text-[9px] uppercase tracking-wider text-white font-bold">
                 {category}
               </span>

@@ -12,6 +12,14 @@ export interface UpdateEntry {
 
 export const WEB_UPDATE_LOG: UpdateEntry[] = [
   {
+    date: '5 June 2026',
+    title: 'Dual-tone accent (purple & orange) + SectionHeader component',
+    status: 'moderate',
+    type: 'revamp',
+    version: '1.5.0',
+    description: 'Switched accent color scheme from red (#dc2626) to dual-tone purple (#8b5cf6) + orange (#f97316). Purple used for interactive elements (buttons, hover borders, heading highlights), orange for decorative/marker elements (diamond markers, hex badges, labels, category tags, logo bar, panel frame corners, navbar active indicator). Created reusable SectionHeader component (label + heading + headingAccent + trailing) and applied it to FeaturedSection, LatestUpdates, and About values section. Restructured ABOUT_COPY.values to include header metadata (label, heading, headingAccent, items). Renamed PWA icons to feldora-logo-192.png and feldora-logo-512.png, updated manifest.json and favicon reference in __root.tsx.',
+  },
+  {
     date: '4 June 2026',
     title: 'New icon',
     status: 'minor',

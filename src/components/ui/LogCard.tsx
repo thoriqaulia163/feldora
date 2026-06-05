@@ -15,8 +15,8 @@ const STATUS_STYLES: Record<UpdateEntry['status'], { label: string; className: s
 
 const CATEGORY_CONFIG: Record<UpdateCategory, { label: string; color: string }> = {
   update: { label: 'Update', color: 'text-emerald-400' },
-  fixing: { label: 'Fixing', color: 'text-red-400' },
-  refactor: { label: 'Refactor', color: 'text-orange-400' },
+  fixing: { label: 'Fixing', color: 'text-orange-400' },
+  refactor: { label: 'Refactor', color: 'text-amber-400' },
   revamp: { label: 'Revamp', color: 'text-sky-400' },
 }
 
@@ -116,7 +116,7 @@ export function LogCard({ entry, number, showAccentBar = false }: LogCardProps) 
             </p>
           </div>
           <svg
-            className={`w-4 h-4 shrink-0 text-feldora-muted transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+            className={`w-4 h-4 shrink-0 text-feldora-accent-secondary transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"

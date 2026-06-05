@@ -83,7 +83,8 @@ public/
 ├── manifest.json        # PWA manifest
 ├── sw.js                # Service worker (offline support)
 ├── offline.html         # Custom offline fallback page
-├── feldora-logo-2.webp  # Logo / PWA icon
+├── feldora-logo-192.png # PWA icon (192x192) + favicon
+├── feldora-logo-512.png # PWA icon (512x512) for splash screen
 └── fonts/               # Custom font files
 ```
 
@@ -108,7 +109,7 @@ Route `/story` berfungsi sebagai layout route (`<Outlet />`), dengan child:
 
 ## Color Palette
 
-Dark-only theme. Semua warna didefinisikan di `tailwind.config.ts` sebagai `feldora.*`:
+Dark-only theme dengan dual-tone accent (purple + orange). Semua warna didefinisikan di `tailwind.config.ts` sebagai `feldora.*`:
 
 | Token | Hex | Penggunaan |
 |-------|-----|-----------|
@@ -116,12 +117,30 @@ Dark-only theme. Semua warna didefinisikan di `tailwind.config.ts` sebagai `feld
 | `feldora-surface` | `#12121a` | Card/panel background |
 | `feldora-surface-light` | `#1a1a26` | Elevated surface, hover state |
 | `feldora-border` | `#2a2a3a` | Border card, divider |
-| `feldora-accent` | `#dc2626` | Primary accent (merah) — CTA, highlight |
-| `feldora-accent-soft` | `#991b1b` | Accent muted |
-| `feldora-accent-glow` | `rgba(220,38,38,0.15)` | Glow/shadow accent |
+| `feldora-accent` | `#8b5cf6` | Primary accent (ungu) — buttons, heading highlights, hover borders |
+| `feldora-accent-soft` | `#6d28d9` | Accent muted/darker |
+| `feldora-accent-glow` | `rgba(139, 92, 246, 0.15)` | Glow/shadow accent |
+| `feldora-accent-secondary` | `#f97316` | Secondary accent (orange) — markers, labels, badges, tags, decorative elements |
 | `feldora-muted` | `#6b7280` | Teks tertiary, placeholder |
 | `feldora-text` | `#f5f5f7` | Teks utama (putih) |
 | `feldora-text-secondary` | `#a1a1aa` | Teks sekunder |
+
+### Distribusi Warna Dual-Tone
+
+| Elemen | Warna | Alasan |
+|--------|-------|--------|
+| Buttons (CTA) | Ungu (`accent`) | Interaktif, perlu standout |
+| Heading accent words | Ungu (`accent`) | Emphasis di judul section |
+| Card hover borders | Ungu (`accent`) | Feedback interaksi |
+| Diamond markers | Orange (`accent-secondary`) | Dekoratif, section indicator |
+| Hex badges | Orange (`accent-secondary`) | Penomoran, ranking |
+| Section labels (mono) | Orange (`accent-secondary`) | Label kecil di atas heading |
+| Category tags (StoryCard) | Orange (`accent-secondary`) | Badges kategori |
+| Logo bar (Navbar/Footer) | Orange (`accent-secondary`) | Brand identity mark |
+| Navbar active indicator | Orange (`accent-secondary`) | Navigasi state |
+| Panel frame corners | Orange (`accent-secondary`) | Dekoratif frame |
+| GlobalLoader | Gradient ungu → orange | Transisi visual dinamis |
+| Scrollbar hover | Orange (`accent-secondary`) | Micro-interaction |
 
 ---
 
@@ -153,11 +172,11 @@ Card dengan sudut kanan bawah terpotong (clip-path). Memberikan kesan sci-fi pan
 Badge heksagonal untuk nomor versi/ranking. Menggunakan clip-path polygon.
 
 ### Panel Frame (`.panel-frame`)
-Container dengan corner accent merah (border-corner) di top-left dan bottom-right.
+Container dengan corner accent orange (border-corner) di top-left dan bottom-right.
 
 ### Angular Buttons (`.btn-angular-*`)
 Tombol CTA dengan clip-path parallelogram — bukan rounded, bukan square.
-- `.btn-angular-primary` — background merah, text putih
+- `.btn-angular-primary` — background ungu, text putih
 - `.btn-angular-outline` — border only, transparent bg
 
 ### Clip Utilities
@@ -181,6 +200,35 @@ Tombol CTA dengan clip-path parallelogram — bukan rounded, bukan square.
 - Diagonal decorative lines (`rotate-[-35deg]`)
 - Gradient accent lines di top/bottom
 - Diamond marker + mono label sebagai section identifier
+- Menggunakan `SectionHeader` component untuk konsistensi header antar section
+
+### SectionHeader Component (`src/components/ui/SectionHeader.tsx`)
+
+Komponen reusable untuk header section yang konsisten di seluruh halaman. Digunakan di:
+- **FeaturedSection** (home) — dengan trailing decorative line
+- **LatestUpdates** (home) — dengan trailing CTA link
+- **About page** (values section) — dengan trailing decorative line
+
+#### Props
+
+| Prop | Type | Default | Deskripsi |
+|------|------|---------|-----------|
+| `label` | `string` | required | Label kecil (orange, mono, uppercase) di atas heading |
+| `heading` | `string` | required | Judul utama |
+| `headingAccent` | `string` | required | Bagian heading yang di-highlight ungu |
+| `headingSize` | `string` | `"text-4xl md:text-5xl"` | Override ukuran heading |
+| `trailing` | `ReactNode` | — | Elemen di kanan (CTA link, garis dekoratif, dll) |
+
+#### Layout
+
+```
+[◆ diamond] [LABEL orange]
+HEADING HEADINGACCENT(ungu)           [trailing element]
+```
+
+#### Catatan
+- Berbeda dengan `PageHeader` yang untuk heading utama halaman (full-width, dengan description).
+- `SectionHeader` untuk sub-section di dalam halaman (lebih compact, tanpa description, dengan trailing support).
 
 ### Cards
 - Image top + content bottom
@@ -338,7 +386,7 @@ Feldora diimplementasikan sebagai PWA untuk pengalaman installable dan offline s
 
 Halaman-halaman utama di-precache saat install:
 - `/`, `/about`, `/log`, `/story`
-- `/offline.html`, `/feldora-logo-2.webp`
+- `/offline.html`, `/feldora-logo-192.png`
 
 ### Registration
 

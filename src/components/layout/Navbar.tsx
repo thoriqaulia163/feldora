@@ -12,7 +12,7 @@ export function Navbar() {
       <nav className="fixed top-0 left-0 right-0 z-50 h-16 px-6 md:px-12 lg:px-16 flex items-center justify-between bg-feldora-bg/90 backdrop-blur-md border-b border-feldora-border/20">
         {/* Logo with angular accent */}
         <Link to="/" className="relative z-10 flex items-center gap-2">
-          <div className="w-2 h-5 bg-feldora-accent skew-x-[-8deg]" />
+          <div className="w-2 h-5 bg-feldora-accent-secondary skew-x-[-8deg]" />
           <span className="text-lg font-black uppercase tracking-[0.15em] text-feldora-text">
             FELDORA
           </span>
@@ -34,7 +34,7 @@ export function Navbar() {
                 }`}
               >
                 {isActive && (
-                  <span className="absolute bottom-0 left-2 right-2 h-[2px] bg-feldora-accent clip-parallelogram" />
+                  <span className="absolute bottom-0 left-2 right-2 h-[2px] bg-feldora-accent-secondary clip-parallelogram" />
                 )}
                 {link.label}
               </Link>

@@ -53,7 +53,7 @@ export function StoryDetail({ slug }: StoryDetailProps) {
           </p>
           <Link
             to="/story"
-            className="px-6 py-3 bg-feldora-accent text-white font-medium uppercase tracking-wider text-sm hover:bg-red-700 transition-colors duration-300"
+            className="px-6 py-3 bg-feldora-accent text-white font-medium uppercase tracking-wider text-sm hover:bg-violet-700 transition-colors duration-300"
           >
             {STORY_COPY.detail.notFound.cta}
           </Link>
@@ -80,7 +80,7 @@ export function StoryDetail({ slug }: StoryDetailProps) {
             {resolvedPost.category.map((cat, i) => (
               <span
                 key={i}
-                className="text-feldora-accent font-mono text-[10px] uppercase tracking-wider border border-feldora-accent/20 bg-feldora-accent-glow px-2.5 py-1"
+                className="text-feldora-accent-secondary font-mono text-[10px] uppercase tracking-wider border border-feldora-accent-secondary/20 bg-feldora-accent-glow px-2.5 py-1"
               >
                 {cat.name}
               </span>

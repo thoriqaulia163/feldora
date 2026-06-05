@@ -26,7 +26,7 @@ export const Route = createRootRoute({
     ],
     links: [
       { rel: 'stylesheet', href: appCss },
-      { rel: 'icon', href: '/icon-512.png' },
+      { rel: 'icon', href: '/feldora-logo-192.png' },
       { rel: 'manifest', href: '/manifest.json' },
       {
         rel: 'preconnect',

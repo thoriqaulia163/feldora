@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { PageHeader } from '~/components/ui/PageHeader'
+import { SectionHeader } from '~/components/ui/SectionHeader'
 import { ABOUT_COPY } from '~/constants/copy'
 
 export const Route = createFileRoute('/about')({
@@ -57,15 +58,19 @@ function AboutPage() {
         <div className="absolute inset-0 bg-feldora-surface/30 -skew-y-1" />
         <div className="absolute top-0 left-0 w-1/4 h-[2px] bg-gradient-to-r from-feldora-accent/40 to-transparent" />
         <div className="relative max-w-7xl mx-auto">
-          <div className="flex items-center gap-3 mb-12">
-            <div className="diamond-marker" />
-            <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tight">
-              Core <span className="text-feldora-accent">Values</span>
-            </h2>
-            <div className="hidden md:block h-px flex-1 bg-gradient-to-r from-feldora-border to-transparent" />
+          <div className="mb-12">
+            <SectionHeader
+              label={ABOUT_COPY.values.label}
+              heading={ABOUT_COPY.values.heading}
+              headingAccent={ABOUT_COPY.values.headingAccent}
+              headingSize="text-3xl md:text-4xl"
+              trailing={
+                <div className="hidden md:block h-px flex-1 bg-gradient-to-r from-feldora-border to-transparent" />
+              }
+            />
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {ABOUT_COPY.values.map((value, i) => (
+            {ABOUT_COPY.values.items.map((value, i) => (
               <div key={i} className="group clip-notch-br bg-feldora-surface border border-feldora-border/40 p-6 hover:border-feldora-accent/30 transition-all duration-300">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="hex-badge w-7 h-7 text-[9px] font-bold text-white">{i + 1}</div>

@@ -12,7 +12,7 @@ export function Footer() {
           {/* Brand */}
           <div className="md:col-span-5">
             <Link to="/" className="inline-flex items-center gap-2">
-              <div className="w-2 h-5 bg-feldora-accent skew-x-[-8deg]" />
+              <div className="w-2 h-5 bg-feldora-accent-secondary skew-x-[-8deg]" />
               <span className="text-xl font-black uppercase tracking-[0.15em] text-feldora-text">
                 FELDORA
               </span>
@@ -22,8 +22,8 @@ export function Footer() {
               storytelling and angular design philosophy.
             </p>
             <div className="mt-6 flex items-center gap-2">
-              <div className="w-12 h-[2px] bg-feldora-accent/40" />
-              <div className="w-2 h-2 rotate-45 border border-feldora-accent/40" />
+              <div className="w-12 h-[2px] bg-feldora-accent-secondary/40" />
+              <div className="w-2 h-2 rotate-45 border border-feldora-accent-secondary/40" />
             </div>
           </div>
 

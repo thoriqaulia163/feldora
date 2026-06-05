@@ -19,14 +19,19 @@ export const ABOUT_COPY = {
       'Built with cutting-edge tools yet designed to be maintainable by a single developer. Scalable architecture without enterprise-level complexity.',
     ],
   },
-  values: [
-    { title: 'Performance First', description: 'Every decision is measured against its impact on load time and runtime performance.' },
-    { title: 'Cinematic Quality', description: 'Visual storytelling that elevates the web experience beyond conventional design.' },
-    { title: 'Clean Architecture', description: 'Maintainable, readable code that scales without unnecessary complexity.' },
-    { title: 'Bold Simplicity', description: 'Premium aesthetics achieved through restraint and angular precision.' },
-    { title: 'Immersive Experience', description: 'Every interaction should feel intentional and contribute to the narrative.' },
-    { title: 'Future Ready', description: 'Built on modern foundations that embrace the evolving web platform.' },
-  ],
+  values: {
+    label: 'Principles',
+    heading: 'Core',
+    headingAccent: 'Values',
+    items: [
+      { title: 'Performance First', description: 'Every decision is measured against its impact on load time and runtime performance.' },
+      { title: 'Cinematic Quality', description: 'Visual storytelling that elevates the web experience beyond conventional design.' },
+      { title: 'Clean Architecture', description: 'Maintainable, readable code that scales without unnecessary complexity.' },
+      { title: 'Bold Simplicity', description: 'Premium aesthetics achieved through restraint and angular precision.' },
+      { title: 'Immersive Experience', description: 'Every interaction should feel intentional and contribute to the narrative.' },
+      { title: 'Future Ready', description: 'Built on modern foundations that embrace the evolving web platform.' },
+    ],
+  },
   creator: {
     label: 'Creator',
     name: 'Feldora Developer',
