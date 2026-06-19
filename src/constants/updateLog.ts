@@ -12,6 +12,14 @@ export interface UpdateEntry {
 
 export const WEB_UPDATE_LOG: UpdateEntry[] = [
   {
+    date: '19 June 2026',
+    title: 'PWA offline overhaul & navbar diamond marker fix',
+    status: 'moderate',
+    type: 'update',
+    version: '1.5.2',
+    description: 'Revamped service worker (sw.js) with network-first caching strategy for navigation and cache-first for static assets. Added layered offline fallback: exact URL cache → clean URL (strip query params) → /story list (for unvisited story detail pages) → / root → offline.html → bare 503. Precaches all main routes (/, /about, /log, /story), logos, and offline.html on install. Split into three dedicated caches (feldora-pages-v2, feldora-assets-v2). Cross-origin requests (Hygraph API, Google Fonts) remain network-only. Also fixed diamond marker vertical alignment on mobile navbar active indicator.',
+  },
+  {
     date: '5 June 2026',
     title: 'Dual-tone accent (purple & orange) + SectionHeader component',
     status: 'moderate',

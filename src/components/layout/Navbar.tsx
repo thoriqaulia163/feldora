@@ -88,7 +88,7 @@ export function Navbar() {
                 }}
               >
                 {link.label}
-                {isActive && <span className="ml-2 inline-block diamond-marker !w-2 !h-2" />}
+                {isActive && <span className="ml-2 mb-0.5 inline-block diamond-marker !w-2 !h-2" />}
               </Link>
             )
           })}

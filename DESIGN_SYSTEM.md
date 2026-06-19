@@ -374,19 +374,48 @@ Feldora diimplementasikan sebagai PWA untuk pengalaman installable dan offline s
 - `display: standalone` — app terbuka tanpa browser UI (address bar hilang)
 - Warna theme & background menggunakan `feldora-bg` agar splash screen konsisten
 
+### Cache Buckets
+
+SW menggunakan tiga cache terpisah untuk isolasi yang lebih baik:
+
+| Cache | Nama | Isi |
+|-------|------|-----|
+| Pages | `feldora-pages-v2` | HTML response semua halaman (navigation requests) |
+| Assets | `feldora-assets-v2` | JS, CSS, font, image, dan `offline.html` |
+| General | `feldora-v2` | Reserved — tidak aktif dipakai, hanya dijaga agar tidak terhapus |
+
 ### Service Worker Strategy
 
 | Resource | Strategy | Alasan |
 |----------|----------|--------|
-| Same-origin pages & assets | **Network-first, cache fallback** | Selalu coba fresh content, offline serve dari cache |
-| Cross-origin (API, CDN) | **Network-only** | Tidak di-cache untuk menghindari stale data dari third-party |
-| Halaman belum pernah dikunjungi | **Fallback ke `offline.html`** | Custom offline page dengan styling Feldora |
+| Navigation (halaman HTML) | **Network-first → layered cache fallback** | Selalu coba fresh dari server; fallback bertingkat saat offline |
+| Static assets (JS/CSS/font/image) | **Cache-first → network fallback** | Aman karena Vite output content-hashed filenames — file baru = URL baru |
+| Cross-origin (Hygraph API, Google Fonts) | **Network-only** | Tidak di-cache untuk menghindari stale data dari third-party |
+
+### Offline Fallback Chain (Navigation)
+
+Ketika user offline dan membuka halaman, SW mencoba fallback secara berurutan:
+
+```
+1. Cache exact URL  →  ada? serve
+2. Cache URL tanpa query params  →  ada? serve
+3. Khusus /story/* → cache /story list  →  ada? serve
+4. Cache /  →  selalu ada (precached saat install)  →  serve
+5. Cache /offline.html  →  selalu ada (precached saat install)  →  serve
+6. Bare 503 inline HTML  →  last resort, praktis tidak pernah tercapai
+```
+
+Karena `/` dan `/offline.html` selalu di-precache saat SW install, user tidak akan pernah melihat error browser native saat offline.
 
 ### Precache
 
-Halaman-halaman utama di-precache saat install:
+Di-precache otomatis saat SW install (non-fatal — satu gagal tidak block yang lain):
+
+**Routes** (masuk ke `feldora-pages-v2`):
 - `/`, `/about`, `/log`, `/story`
-- `/offline.html`, `/feldora-logo-192.png`
+
+**Assets** (masuk ke `feldora-assets-v2`):
+- `/feldora-logo-192.png`, `/feldora-logo-512.png`, `/offline.html`
 
 ### Registration
 
@@ -402,12 +431,17 @@ Ini mencegah caching yang mengganggu saat development. Di localhost, perubahan c
 ### Offline Page (`public/offline.html`)
 
 Halaman static HTML dengan styling Feldora (dark bg, diamond markers, angular button).
-Ditampilkan saat user offline dan navigasi ke halaman yang belum pernah di-cache.
+Di-precache saat SW install sehingga selalu tersedia. Ditampilkan hanya sebagai last resort — ketika semua halaman lain (termasuk `/`) tidak ada di cache. Dalam praktik normal tidak akan pernah muncul.
 
 ### Cache Versioning
 
-Ubah `CACHE_NAME` di `sw.js` (e.g., `feldora-v1` → `feldora-v2`) saat deploy perubahan besar.
-Service worker akan otomatis hapus cache lama saat activate.
+Terdapat tiga cache name yang perlu di-bump saat deploy perubahan besar:
+```js
+const CACHE_NAME   = 'feldora-v2'      // general
+const CACHE_PAGES  = 'feldora-pages-v2'
+const CACHE_ASSETS = 'feldora-assets-v2'
+```
+Ubah semua suffix angka secara bersamaan (e.g., `v2` → `v3`). SW akan otomatis hapus cache lama saat activate via `caches.keys()` cleanup.
 
 ### Splash Screen
 
@@ -630,6 +664,6 @@ npm run lint     # TypeScript type check (tsc --noEmit)
    - Internal route (mengarah ke halaman website sendiri) → **WAJIB** menggunakan `<Link>` dari `@tanstack/react-router`. Ini memastikan client-side navigation tanpa full page reload. Gunakan `<a>` hanya jika ada kebutuhan spesifik yang tidak bisa di-cover oleh `<Link>`.
    - External route (mengarah ke domain luar seperti GitHub, Discord, dll) → boleh menggunakan tag `<a>` biasa dengan `target="_blank"` dan `rel="noopener noreferrer"`.
 
-9. **PWA & Service Worker** — Service worker (`public/sw.js`) hanya di-register di production (bukan localhost). Saat develop, SW tidak aktif sehingga perubahan langsung terlihat. Ubah `CACHE_NAME` di `sw.js` saat deploy perubahan besar agar cache lama terhapus.
+9. **PWA & Service Worker** — Service worker (`public/sw.js`) hanya di-register di production (bukan localhost). Saat develop, SW tidak aktif sehingga perubahan langsung terlihat. Saat deploy perubahan besar, bump semua tiga cache name (`feldora-v2`, `feldora-pages-v2`, `feldora-assets-v2`) ke versi berikutnya secara bersamaan agar cache lama terhapus.
 
 10. **Copywriting terpusat** — Semua teks/copy di-manage dari `src/constants/copy/`. Setiap halaman punya file sendiri (`home.ts`, `about.ts`, `log.ts`, `story.ts`). Untuk ubah teks di website, cukup edit file di directory ini tanpa perlu sentuh komponen.
