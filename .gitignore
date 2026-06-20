@@ -24,3 +24,6 @@ src/routeTree.gen.ts
 # Logs
 *.log
 npm-debug.log*
+
+# Dataset (large, generated locally via scripts)
+public/dataset

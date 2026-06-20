@@ -47,6 +47,8 @@ src/
 ├── components/
 │   ├── home/            # Homepage sections (Hero, Featured, Updates, CTA)
 │   ├── layout/          # Navbar, Footer (persistent layout)
+│   ├── playground/      # Playground shell, module registry, types
+│   │   └── modules/     # Module implementations (weather/, etc.)
 │   ├── story/           # Story list & detail components
 │   └── ui/              # Reusable UI components (LogCard)
 ├── constants/
@@ -55,12 +57,14 @@ src/
 │   │   ├── home.ts        # Hero, Featured, Updates, CTA
 │   │   ├── about.ts       # Header, Philosophy, Platform, Values, Creator
 │   │   ├── log.ts         # Header
-│   │   └── story.ts       # Header, Error states, Detail page
+│   │   ├── story.ts       # Header, Error states, Detail page
+│   │   └── playground.ts  # Playground & module copy
 │   ├── navigation.ts      # Navigation links array
 │   ├── placeholderStories.ts  # Static placeholder articles
 │   └── updateLog.ts       # Update log data & types
 ├── lib/
 │   ├── graphql.ts       # GraphQL queries & types (Hygraph)
+│   ├── ml/              # Machine learning (cities data, types, RF algorithm, PRNG)
 │   ├── queries.ts       # React Query hooks (useGetPosts, useGetPostDetail)
 │   └── queryClient.ts   # Query client factory
 ├── routes/
@@ -68,6 +72,7 @@ src/
 │   ├── index.tsx        # Home page
 │   ├── about.tsx        # About page
 │   ├── log.tsx          # Changelog page
+│   ├── playground.tsx   # Playground page
 │   ├── story.tsx        # Story layout (Outlet)
 │   ├── story.index.tsx  # Story list page (/story)
 │   └── story.$slug.tsx  # Story detail page (/story/:slug)
@@ -80,12 +85,17 @@ src/
 └── routeTree.gen.ts     # Auto-generated route tree (DO NOT EDIT)
 
 public/
+├── ai-models/           # Pre-trained ML models (served to browser)
+├── dataset/             # Training datasets (git-ignored, not deployed)
 ├── manifest.json        # PWA manifest
 ├── sw.js                # Service worker (offline support)
 ├── offline.html         # Custom offline fallback page
 ├── feldora-logo-192.png # PWA icon (192x192) + favicon
 ├── feldora-logo-512.png # PWA icon (512x512) for splash screen
 └── fonts/               # Custom font files
+
+scripts/
+└── local-weather-forecast/  # Dataset extraction & model training scripts
 ```
 
 ---
@@ -97,6 +107,7 @@ public/
 | `/` | Home | Landing page — Hero + Featured + Updates + CTA |
 | `/about` | About | Vision, philosophy, values, creator |
 | `/log` | Log | Changelog/update history (timeline) |
+| `/playground` | Playground | Module eksperimen (AI, Tool, Game) — dynamic loading |
 | `/story` | Story List | Grid card articles (dari Hygraph atau placeholder) |
 | `/story/:slug` | Story Detail | Full article — title, meta, image, content HTML |
 | `*` (catch-all) | 404 Not Found | Error page untuk route yang tidak ada |
@@ -272,9 +283,15 @@ interface UpdateEntry {
   status: UpdateStatus  // Level dampak update
   type: UpdateCategory  // Kategori jenis perubahan
   version: string       // Versi (format semver: "1.0.0")
-  description: string   // Deskripsi detail (ditampilkan di accordion)
+  description: string   // Deskripsi detail, max 150 karakter
 }
 ```
+
+### Aturan Penulisan Log
+
+- **`description`**: Maksimal **150 karakter**. Ringkas, padat, tanpa detail implementasi. Jika perlu lebih detail, tulis di commit message atau PR description.
+- **`title`**: Ringkasan perubahan utama dalam satu baris.
+- **`version`**: Mengikuti semver — major (breaking/rebuild), moderate (fitur baru), minor (fix/tweak).
 
 ### Status Mapping (Warna Tag)
 
@@ -667,3 +684,83 @@ npm run lint     # TypeScript type check (tsc --noEmit)
 9. **PWA & Service Worker** — Service worker (`public/sw.js`) hanya di-register di production (bukan localhost). Saat develop, SW tidak aktif sehingga perubahan langsung terlihat. Saat deploy perubahan besar, bump semua tiga cache name (`feldora-v2`, `feldora-pages-v2`, `feldora-assets-v2`) ke versi berikutnya secara bersamaan agar cache lama terhapus.
 
 10. **Copywriting terpusat** — Semua teks/copy di-manage dari `src/constants/copy/`. Setiap halaman punya file sendiri (`home.ts`, `about.ts`, `log.ts`, `story.ts`). Untuk ubah teks di website, cukup edit file di directory ini tanpa perlu sentuh komponen.
+
+---
+
+## Playground System
+
+### Konsep
+
+`/playground` adalah halaman host untuk module-module eksperimen — tool, AI, atau game kecil yang berjalan di browser. Setiap module bersifat independen, di-load secara dynamic (lazy), dan tidak mempengaruhi halaman lain.
+
+### Arsitektur
+
+```
+src/components/playground/
+├── types.ts                  # Interface: PlaygroundModule, ModuleInstance, ModuleLabel
+├── moduleRegistry.ts         # Manifest semua module yang terdaftar
+├── PlaygroundShell.tsx        # Shell: header, module cards, lifecycle
+└── modules/
+    └── <module-name>/        # Tiap module punya folder sendiri
+        ├── ModuleComponent.tsx
+        └── ...helpers
+```
+
+### Module Manifest
+
+Setiap module didaftarkan di `moduleRegistry.ts` dengan interface:
+
+```typescript
+interface PlaygroundModule {
+  id: string                  // Unique identifier (kebab-case)
+  name: string                // Display name
+  description: string         // Deskripsi singkat
+  label: ModuleLabel          // 'AI' | 'Tool' | 'Game'
+  lastUpdated: string         // Tanggal update terakhir (format: "20 June 2026")
+  estimatedDownloadSize: string  // Estimasi ukuran chunk + asset
+  load: () => Promise<{default: ComponentType}>  // Dynamic import
+}
+```
+
+### Label Warna
+
+| Label | Warna | Use Case |
+|-------|-------|----------|
+| `AI` | Purple (accent) | Module yang menggunakan model ML |
+| `Tool` | Orange (accent-secondary) | Utility/tool umum |
+| `Game` | Emerald green | Mini-game atau interaktif |
+
+### Module Lifecycle
+
+```
+idle → loading → ready → [active]
+                → error → [retry → loading]
+```
+
+| State | UI |
+|-------|-----|
+| `idle` | Card dengan tombol "Load Module" |
+| `loading` | Teks "Loading..." pulse animation |
+| `ready` | Component di-render, card list disembunyikan |
+| `error` | Error message + tombol "Retry" |
+
+### Aturan Module
+
+1. **Dynamic import only** — Module tidak boleh di-import saat initial load playground
+2. **Self-contained** — Setiap module mengelola state, assets, dan error handling sendiri
+3. **No side effects** — Module tidak boleh modify global state atau halaman lain
+4. **Chunk cached** — Setelah pertama kali di-load, chunk di-cache oleh browser
+5. **Asset singleton** — Model/data yang besar di-cache di module-level variable (bukan component state)
+
+### Konvensi File
+
+- Module component: `export default function ModuleName()` (harus default export)
+- Folder: `src/components/playground/modules/<kebab-case-name>/`
+- Assets AI: `public/ai-models/<module-name>/model.json`
+- Dataset: `public/dataset/<module-name>/` (git-ignored, tidak deploy)
+- Scripts: `scripts/<module-name>/`
+
+### Dokumentasi Module
+
+Detail lengkap setiap module didokumentasikan di `PLAYGROUND_MODULES.md` di root project.
+

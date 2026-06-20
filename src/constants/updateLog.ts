@@ -12,12 +12,28 @@ export interface UpdateEntry {
 
 export const WEB_UPDATE_LOG: UpdateEntry[] = [
   {
+    date: '20 June 2026',
+    title: 'Local Weather Forecast module — offline rain prediction',
+    status: 'moderate',
+    type: 'update',
+    version: '1.7.0',
+    description: 'AI module: Random Forest (40 trees, depth 6) prediksi hujan 514 kota Indonesia. Offline inference <1ms di browser.',
+  },
+  {
+    date: '20 June 2026',
+    title: 'Playground route & module system',
+    status: 'moderate',
+    type: 'update',
+    version: '1.6.0',
+    description: 'New /playground route with dynamic module loading, lifecycle management, label badges (AI/Tool/Game), and searchable UI.',
+  },
+  {
     date: '19 June 2026',
     title: 'PWA offline overhaul & navbar diamond marker fix',
     status: 'moderate',
     type: 'update',
-    version: '1.5.2',
-    description: 'Revamped service worker (sw.js) with network-first caching strategy for navigation and cache-first for static assets. Added layered offline fallback: exact URL cache → clean URL (strip query params) → /story list (for unvisited story detail pages) → / root → offline.html → bare 503. Precaches all main routes (/, /about, /log, /story), logos, and offline.html on install. Split into three dedicated caches (feldora-pages-v2, feldora-assets-v2). Cross-origin requests (Hygraph API, Google Fonts) remain network-only. Also fixed diamond marker vertical alignment on mobile navbar active indicator.',
+    version: '1.5.1',
+    description: 'Revamped service worker with layered offline fallback, split caches, and precaching of main routes. Fixed diamond marker alignment on mobile.',
   },
   {
     date: '5 June 2026',
@@ -25,7 +41,7 @@ export const WEB_UPDATE_LOG: UpdateEntry[] = [
     status: 'moderate',
     type: 'revamp',
     version: '1.5.0',
-    description: 'Switched accent color scheme from red (#dc2626) to dual-tone purple (#8b5cf6) + orange (#f97316). Purple used for interactive elements (buttons, hover borders, heading highlights), orange for decorative/marker elements (diamond markers, hex badges, labels, category tags, logo bar, panel frame corners, navbar active indicator). Created reusable SectionHeader component (label + heading + headingAccent + trailing) and applied it to FeaturedSection, LatestUpdates, and About values section. Restructured ABOUT_COPY.values to include header metadata (label, heading, headingAccent, items). Renamed PWA icons to feldora-logo-192.png and feldora-logo-512.png, updated manifest.json and favicon reference in __root.tsx.',
+    description: 'Switched accent to dual-tone purple + orange. Created reusable SectionHeader. Renamed PWA icons to feldora-logo PNG format.',
   },
   {
     date: '4 June 2026',
@@ -33,7 +49,7 @@ export const WEB_UPDATE_LOG: UpdateEntry[] = [
     status: 'minor',
     type: 'revamp',
     version: '1.4.1',
-    description: 'Replaced webp logo with proper PNG icons (192x192 and 512x512) for PWA manifest and browser favicon compatibility across all devices.',
+    description: 'Replaced webp logo with proper PNG icons (192x192 and 512x512) for PWA manifest and browser favicon compatibility.',
   },
   {
     date: '4 June 2026',
@@ -41,7 +57,7 @@ export const WEB_UPDATE_LOG: UpdateEntry[] = [
     status: 'moderate',
     type: 'update',
     version: '1.4.0',
-    description: 'Implemented infinite scroll on StoryList using useInfiniteQuery with IntersectionObserver. Fetches 12 posts per page via Hygraph GraphQL paginated query (first/skip/pageInfo.hasNextPage). Created reusable Spinner component with configurable size. Added mock API (36 posts, 800ms delay) for future testing. Used useMemo for flattened posts array to avoid unnecessary recalculations on every render.',
+    description: 'Infinite scroll via useInfiniteQuery + IntersectionObserver. Paginated Hygraph query (12/page). Added Spinner and mock API.',
   },
   {
     date: '4 June 2026',
@@ -49,7 +65,7 @@ export const WEB_UPDATE_LOG: UpdateEntry[] = [
     status: 'minor',
     type: 'refactor',
     version: '1.3.2',
-    description: 'Moved all hardcoded text/copy from components into src/constants/copy/ directory with separate files per page (home.ts, about.ts, log.ts, story.ts). Components now import text from centralized copy files, making content changes easier without touching UI code.',
+    description: 'Moved all hardcoded text into src/constants/copy/ per page. Components now import from centralized copy files.',
   },
   {
     date: '4 June 2026',
@@ -57,7 +73,7 @@ export const WEB_UPDATE_LOG: UpdateEntry[] = [
     status: 'minor',
     type: 'fixing',
     version: '1.3.1',
-    description: 'Extracted StoryCard as reusable component shared between FeaturedSection and StoryList. Fixed mobile horizontal scroll on log page by moving tooltip to left side and adding overflow-hidden on LogCard. Replaced broken placeholder image. Made FeaturedSection cards clickable with navigation to story detail. Extracted NotFoundPage to separate component. Disabled service worker registration on localhost for smoother development. Added development orientation principles to DESIGN_SYSTEM.md. Created reusable PageHeader component and applied it to About, Log, and Story pages.',
+    description: 'Extracted StoryCard as shared component. Fixed mobile scroll on log page. Created PageHeader and NotFoundPage components.',
   },
   {
     date: '4 June 2026',
@@ -65,7 +81,7 @@ export const WEB_UPDATE_LOG: UpdateEntry[] = [
     status: 'moderate',
     type: 'update',
     version: '1.3.0',
-    description: 'Implemented comprehensive error and loading state system: GlobalLoader (red loading bar on route transition), reusable Skeleton components (card, article, grid), ErrorState reusable component with retry/back actions, global ErrorPage boundary for runtime crashes, OfflineBanner (dismissible notification at top-right), Toast notification system (success/error/warning/info with auto-dismiss). Also refactored StoryList to show proper error/empty states and StoryDetail to fallback to placeholder data or show error UI.',
+    description: 'GlobalLoader, Skeleton components, ErrorState, ErrorPage boundary, OfflineBanner, and Toast notification system.',
   },
   {
     date: '4 June 2026',
@@ -73,7 +89,7 @@ export const WEB_UPDATE_LOG: UpdateEntry[] = [
     status: 'moderate',
     type: 'update',
     version: '1.2.0',
-    description: 'Added Progressive Web App support: manifest.json for installability (standalone display, dark theme), service worker with network-first caching strategy for offline access, custom offline.html fallback page styled with Feldora design system, and precaching of essential routes. App is now installable on mobile and desktop.',
+    description: 'Added manifest.json, service worker with network-first caching, offline.html fallback. App now installable on mobile and desktop.',
   },
   {
     date: '4 June 2026',
@@ -81,7 +97,7 @@ export const WEB_UPDATE_LOG: UpdateEntry[] = [
     status: 'moderate',
     type: 'revamp',
     version: '1.1.0',
-    description: 'Restructured WEB_UPDATE_LOG data with new fields: status (minor/moderate/major), type (update/fixing/refactor/revamp), version, and description. Renamed tanggal to date, update to title. Created reusable LogCard component with accordion expand for description, color-coded status badges, category type icons (circle-up green for update, wrench-screwdriver red for fixing, broom orange for refactor, sparkles blue for revamp) with hover tooltips, version display below date, and responsive mobile layout where status & type shift to the right. Updated LatestUpdates (home) and Log page to use the shared component.',
+    description: 'Restructured log data with status/type/version fields. Created LogCard with accordion, color-coded badges, and hover tooltips.',
   },
   {
     date: '2 June 2026',
@@ -89,7 +105,7 @@ export const WEB_UPDATE_LOG: UpdateEntry[] = [
     status: 'major',
     type: 'refactor',
     version: '1.0.0',
-    description: 'Complete platform migration from React SPA to TanStack Start with SSR, file-based routing, and Nitro for Vercel deployment. Implemented cinematic dark-only design system inspired by Riot Games — angular geometry, bold typography (Inter + JetBrains Mono), and CSS-only animations. Built with development orientations: security & privacy (env vars protected, least-privilege), high performance & lightweight (SSR, minimal deps, no runtime animation libs), modular & scalable (reusable components, structured folder architecture), and maintainable & fixable (TypeScript strict, DESIGN_SYSTEM.md as source of truth, clear separation of concerns).',
+    description: 'Full migration to TanStack Start + SSR + Nitro. Cinematic dark design system inspired by Riot Games. TypeScript strict mode.',
   },
   {
     date: '18 September 2025',
@@ -97,7 +113,7 @@ export const WEB_UPDATE_LOG: UpdateEntry[] = [
     status: 'minor',
     type: 'update',
     version: '0.4.3',
-    description: 'Added custom fonts (Inter, JetBrains Mono) and migrated update log data from inline to a dedicated constants file for better maintainability.',
+    description: 'Added custom fonts (Inter, JetBrains Mono) and migrated update log data to a dedicated constants file.',
   },
   {
     date: '9 Februari 2025',
@@ -105,7 +121,7 @@ export const WEB_UPDATE_LOG: UpdateEntry[] = [
     status: 'minor',
     type: 'update',
     version: '0.4.2',
-    description: 'update post page formating',
+    description: 'Updated post page formatting.',
   },
   {
     date: '9 Februari 2025',
@@ -113,7 +129,7 @@ export const WEB_UPDATE_LOG: UpdateEntry[] = [
     status: 'minor',
     type: 'fixing',
     version: '0.4.1',
-    description: 'fixing vercel configuration for routing',
+    description: 'Fixed Vercel configuration for direct route navigation.',
   },
   {
     date: '8 Februari 2025',
@@ -121,7 +137,7 @@ export const WEB_UPDATE_LOG: UpdateEntry[] = [
     status: 'moderate',
     type: 'fixing',
     version: '0.4.0',
-    description: 'fixing format in post page, so it match data from rich-text-editor',
+    description: 'Fixed post page format to match rich-text-editor data output.',
   },
   {
     date: '8 Februari 2025',
@@ -129,7 +145,7 @@ export const WEB_UPDATE_LOG: UpdateEntry[] = [
     status: 'moderate',
     type: 'update',
     version: '0.3.0',
-    description: 'Add log page for tracking website update and implement react-helmet for async title',
+    description: 'Added log page for tracking website updates. Implemented react-helmet for async page titles.',
   },
   {
     date: '8 Februari 2025',
@@ -137,7 +153,7 @@ export const WEB_UPDATE_LOG: UpdateEntry[] = [
     status: 'minor',
     type: 'refactor',
     version: '0.2.1',
-    description: 'Revamp UI & Layout and add Add log. Add new webLogo of Feldora and page animation.',
+    description: 'Revamped UI & layout. Added new Feldora logo and page transition animations.',
   },
   {
     date: '2 Agustus 2024',
@@ -145,7 +161,7 @@ export const WEB_UPDATE_LOG: UpdateEntry[] = [
     status: 'moderate',
     type: 'update',
     version: '0.2.0',
-    description: 'Integrate React-Query with api from GraphQL (Hygraph)',
+    description: 'Integrated React Query with Hygraph GraphQL API for post fetching.',
   },
   {
     date: '22 Juli 2024',
@@ -153,7 +169,7 @@ export const WEB_UPDATE_LOG: UpdateEntry[] = [
     status: 'moderate',
     type: 'update',
     version: '0.1.0',
-    description: 'Install and setup React-Query in the project. Set rules & standard for development',
+    description: 'Installed and configured React Query. Set development rules & standards.',
   },
   {
     date: '9 Juli 2024',
@@ -161,6 +177,6 @@ export const WEB_UPDATE_LOG: UpdateEntry[] = [
     status: 'major',
     type: 'update',
     version: '0.0.0',
-    description: 'Initializing Feldora Project and Setup. Created with Vite + React. Plan to use react-query as data fetching & state maintainers',
+    description: 'Initialized Feldora with Vite + React. Planned react-query for data fetching & state management.',
   },
 ]
