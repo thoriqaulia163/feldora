@@ -120,8 +120,8 @@ public/dataset/local-weather-forecast/
 - `success` — Rain/No Rain icon, confidence bar, execution time, features grid
 
 **Info Section (bottom):**
-- About box — paragraf tentang model, data, dan filosofi
 - How to Use box — langkah-langkah pemakaian
+- About box — paragraf tentang model, data, dan filosofi
 
 ### Inference Flow
 

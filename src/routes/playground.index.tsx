@@ -91,7 +91,7 @@ function ModuleCard({ module: mod }: { module: PlaygroundModule }) {
 
   const labelColors: Record<ModuleLabel, string> = {
     AI: 'bg-feldora-accent/20 text-feldora-accent border-feldora-accent/30',
-    Tool: 'bg-feldora-accent-secondary/20 text-feldora-accent-secondary border-feldora-accent-secondary/30',
+    Tool: 'bg-amber-400/20 text-amber-400 border-amber-400/30',
     Game: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
   }
 

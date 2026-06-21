@@ -13,6 +13,14 @@ export interface UpdateEntry {
 export const WEB_UPDATE_LOG: UpdateEntry[] = [
   {
     date: '21 June 2026',
+    title: 'Swap info box order in Weather module, Tool label color to yellow',
+    status: 'minor',
+    type: 'fixing',
+    version: '1.9.1',
+    description: '"How to Use" now appears before "About" in Weather module. Playground Tool label color changed from orange to yellow for better distinction.',
+  },
+  {
+    date: '21 June 2026',
     title: 'Home revamp (Hero carousel, API Featured), About restructure, /log merged, reusable Carousel',
     status: 'moderate',
     type: 'revamp',

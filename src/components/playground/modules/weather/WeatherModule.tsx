@@ -395,6 +395,21 @@ export default function WeatherModule() {
 
       {/* Info Box — below main content */}
       <div className="grid md:grid-cols-2 gap-4">
+        {/* How to Use */}
+        <div className="bg-feldora-surface border border-feldora-border/30 p-5 clip-notch-br">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="hex-badge w-5 h-5 text-[8px] font-bold text-white">?</div>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-feldora-text">How to Use</h4>
+          </div>
+          <ol className="space-y-2 text-feldora-text-secondary text-xs leading-relaxed list-decimal pl-4">
+            <li>Pick a <span className="text-feldora-text">date</span> — defaults to today, change freely</li>
+            <li>Search for a <span className="text-feldora-text">city</span> — type city name or province, select from dropdown</li>
+            <li>Optionally open <span className="text-feldora-text">Advanced Settings</span> to set ENSO phase (El Nino/La Nina) and IOD (Indian Ocean Dipole)</li>
+            <li>Click <span className="text-feldora-text">Predict</span></li>
+            <li>Result shows: <span className="text-feldora-text">Rain/No Rain</span>, confidence %, execution time, and all features used for inference</li>
+          </ol>
+        </div>
+
         {/* About */}
         <div className="bg-feldora-surface border border-feldora-border/30 p-5 clip-notch-br">
           <div className="flex items-center gap-2 mb-3">
@@ -412,21 +427,6 @@ export default function WeatherModule() {
               Designed with an offline-first philosophy — once loaded, predictions run entirely in-browser with zero network requests, making it usable on any device regardless of connectivity.
             </p>
           </div>
-        </div>
-
-        {/* How to Use */}
-        <div className="bg-feldora-surface border border-feldora-border/30 p-5 clip-notch-br">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="hex-badge w-5 h-5 text-[8px] font-bold text-white">?</div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-feldora-text">How to Use</h4>
-          </div>
-          <ol className="space-y-2 text-feldora-text-secondary text-xs leading-relaxed list-decimal pl-4">
-            <li>Pick a <span className="text-feldora-text">date</span> — defaults to today, change freely</li>
-            <li>Search for a <span className="text-feldora-text">city</span> — type city name or province, select from dropdown</li>
-            <li>Optionally open <span className="text-feldora-text">Advanced Settings</span> to set ENSO phase (El Nino/La Nina) and IOD (Indian Ocean Dipole)</li>
-            <li>Click <span className="text-feldora-text">Predict</span></li>
-            <li>Result shows: <span className="text-feldora-text">Rain/No Rain</span>, confidence %, execution time, and all features used for inference</li>
-          </ol>
         </div>
       </div>
     </div>

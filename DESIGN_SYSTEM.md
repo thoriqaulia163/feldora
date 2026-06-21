@@ -767,7 +767,7 @@ interface PlaygroundModule {
 | Label | Warna | Use Case |
 |-------|-------|----------|
 | `AI` | Purple (accent) | Module yang menggunakan model ML |
-| `Tool` | Orange (accent-secondary) | Utility/tool umum |
+| `Tool` | Yellow (amber-400) | Utility/tool umum |
 | `Game` | Emerald green | Mini-game atau interaktif |
 
 ### Module Lifecycle
