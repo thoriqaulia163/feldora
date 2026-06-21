@@ -44,7 +44,7 @@ export const Route = createRootRoute({
     ],
   }),
   component: RootComponent,
-  notFoundComponent: NotFoundPage,
+  notFoundComponent: () => <NotFoundPage />,
   errorComponent: ErrorPage,
 })
 

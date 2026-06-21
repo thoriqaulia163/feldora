@@ -1,13 +1,18 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { PlaygroundShell } from '~/components/playground/PlaygroundShell'
+import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { NotFoundPage } from '~/components/layout/NotFoundPage'
 
 export const Route = createFileRoute('/playground')({
-  head: () => ({
-    meta: [{ title: 'FELDORA — Playground' }],
-  }),
-  component: PlaygroundPage,
+  component: PlaygroundLayout,
+  notFoundComponent: () => (
+    <NotFoundPage
+      label="Module not found"
+      message="This module doesn't exist in the Playground."
+      backTo="/playground"
+      backText="Back to Playground"
+    />
+  ),
 })
 
-function PlaygroundPage() {
-  return <PlaygroundShell />
+function PlaygroundLayout() {
+  return <Outlet />
 }

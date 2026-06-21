@@ -1,8 +1,20 @@
 import { Link } from '@tanstack/react-router'
 
-export function NotFoundPage() {
+interface NotFoundPageProps {
+  label?: string
+  message?: string
+  backTo?: string
+  backText?: string
+}
+
+export function NotFoundPage({
+  label = 'Lost in the void',
+  message = "This page doesn't exist in the Feldora universe.",
+  backTo = '/',
+  backText = 'Return Home',
+}: NotFoundPageProps) {
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-6">
+    <div className="min-h-[80vh] flex items-center justify-center px-6 pt-24">
       <div className="text-center max-w-md">
         {/* Large 404 with geometric accents */}
         <div className="relative inline-block mb-8">
@@ -21,18 +33,18 @@ export function NotFoundPage() {
         <div className="flex items-center justify-center gap-3 mb-4">
           <div className="diamond-marker !w-2 !h-2" />
           <span className="text-feldora-accent font-mono text-xs uppercase tracking-[0.3em]">
-            Lost in the void
+            {label}
           </span>
           <div className="diamond-marker !w-2 !h-2" />
         </div>
 
         <p className="text-feldora-text-secondary text-lg mb-10">
-          This page doesn't exist in the Feldora universe.
+          {message}
         </p>
 
         {/* CTA */}
-        <Link to="/" className="btn-angular-primary">
-          Return Home
+        <Link to={backTo} className="btn-angular-primary">
+          {backText}
         </Link>
       </div>
     </div>

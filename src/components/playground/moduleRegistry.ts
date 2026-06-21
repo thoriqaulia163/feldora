@@ -9,6 +9,22 @@ export const PLAYGROUND_MODULES: PlaygroundModule[] = [
     label: 'AI',
     lastUpdated: '20 June 2026',
     estimatedDownloadSize: '~130 KB',
-    load: () => import('./modules/weather/WeatherModule.js'),
+    cacheCheckUrl: '/ai-models/local-weather-forecast/model.json',
+  },
+  {
+    id: 'tic-tac-toe',
+    name: 'Tic Tac Toe',
+    description: 'Coming soon',
+    label: 'Game',
+    lastUpdated: '-',
+    estimatedDownloadSize: '-',
+  },
+  {
+    id: 'split-bill',
+    name: 'Split Bill',
+    description: 'Coming soon',
+    label: 'Tool',
+    lastUpdated: '-',
+    estimatedDownloadSize: '-',
   },
 ]

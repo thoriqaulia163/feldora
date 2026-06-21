@@ -685,6 +685,8 @@ npm run lint     # TypeScript type check (tsc --noEmit)
 
 10. **Copywriting terpusat** — Semua teks/copy di-manage dari `src/constants/copy/`. Setiap halaman punya file sendiri (`home.ts`, `about.ts`, `log.ts`, `story.ts`). Untuk ubah teks di website, cukup edit file di directory ini tanpa perlu sentuh komponen.
 
+11. **Auto-version di Footer** — Footer menampilkan versi website yang otomatis dibaca dari `package.json` via Vite `define`. Didefinisikan di `vite.config.ts` sebagai `__APP_VERSION__` (string replacement saat build, zero runtime cost). Cukup update `version` di `package.json`, footer otomatis ikut. Perlu restart dev server jika version berubah saat dev sedang jalan.
+
 ---
 
 ## Playground System
@@ -712,15 +714,19 @@ Setiap module didaftarkan di `moduleRegistry.ts` dengan interface:
 
 ```typescript
 interface PlaygroundModule {
-  id: string                  // Unique identifier (kebab-case)
-  name: string                // Display name
-  description: string         // Deskripsi singkat
-  label: ModuleLabel          // 'AI' | 'Tool' | 'Game'
-  lastUpdated: string         // Tanggal update terakhir (format: "20 June 2026")
+  id: string                     // Unique identifier (kebab-case), dipakai sebagai route path
+  name: string                   // Display name
+  description: string            // Deskripsi singkat
+  label: ModuleLabel             // 'AI' | 'Tool' | 'Game'
+  lastUpdated: string            // Tanggal update terakhir (format: "20 June 2026")
   estimatedDownloadSize: string  // Estimasi ukuran chunk + asset
-  load: () => Promise<{default: ComponentType}>  // Dynamic import
+  cacheCheckUrl?: string         // URL asset utama untuk cek offline status (opsional)
 }
 ```
+
+`cacheCheckUrl` opsional karena:
+- Module dengan external model/data (AI) perlu cek apakah asset sudah di-cache
+- Module pure client-side (Game, Tool) offline by default setelah JS chunk ter-cache — tidak perlu field ini
 
 ### Label Warna
 
@@ -746,16 +752,17 @@ idle → loading → ready → [active]
 
 ### Aturan Module
 
-1. **Dynamic import only** — Module tidak boleh di-import saat initial load playground
+1. **Route-based loading** — Setiap module punya route file sendiri (`playground.<module-id>.tsx`)
 2. **Self-contained** — Setiap module mengelola state, assets, dan error handling sendiri
 3. **No side effects** — Module tidak boleh modify global state atau halaman lain
-4. **Chunk cached** — Setelah pertama kali di-load, chunk di-cache oleh browser
+4. **Lazy by default** — TanStack Router code-split per route file, module hanya di-load saat halaman dibuka
 5. **Asset singleton** — Model/data yang besar di-cache di module-level variable (bukan component state)
 
 ### Konvensi File
 
+- Module route: `src/routes/playground.<module-id>.tsx`
 - Module component: `export default function ModuleName()` (harus default export)
-- Folder: `src/components/playground/modules/<kebab-case-name>/`
+- Module folder: `src/components/playground/modules/<kebab-case-name>/`
 - Assets AI: `public/ai-models/<module-name>/model.json`
 - Dataset: `public/dataset/<module-name>/` (git-ignored, tidak deploy)
 - Scripts: `scripts/<module-name>/`
@@ -763,4 +770,28 @@ idle → loading → ready → [active]
 ### Dokumentasi Module
 
 Detail lengkap setiap module didokumentasikan di `PLAYGROUND_MODULES.md` di root project.
+
+### Routing
+
+Setiap module memiliki route sendiri di bawah `/playground`:
+- `/playground` → layout (Outlet)
+- `/playground/` → index (module list + search)
+- `/playground/<module-id>` → halaman module (lazy loaded via route code-splitting)
+
+Module tidak di-load saat initial render website maupun saat halaman playground index dibuka. Chunk hanya di-download ketika user navigasi ke route module tersebut.
+
+### Offline Support
+
+- Module yang pernah dibuka tersedia secara offline (SW cache page + model)
+- Status offline di-track via `localStorage` (`module-offline:<module-id>`)
+- Flag di-set saat model berhasil load, dihapus saat fetch gagal (self-healing)
+- Badge ditampilkan di module card: "Offline Ready" (hijau) atau "Not Loaded" (abu-abu)
+
+### Not Found Handling
+
+Route `/playground/*` yang tidak ada menampilkan `NotFoundPage` dengan props:
+- label: "Module not found"
+- backTo: `/playground`
+
+`NotFoundPage` adalah component reusable dengan props untuk label, message, backTo, dan backText.
 

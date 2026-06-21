@@ -35,10 +35,12 @@ export function useLocalWeatherPredictor(): PredictorHook {
       const model: SerializedModel = await res.json()
       cachedModel = model
       setState('ready')
+      localStorage.setItem('module-offline:local-weather-forecast', 'true')
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Unknown error loading model'
       setError(msg)
       setState('error')
+      localStorage.removeItem('module-offline:local-weather-forecast')
     } finally {
       loadingRef.current = false
     }

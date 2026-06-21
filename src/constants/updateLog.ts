@@ -13,6 +13,14 @@ export interface UpdateEntry {
 export const WEB_UPDATE_LOG: UpdateEntry[] = [
   {
     date: '20 June 2026',
+    title: 'Playground per-module routing, offline status badge, search & NotFoundPage refactor',
+    status: 'moderate',
+    type: 'refactor',
+    version: '1.8.0',
+    description: 'Modules now have dedicated routes (/playground/<id>). Removed load() from manifest. Added offline badge, search, and reusable NotFoundPage.',
+  },
+  {
+    date: '20 June 2026',
     title: 'Local Weather Forecast module — offline rain prediction',
     status: 'moderate',
     type: 'update',

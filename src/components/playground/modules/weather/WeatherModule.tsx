@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from '@tanstack/react-router'
 import { useLocalWeatherPredictor } from './useLocalWeatherPredictor'
 import {
   buildFeatureVector,
@@ -79,6 +80,15 @@ export default function WeatherModule() {
 
   return (
     <div className="space-y-8">
+      {/* Back link */}
+      <Link
+        to="/playground"
+        className="inline-flex items-center gap-2 text-feldora-text-secondary text-sm hover:text-feldora-accent transition-colors duration-200 group"
+      >
+        <span className="group-hover:-translate-x-1 transition-transform duration-200">←</span>
+        Back to modules
+      </Link>
+
       {/* Module Title */}
       <div className="flex items-center gap-3">
         <div className="diamond-marker !w-2.5 !h-2.5" />
@@ -134,18 +144,23 @@ export default function WeatherModule() {
               <label className="text-feldora-muted font-mono text-[10px] uppercase tracking-wider block mb-2">
                 {COPY.provinceLabel}
               </label>
-              <input
-                type="text"
-                value={citySearch}
-                onChange={(e) => {
-                  setCitySearch(e.target.value)
-                  setShowCityDropdown(true)
-                  if (province) { setProvince(''); setResult(null); setPredictState('idle') }
-                }}
-                onFocus={() => setShowCityDropdown(true)}
-                placeholder={COPY.provincePlaceholder}
-                className="w-full bg-feldora-surface-light border border-feldora-border/50 text-feldora-text text-sm px-3 py-2.5 focus:outline-none focus:border-feldora-accent/60 transition-colors"
-              />
+              <div className="relative">
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-feldora-muted" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clipRule="evenodd" />
+                </svg>
+                <input
+                  type="text"
+                  value={citySearch}
+                  onChange={(e) => {
+                    setCitySearch(e.target.value)
+                    setShowCityDropdown(true)
+                    if (province) { setProvince(''); setResult(null); setPredictState('idle') }
+                  }}
+                  onFocus={() => setShowCityDropdown(true)}
+                  placeholder={COPY.provincePlaceholder}
+                  className="w-full bg-feldora-surface-light border border-feldora-border/50 text-feldora-text text-sm pl-10 pr-3 py-2.5 focus:outline-none focus:border-feldora-accent/60 transition-colors"
+                />
+              </div>
               {showCityDropdown && citySearch.length > 0 && (
                 <div className="absolute z-20 top-full left-0 right-0 mt-1 max-h-48 overflow-y-auto bg-feldora-surface border border-feldora-border/50 shadow-lg">
                   {INDONESIA_CITIES
@@ -253,7 +268,7 @@ export default function WeatherModule() {
             {predictState === 'idle' && (
               <div className="h-full flex items-center justify-center min-h-[200px]">
                 <p className="text-feldora-muted font-mono text-xs uppercase tracking-wider text-center">
-                  Select a province and click Predict
+                  Select a cities and click Predict
                 </p>
               </div>
             )}

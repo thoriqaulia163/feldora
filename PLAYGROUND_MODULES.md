@@ -132,12 +132,16 @@ public/dataset/local-weather-forecast/
 4. Return: { prediction: 0|1, confidence: float, executionTime: ms }
 ```
 
-### Model Caching
+### Offline Support
 
-- `model.json` di-fetch sekali saat module pertama kali dimuat
+- Model (`model.json`) di-fetch sekali saat module pertama kali dimuat
 - Disimpan di module-level singleton variable (`cachedModel`)
 - Persist across mount/unmount — kembali ke module list lalu load lagi = instant (no re-fetch)
-- Browser juga cache response via HTTP caching / service worker
+- Browser/SW cache response untuk offline access
+- Status offline di-track via localStorage (`module-offline:local-weather-forecast`)
+  - Set `true` saat model load sukses
+  - Dihapus saat model load gagal (self-healing jika cache stale)
+- Badge di playground index: "Offline Ready" (hijau) atau "Not Loaded" (abu-abu)
 
 ### Scripts
 
