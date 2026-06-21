@@ -12,7 +12,15 @@ export interface UpdateEntry {
 
 export const WEB_UPDATE_LOG: UpdateEntry[] = [
   {
-    date: '20 June 2026',
+    date: '21 June 2026',
+    title: 'Switch offline badge to Cache API, remove localStorage dependency',
+    status: 'minor',
+    type: 'fixing',
+    version: '1.8.1',
+    description: 'Offline status now uses Cache API as single source of truth. Removed localStorage tracking for more accurate offline detection.',
+  },
+  {
+    date: '21 June 2026',
     title: 'Playground per-module routing, offline status badge, search & NotFoundPage refactor',
     status: 'moderate',
     type: 'refactor',

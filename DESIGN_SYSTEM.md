@@ -783,9 +783,10 @@ Module tidak di-load saat initial render website maupun saat halaman playground 
 ### Offline Support
 
 - Module yang pernah dibuka tersedia secara offline (SW cache page + model)
-- Status offline di-track via `localStorage` (`module-offline:<module-id>`)
-- Flag di-set saat model berhasil load, dihapus saat fetch gagal (self-healing)
+- Status offline di-detect via **Cache API** (`caches.match(cacheCheckUrl)`) — single source of truth
 - Badge ditampilkan di module card: "Offline Ready" (hijau) atau "Not Loaded" (abu-abu)
+- Model singleton (`cachedModel`) di memory tetap tersedia selama tab tidak di-refresh, meskipun cache dihapus
+- Di localhost (dev), Cache API kosong karena SW tidak aktif — badge selalu "Not Loaded"
 
 ### Not Found Handling
 

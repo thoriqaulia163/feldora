@@ -82,11 +82,12 @@ function ModuleCard({ module: mod }: { module: PlaygroundModule }) {
   const [offlineReady, setOfflineReady] = useState(false)
 
   useEffect(() => {
-    if (mod.cacheCheckUrl) {
-      const flag = localStorage.getItem(`module-offline:${mod.id}`)
-      setOfflineReady(flag === 'true')
+    if (mod.cacheCheckUrl && 'caches' in window) {
+      caches.match(mod.cacheCheckUrl).then((res) => {
+        setOfflineReady(!!res)
+      }).catch(() => {})
     }
-  }, [mod.cacheCheckUrl, mod.id])
+  }, [mod.cacheCheckUrl])
 
   const labelColors: Record<ModuleLabel, string> = {
     AI: 'bg-feldora-accent/20 text-feldora-accent border-feldora-accent/30',
