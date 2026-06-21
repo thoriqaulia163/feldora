@@ -24,7 +24,7 @@ export function LatestUpdates() {
             heading={HOME_COPY.updates.heading}
             headingAccent={HOME_COPY.updates.headingAccent}
             trailing={
-              <Link to="/log" className="btn-angular-outline text-xs">
+              <Link to="/about" hash="log" className="btn-angular-outline text-xs">
                 {HOME_COPY.updates.cta}
               </Link>
             }

@@ -13,6 +13,14 @@ export interface UpdateEntry {
 export const WEB_UPDATE_LOG: UpdateEntry[] = [
   {
     date: '21 June 2026',
+    title: 'Home revamp (Hero carousel, API Featured), About restructure, /log merged, reusable Carousel',
+    status: 'moderate',
+    type: 'revamp',
+    version: '1.9.0',
+    description: 'Hero carousel (4 slides, auto-scroll 10s). Featured uses Hygraph API. CTA → Playground. /log merged into About with infinite scroll. Reusable Carousel component.',
+  },
+  {
+    date: '21 June 2026',
     title: 'Switch offline badge to Cache API, remove localStorage dependency',
     status: 'minor',
     type: 'fixing',

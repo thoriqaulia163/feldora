@@ -50,13 +50,13 @@ src/
 │   ├── playground/      # Playground shell, module registry, types
 │   │   └── modules/     # Module implementations (weather/, etc.)
 │   ├── story/           # Story list & detail components
-│   └── ui/              # Reusable UI components (LogCard)
+│   └── ui/              # Reusable UI components (LogCard, Carousel)
 ├── constants/
 │   ├── copy/              # Copywriting terpusat per halaman
 │   │   ├── index.ts       # Barrel export
 │   │   ├── home.ts        # Hero, Featured, Updates, CTA
-│   │   ├── about.ts       # Header, Philosophy, Platform, Values, Creator
-│   │   ├── log.ts         # Header
+│   │   ├── about.ts       # Header (with creator quote), Design Philosophy, Development Philosophy
+│   │   ├── log.ts         # Section header for update log (used in About page)
 │   │   ├── story.ts       # Header, Error states, Detail page
 │   │   └── playground.ts  # Playground & module copy
 │   ├── navigation.ts      # Navigation links array
@@ -70,9 +70,10 @@ src/
 ├── routes/
 │   ├── __root.tsx       # Root layout (Navbar + Footer + QueryProvider + SW register)
 │   ├── index.tsx        # Home page
-│   ├── about.tsx        # About page
-│   ├── log.tsx          # Changelog page
-│   ├── playground.tsx   # Playground page
+│   ├── about.tsx        # About page (includes update log section)
+│   ├── playground.tsx   # Playground layout
+│   ├── playground.index.tsx  # Playground module list
+│   ├── playground.local-weather-forecast.tsx  # Weather module route
 │   ├── story.tsx        # Story layout (Outlet)
 │   ├── story.index.tsx  # Story list page (/story)
 │   └── story.$slug.tsx  # Story detail page (/story/:slug)
@@ -104,9 +105,8 @@ scripts/
 
 | Path | Page | Deskripsi |
 |------|------|-----------|
-| `/` | Home | Landing page — Hero + Featured + Updates + CTA |
-| `/about` | About | Vision, philosophy, values, creator |
-| `/log` | Log | Changelog/update history (timeline) |
+| `/` | Home | Landing page — Hero carousel + Featured (API) + CTA (Playground) + Updates |
+| `/about` | About | Vision, design philosophy, development philosophy, update log (infinite scroll) |
 | `/playground` | Playground | Module eksperimen (AI, Tool, Game) — dynamic loading |
 | `/story` | Story List | Grid card articles (dari Hygraph atau placeholder) |
 | `/story/:slug` | Story Detail | Full article — title, meta, image, content HTML |
@@ -115,6 +115,8 @@ scripts/
 Route `/story` berfungsi sebagai layout route (`<Outlet />`), dengan child:
 - `/story/` → `story.index.tsx` (list)
 - `/story/$slug` → `story.$slug.tsx` (detail)
+
+Route `/about#log` — deep link langsung ke section update log di halaman About.
 
 ---
 
@@ -201,10 +203,15 @@ Tombol CTA dengan clip-path parallelogram — bukan rounded, bukan square.
 
 ### Hero Section
 - Full-height (`min-h-screen`)
-- Grid 7:5 (text kiri, geometric art kanan)
+- **Carousel** dengan 4 slide (auto-scroll 10 detik, pause on hover):
+  1. **Intro** — Grid 7:5 (judul FELDORA + deskripsi kiri, geometric art kanan)
+  2. **Playground Highlight** — Configurable module showcase (default: Local Weather Forecast) dengan ilustrasi interaktif
+  3. **Latest Story** — Judul + excerpt dari Hygraph API (dengan featured image), fallback "Explore Stories" jika offline
+  4. **About/Log** — Ringkasan platform dengan ilustrasi blueprint/design system
 - Background: subtle grid pattern + diagonal accent slabs
 - Corner frame decorations (border-corner elements)
 - Bottom: SVG angular cut sebagai divider
+- Konfigurasi carousel: `src/components/home/heroCarouselConfig.ts` (ubah `HIGHLIGHTED_MODULE_ID` untuk ganti module yang di-feature)
 
 ### Content Sections
 - Skewed background panels (`-skew-y-1`) untuk visual depth
@@ -217,8 +224,8 @@ Tombol CTA dengan clip-path parallelogram — bukan rounded, bukan square.
 
 Komponen reusable untuk header section yang konsisten di seluruh halaman. Digunakan di:
 - **FeaturedSection** (home) — dengan trailing decorative line
-- **LatestUpdates** (home) — dengan trailing CTA link
-- **About page** (values section) — dengan trailing decorative line
+- **LatestUpdates** (home) — dengan trailing CTA link ke `/about#log`
+- **About page** (design philosophy, development philosophy, update log sections)
 
 #### Props
 
@@ -248,6 +255,31 @@ HEADING HEADINGACCENT(ungu)           [trailing element]
 - Corner brackets yang muncul on-hover
 - "Read Story" text yang slide-in on-hover
 
+### Carousel Component (`src/components/ui/Carousel.tsx`)
+
+Komponen reusable untuk carousel/slider. Digunakan di:
+- **HeroSection** (home) — 4 slides, autoScroll 10 detik
+
+#### Props
+
+| Prop | Type | Default | Deskripsi |
+|------|------|---------|-----------|
+| `children` | `ReactNode[]` | required | Array of slide content |
+| `autoScroll` | `boolean` | `false` | Enable auto-advance |
+| `interval` | `number` | `10000` | Auto-scroll interval (ms) |
+| `pauseOnHover` | `boolean` | `true` | Pause auto-scroll saat hover |
+| `minHeight` | `string` | `"min-h-[400px] md:min-h-[450px]"` | Min height slide container |
+| `showIndicators` | `boolean` | `true` | Tampilkan dot indicators |
+| `showCounter` | `boolean` | `true` | Tampilkan "01 / 04" counter |
+| `showArrows` | `boolean` | `true` | Tampilkan tombol prev/next |
+
+#### Perilaku
+- Slide aktif: `opacity-100 pointer-events-auto`, slide lain: `opacity-0 pointer-events-none`
+- Transition: `duration-700 ease-in-out` (slide + fade)
+- Prev/Next arrows di bottom-right (orange accent, fill on hover)
+- Dot indicators di bottom-left (active = bar orange, inactive = dot abu-abu)
+- Pause on hover mencegah auto-advance saat user berinteraksi
+
 ---
 
 ## Animation Strategy
@@ -270,6 +302,8 @@ Hover transitions:
 ---
 
 ## Update Log System
+
+Update log ditampilkan sebagai section terakhir di halaman `/about` (bukan route terpisah). Menggunakan **infinite scroll** (5 entri per batch, 300ms debounce) agar performa tetap baik saat log semakin banyak. Deep link: `/about#log`.
 
 ### Data Structure (`src/constants/updateLog.ts`)
 

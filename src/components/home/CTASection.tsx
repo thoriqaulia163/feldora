@@ -26,10 +26,10 @@ export function CTASection() {
         </p>
 
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link to="/story" className="btn-angular-primary">
+          <Link to="/playground" className="btn-angular-primary">
             {HOME_COPY.cta.primary}
           </Link>
-          <Link to="/log" className="btn-angular-outline">
+          <Link to="/playground/local-weather-forecast" className="btn-angular-outline">
             {HOME_COPY.cta.secondary}
           </Link>
         </div>

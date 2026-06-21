@@ -20,9 +20,9 @@ export const HOME_COPY = {
   },
   cta: {
     heading: 'Ready to',
-    headingAccent: 'Explore?',
-    description: 'Dive into stories crafted at the intersection of technology and creativity.',
-    primary: 'Read Stories',
-    secondary: 'View Changelog',
+    headingAccent: 'Experiment?',
+    description: 'Try our AI-powered modules running entirely in your browser. No API calls, no data sent anywhere — just pure offline intelligence.',
+    primary: 'Open Playground',
+    secondary: 'Try Weather Forecast',
   },
 } as const

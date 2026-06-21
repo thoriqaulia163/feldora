@@ -3,7 +3,7 @@ const CACHE_PAGES = 'feldora-pages-v2'
 const CACHE_ASSETS = 'feldora-assets-v2'
 
 // Routes to precache on install — these will always be available offline
-const PRECACHE_ROUTES = ['/', '/about', '/log', '/story']
+const PRECACHE_ROUTES = ['/', '/about', '/story']
 
 // Static assets to precache on install
 const PRECACHE_ASSETS = [
