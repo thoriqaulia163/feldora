@@ -1,5 +1,6 @@
 /**
- * 514 Indonesian cities/kabupaten with geographic and climate metadata.
+ * 287 Indonesian cities/kabupaten with geographic and climate metadata.
+ * Covers all 38 provinces with proportional representation.
  * monsoonZone: 0=Equatorial, 1=Monsoonal, 2=Local
  */
 export interface CityData {

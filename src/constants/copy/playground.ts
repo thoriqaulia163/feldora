@@ -15,7 +15,7 @@ export const PLAYGROUND_COPY = {
   weather: {
     name: 'Local Weather Forecast',
     description:
-      'Offline rain prediction for 38 Indonesian provinces using a pre-trained Random Forest model. No API calls — runs entirely in-browser.',
+      'Offline rain prediction for 287 Indonesian provinces using a pre-trained Random Forest model. No API calls — runs entirely in-browser.',
     provinceLabel: 'City',
     provincePlaceholder: 'Search city...',
     dateLabel: 'Date',
@@ -29,5 +29,36 @@ export const PLAYGROUND_COPY = {
     confidenceLabel: 'Confidence',
     executionTimeLabel: 'Execution Time',
     featuresTitle: 'Features Used',
+  },
+  weatherV2: {
+    name: 'Local Weather Forecast V2',
+    description:
+      'Multi-slot rain prediction for 287 Indonesian cities using independent Random Forests per time slot. Predicts rain for morning, afternoon, evening, and night.',
+    cityLabel: 'City',
+    cityPlaceholder: 'Search city...',
+    dateLabel: 'Date',
+    prevDayLabel: 'Cuaca Kemarin',
+    advancedLabel: 'Advanced Settings',
+    ensoLabel: 'ENSO Phase',
+    iodLabel: 'IOD Phase',
+    predictButton: 'Predict',
+    resultTitle: 'Prediction Result',
+    executionTimeLabel: 'Execution Time',
+    idleMessage: 'Select a city and click Predict',
+    howToUseTitle: 'How to Use',
+    howToUseSteps: [
+      'Select a date (default: today).',
+      'Search and select a city.',
+      'Pilih kondisi hujan kemarin — dari 4 slot waktu (Pagi 05–10, Siang 11–14, Sore 15–17, Malam 18–04), berapa yang hujan.',
+      '(Optional) Set ENSO & IOD phase in Advanced Settings.',
+      'Click Predict to see rain forecast for all time slots.',
+    ],
+    aboutTitle: 'About',
+    aboutDescription:
+      'This module predicts rain/no-rain for four time slots — Pagi (05:00–10:59), Siang (11:00–14:59), Sore (15:00–17:59), Malam (18:00–04:59) — using independent Random Forests trained on 5 years of hourly historical data from 287 Indonesian cities.',
+    aboutFeatures:
+      'Features: day of year, latitude, longitude, elevation, monsoon zone, local season, ENSO phase, IOD phase, and previous day\'s rain pattern (how many of the 4 time slots had rain yesterday). Runs entirely in-browser with no API calls.',
+    disclaimer:
+      'Predictions are experimental and should not be used as a primary reference. Results are based on historical climatological patterns with limited parameters, not real-time atmospheric data. Use official meteorological services (BMKG) for critical decisions.',
   },
 } as const

@@ -48,7 +48,7 @@ src/
 │   ├── home/            # Homepage sections (Hero, Featured, Updates, CTA)
 │   ├── layout/          # Navbar, Footer (persistent layout)
 │   ├── playground/      # Playground shell, module registry, types
-│   │   └── modules/     # Module implementations (weather/, etc.)
+│   │   └── modules/     # Module implementations (weather/, weather-v2/, etc.)
 │   ├── story/           # Story list & detail components
 │   └── ui/              # Reusable UI components (LogCard, Carousel)
 ├── constants/
@@ -73,7 +73,8 @@ src/
 │   ├── about.tsx        # About page (includes update log section)
 │   ├── playground.tsx   # Playground layout
 │   ├── playground.index.tsx  # Playground module list
-│   ├── playground.local-weather-forecast.tsx  # Weather module route
+│   ├── playground.local-weather-forecast.tsx  # Weather module V1 route
+│   ├── playground.local-weather-forecast-v2.tsx  # Weather module V2 route
 │   ├── story.tsx        # Story layout (Outlet)
 │   ├── story.index.tsx  # Story list page (/story)
 │   └── story.$slug.tsx  # Story detail page (/story/:slug)

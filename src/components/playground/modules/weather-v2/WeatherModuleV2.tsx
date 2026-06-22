@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react'
 import { Link } from '@tanstack/react-router'
-import { useLocalWeatherPredictor } from './useLocalWeatherPredictor'
+import { useLocalWeatherPredictorV2 } from './useLocalWeatherPredictorV2'
 import {
   buildFeatureVector,
   INDONESIA_CITIES,
-  getSeasonLabel,
-  getMonsoonLabel,
-} from './weatherUtils'
+  TIME_SLOT_LABELS,
+  WEATHER_DISPLAY,
+} from './weatherUtilsV2'
 import { PLAYGROUND_COPY } from '~/constants/copy'
-import type { PredictionResult } from '~/lib/ml/types'
+import type { PredictionResultV2, SlotPrediction } from '~/lib/ml/typesV2'
 
-const COPY = PLAYGROUND_COPY.weather
+const COPY = PLAYGROUND_COPY.weatherV2
 
 const ENSO_OPTIONS = [
   { value: -1, label: 'La Nina' },
@@ -24,40 +24,47 @@ const IOD_OPTIONS = [
   { value: 1, label: 'Positif' },
 ]
 
-export default function WeatherModule() {
-  const { state: modelState, error: modelError, loadModel, predict } = useLocalWeatherPredictor()
+const PREV_WEATHER_OPTIONS = [
+  { value: 0, label: 'Tidak hujan sama sekali' },
+  { value: 1, label: 'Hujan di 1 waktu' },
+  { value: 2, label: 'Hujan di 2 waktu (misal: pagi & sore)' },
+  { value: 3, label: 'Hujan di 3 waktu' },
+  { value: 4, label: 'Hujan di semua waktu' },
+]
 
-  const [province, setProvince] = useState('')
+export default function WeatherModuleV2() {
+  const { state: modelState, error: modelError, loadModel, predict } = useLocalWeatherPredictorV2()
+
   const [citySearch, setCitySearch] = useState('')
+  const [selectedCity, setSelectedCity] = useState('')
   const [showCityDropdown, setShowCityDropdown] = useState(false)
   const [selectedDate, setSelectedDate] = useState(() => {
     const d = new Date()
-    return d.toISOString().split('T')[0] // YYYY-MM-DD
+    return d.toISOString().split('T')[0]
   })
   const [enso, setEnso] = useState(0)
   const [iod, setIod] = useState(0)
+  const [prevDayRainSlots, setPrevDayRainSlots] = useState(1)
   const [showAdvanced, setShowAdvanced] = useState(false)
-  const [result, setResult] = useState<PredictionResult | null>(null)
+  const [result, setResult] = useState<PredictionResultV2 | null>(null)
   const [predictState, setPredictState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [predictError, setPredictError] = useState<string | null>(null)
 
-  // Auto-load model when module mounts
   useEffect(() => {
     loadModel()
   }, [loadModel])
 
   const handlePredict = () => {
-    if (!province) return
+    if (!selectedCity) return
 
     setPredictState('loading')
     setPredictError(null)
     setResult(null)
 
-    // Use microtask to allow UI to update with loading state
     Promise.resolve().then(() => {
       try {
         const date = new Date(selectedDate + 'T00:00:00')
-        const fv = buildFeatureVector(province, enso, iod, date)
+        const fv = buildFeatureVector(selectedCity, enso, iod, prevDayRainSlots, date)
         if (!fv) {
           setPredictError('Failed to build feature vector. Please check your inputs.')
           setPredictState('error')
@@ -125,9 +132,17 @@ export default function WeatherModule() {
               </label>
               <div
                 className="relative w-full cursor-pointer"
+                role="group"
+                aria-label="Date picker"
                 onClick={(e) => {
                   const input = (e.currentTarget as HTMLElement).querySelector('input')
                   input?.showPicker()
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    const input = (e.currentTarget as HTMLElement).querySelector('input')
+                    input?.showPicker()
+                  }
                 }}
               >
                 <input
@@ -142,7 +157,7 @@ export default function WeatherModule() {
             {/* City */}
             <div className="relative">
               <label className="text-feldora-muted font-mono text-[10px] uppercase tracking-wider block mb-2">
-                {COPY.provinceLabel}
+                {COPY.cityLabel}
               </label>
               <div className="relative">
                 <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-feldora-muted" viewBox="0 0 20 20" fill="currentColor">
@@ -154,10 +169,10 @@ export default function WeatherModule() {
                   onChange={(e) => {
                     setCitySearch(e.target.value)
                     setShowCityDropdown(true)
-                    if (province) { setProvince(''); setResult(null); setPredictState('idle') }
+                    if (selectedCity) { setSelectedCity(''); setResult(null); setPredictState('idle') }
                   }}
                   onFocus={() => setShowCityDropdown(true)}
-                  placeholder={COPY.provincePlaceholder}
+                  placeholder={COPY.cityPlaceholder}
                   className="w-full bg-feldora-surface-light border border-feldora-border/50 text-feldora-text text-sm pl-10 pr-3 py-2.5 focus:outline-none focus:border-feldora-accent/60 transition-colors"
                 />
               </div>
@@ -174,7 +189,7 @@ export default function WeatherModule() {
                         key={c.name}
                         type="button"
                         onClick={() => {
-                          setProvince(c.name)
+                          setSelectedCity(c.name)
                           setCitySearch(c.name)
                           setShowCityDropdown(false)
                           setResult(null)
@@ -194,11 +209,31 @@ export default function WeatherModule() {
                   )}
                 </div>
               )}
-              {province && (
+              {selectedCity && (
                 <div className="mt-1 text-feldora-accent font-mono text-[10px]">
-                  Selected: {province}
+                  Selected: {selectedCity}
                 </div>
               )}
+            </div>
+
+            {/* Previous Day Weather */}
+            <div>
+              <label className="text-feldora-muted font-mono text-[10px] uppercase tracking-wider block mb-2">
+                {COPY.prevDayLabel}
+              </label>
+              <select
+                value={prevDayRainSlots}
+                onChange={(e) => { setPrevDayRainSlots(Number(e.target.value)); setResult(null); setPredictState('idle') }}
+                className="w-full bg-feldora-surface-light border border-feldora-border/50 text-feldora-text text-sm px-3 py-2.5 focus:outline-none focus:border-feldora-accent/60 transition-colors"
+              >
+                {PREV_WEATHER_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
+              <p className="mt-1.5 text-feldora-muted text-[10px] leading-relaxed">
+                4 waktu: Pagi (05:00–10:59), Siang (11:00–14:59), Sore (15:00–17:59), Malam (18:00–04:59).
+                Berapa dari 4 waktu tersebut yang hujan kemarin?
+              </p>
             </div>
 
             {/* Advanced Settings Toggle */}
@@ -256,7 +291,7 @@ export default function WeatherModule() {
             {/* Predict Button */}
             <button
               onClick={handlePredict}
-              disabled={!province || predictState === 'loading'}
+              disabled={!selectedCity || predictState === 'loading'}
               className="btn-angular-primary w-full !py-3 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {COPY.predictButton}
@@ -268,7 +303,7 @@ export default function WeatherModule() {
             {predictState === 'idle' && (
               <div className="h-full flex items-center justify-center min-h-[200px]">
                 <p className="text-feldora-muted font-mono text-xs uppercase tracking-wider text-center">
-                  Select a cities and click Predict
+                  {COPY.idleMessage}
                 </p>
               </div>
             )}
@@ -284,107 +319,51 @@ export default function WeatherModule() {
 
             {predictState === 'error' && (
               <div className="h-full flex flex-col items-center justify-center min-h-[200px] gap-4">
-                <div className="w-10 h-10 flex items-center justify-center bg-red-500/10 text-red-400 text-lg">
-                  !
-                </div>
-                <p className="text-red-400 text-sm text-center max-w-xs">
-                  {predictError}
-                </p>
-                <button
-                  onClick={handlePredict}
-                  className="btn-angular-primary !px-4 !py-2 !text-[10px]"
-                >
-                  Retry
-                </button>
+                <div className="w-10 h-10 flex items-center justify-center bg-red-500/10 text-red-400 text-lg">!</div>
+                <p className="text-red-400 text-sm text-center max-w-xs">{predictError}</p>
+                <button onClick={handlePredict} className="btn-angular-primary !px-4 !py-2 !text-[10px]">Retry</button>
               </div>
             )}
 
             {predictState === 'success' && result && (
-              <div className="space-y-6">
-                {/* Prediction Result */}
-                <div>
-                  <span className="text-feldora-muted font-mono text-[10px] uppercase tracking-wider block mb-3">
-                    {COPY.resultTitle}
-                  </span>
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`w-10 h-10 flex items-center justify-center text-lg ${
-                        result.prediction === 1
-                          ? 'bg-blue-500/20 text-blue-400'
-                          : 'bg-amber-500/20 text-amber-400'
-                      }`}
-                    >
-                      {result.prediction === 1 ? '🌧' : '☀'}
-                    </div>
-                    <span className="text-2xl font-bold uppercase tracking-wide">
-                      {result.prediction === 1 ? COPY.rainLabel : COPY.noRainLabel}
-                    </span>
-                  </div>
-                </div>
+              <div className="space-y-5">
+                <span className="text-feldora-muted font-mono text-[10px] uppercase tracking-wider block">
+                  {COPY.resultTitle}
+                </span>
 
-                {/* Confidence */}
-                <div>
-                  <span className="text-feldora-muted font-mono text-[10px] uppercase tracking-wider block mb-2">
-                    {COPY.confidenceLabel}
-                  </span>
-                  <div className="flex items-center gap-3">
-                    <div className="flex-1 h-2 bg-feldora-surface-light overflow-hidden">
-                      <div
-                        className="h-full bg-feldora-accent transition-all duration-500"
-                        style={{ width: `${(result.confidence * 100).toFixed(0)}%` }}
+                {/* 4 Time Slot Rows */}
+                <div className="space-y-3">
+                  {TIME_SLOT_LABELS.map((slot) => {
+                    const prediction = result[slot.key as keyof PredictionResultV2] as SlotPrediction
+                    const display = WEATHER_DISPLAY[prediction.categoryIndex]
+                    const confidencePct = Math.round(prediction.confidence * 100)
+
+                    return (
+                      <SlotRow
+                        key={slot.key}
+                        label={slot.label}
+                        range={slot.range}
+                        icon={display.icon}
+                        category={display.label}
+                        color={display.color}
+                        confidence={confidencePct}
+                        isRain={prediction.categoryIndex === 1}
                       />
-                    </div>
-                    <span className="text-feldora-text font-mono text-sm font-bold">
-                      {(result.confidence * 100).toFixed(1)}%
-                    </span>
-                  </div>
+                    )
+                  })}
                 </div>
 
                 {/* Execution Time */}
-                <div>
-                  <span className="text-feldora-muted font-mono text-[10px] uppercase tracking-wider block mb-1">
-                    {COPY.executionTimeLabel}
-                  </span>
-                  <span className="text-feldora-accent font-mono text-sm">
-                    {result.executionTime < 1
-                      ? `${(result.executionTime * 1000).toFixed(0)} μs`
-                      : `${result.executionTime.toFixed(2)} ms`}
-                  </span>
-                </div>
-
-                {/* Features Used */}
-                <div>
-                  <span className="text-feldora-muted font-mono text-[10px] uppercase tracking-wider block mb-3">
-                    {COPY.featuresTitle}
-                  </span>
-                  <div className="grid grid-cols-2 gap-2">
-                    {Object.entries(result.features).map(([key, value]) => (
-                      <div
-                        key={key}
-                        className="flex justify-between items-center bg-feldora-surface-light/50 border border-feldora-border/20 px-3 py-1.5"
-                      >
-                        <span className="text-feldora-text-secondary font-mono text-[10px] uppercase">
-                          {key === 'localSeasonIndex'
-                            ? 'season'
-                            : key === 'monsoonZone'
-                              ? 'monsoon'
-                              : key}
-                        </span>
-                        <span className="text-feldora-text font-mono text-xs font-bold">
-                          {key === 'localSeasonIndex'
-                            ? getSeasonLabel(value)
-                            : key === 'monsoonZone'
-                              ? getMonsoonLabel(value)
-                              : key === 'enso'
-                                ? ENSO_OPTIONS.find((o) => o.value === value)?.label ?? value
-                                : key === 'iod'
-                                  ? IOD_OPTIONS.find((o) => o.value === value)?.label ?? value
-                                  : typeof value === 'number' && !Number.isInteger(value)
-                                    ? value.toFixed(2)
-                                    : value}
-                        </span>
-                      </div>
-                    ))}
+                <div className="pt-3 border-t border-feldora-border/30">
+                  <div className="flex items-center justify-between">
+                    <span className="text-feldora-muted font-mono text-[10px] uppercase tracking-wider">
+                      {COPY.executionTimeLabel}
+                    </span>
+                    <span className="text-feldora-text-secondary font-mono text-xs">
+                      {result.executionTime < 1
+                        ? `${(result.executionTime * 1000).toFixed(0)}μs`
+                        : `${result.executionTime.toFixed(2)}ms`}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -393,47 +372,83 @@ export default function WeatherModule() {
         </div>
       )}
 
-      {/* Info Box — below main content */}
-      <div className="grid md:grid-cols-2 gap-4">
-        {/* How to Use */}
-        <div className="bg-feldora-surface border border-feldora-border/30 p-5 clip-notch-br">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="hex-badge w-5 h-5 text-[8px] font-bold text-white">?</div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-feldora-text">How to Use</h4>
+      {/* About / Disclaimer Section */}
+      {modelState === 'ready' && (
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="card-polygon p-6">
+            <h3 className="text-sm font-bold uppercase tracking-wider mb-3">{COPY.howToUseTitle}</h3>
+            <ol className="space-y-2 text-feldora-text-secondary text-sm list-decimal list-inside">
+              {COPY.howToUseSteps.map((step) => (
+                <li key={step}>{step}</li>
+              ))}
+            </ol>
           </div>
-          <ol className="space-y-2 text-feldora-text-secondary text-xs leading-relaxed list-decimal pl-4">
-            <li>Pick a <span className="text-feldora-text">date</span> — defaults to today, change freely</li>
-            <li>Search for a <span className="text-feldora-text">city</span> — type city name or province, select from dropdown</li>
-            <li>Optionally open <span className="text-feldora-text">Advanced Settings</span> to set ENSO phase (El Nino/La Nina) and IOD (Indian Ocean Dipole)</li>
-            <li>Click <span className="text-feldora-text">Predict</span></li>
-            <li>Result shows: <span className="text-feldora-text">Rain/No Rain</span>, confidence %, execution time, and all features used for inference</li>
-          </ol>
-        </div>
 
-        {/* About */}
-        <div className="bg-feldora-surface border border-feldora-border/30 p-5 clip-notch-br">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="hex-badge w-5 h-5 text-[8px] font-bold text-white">i</div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-feldora-text">About</h4>
-          </div>
-          <div className="text-feldora-text-secondary text-xs leading-relaxed space-y-2">
-            <p>
-              This module uses a <span className="text-feldora-text">Random Forest</span> model (40 decision trees, max depth 6) trained on historical precipitation data from <span className="text-feldora-text">Open-Meteo</span> covering 514 Indonesian cities between 2021–2025.
-            </p>
-            <p>
-              The model considers geographic features (latitude, longitude, elevation), temporal patterns (day of year, local season), monsoon zone classification, and large-scale climate drivers (ENSO and IOD phases) to predict whether significant rainfall (&gt;5mm) will occur.
-            </p>
-            <p>
-              Designed with an offline-first philosophy — once loaded, predictions run entirely in-browser with zero network requests, making it usable on any device regardless of connectivity.
-            </p>
-            <div className="mt-3 p-2.5 bg-feldora-surface-light border border-amber-500/20">
-              <p className="text-amber-400/90 text-[10px] font-mono uppercase tracking-wider mb-1">Disclaimer</p>
-              <p className="text-feldora-muted text-[10px] leading-relaxed">
-                Predictions are experimental and should not be used as a primary reference. Results are based on historical climatological patterns with limited parameters, not real-time atmospheric data. Use official meteorological services (BMKG) for critical decisions.
-              </p>
+          <div className="card-polygon p-6">
+            <h3 className="text-sm font-bold uppercase tracking-wider mb-3">{COPY.aboutTitle}</h3>
+            <div className="space-y-3 text-feldora-text-secondary text-sm leading-relaxed">
+              <p>{COPY.aboutDescription}</p>
+              <p>{COPY.aboutFeatures}</p>
+              <div className="mt-4 p-3 bg-feldora-surface-light border border-amber-500/20">
+                <p className="text-amber-400/90 text-xs font-mono uppercase tracking-wider mb-1">Disclaimer</p>
+                <p className="text-feldora-muted text-xs leading-relaxed">{COPY.disclaimer}</p>
+              </div>
             </div>
           </div>
         </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Slot Row Component ─────────────────────────────────────────────────────
+
+function SlotRow({
+  label,
+  range,
+  icon,
+  category,
+  color,
+  confidence,
+  isRain,
+}: Readonly<{
+  label: string
+  range: string
+  icon: string
+  category: string
+  color: string
+  confidence: number
+  isRain: boolean
+}>) {
+  return (
+    <div className={`flex items-center gap-3 p-3 border transition-colors ${
+      isRain
+        ? 'bg-blue-500/5 border-blue-500/20 hover:border-blue-500/30'
+        : 'bg-feldora-surface-light/50 border-feldora-border/30 hover:border-feldora-accent/20'
+    }`}>
+      {/* Time label */}
+      <div className="w-14 shrink-0">
+        <span className="text-feldora-text text-xs font-bold uppercase tracking-wider block">{label}</span>
+        <span className="text-feldora-muted text-[9px] font-mono">{range}</span>
+      </div>
+
+      {/* Icon + Category */}
+      <div className="flex items-center gap-2 flex-1 min-w-0">
+        <span className="text-lg leading-none">{icon}</span>
+        <span className={`text-sm font-semibold ${color}`}>{category}</span>
+      </div>
+
+      {/* Confidence bar */}
+      <div className="flex items-center gap-2 shrink-0">
+        <div className="w-16 h-1.5 bg-feldora-border/50 overflow-hidden">
+          <div
+            className={`h-full transition-all duration-500 ${isRain ? 'bg-blue-400' : 'bg-feldora-accent'}`}
+            style={{ width: `${confidence}%` }}
+          />
+        </div>
+        <span className="text-feldora-text-secondary font-mono text-[10px] w-8 text-right">
+          {confidence}%
+        </span>
       </div>
     </div>
   )

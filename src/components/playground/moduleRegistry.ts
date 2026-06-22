@@ -5,11 +5,21 @@ export const PLAYGROUND_MODULES: PlaygroundModule[] = [
     id: 'local-weather-forecast',
     name: 'Local Weather Forecast',
     description:
-      'Offline rain prediction for 514 Indonesian cities using a pre-trained Random Forest model (40 trees, depth 6). No API calls — runs entirely in-browser.',
+      'Offline rain prediction for 287 Indonesian cities using a pre-trained Random Forest model (40 trees, depth 6). No API calls — runs entirely in-browser.',
     label: 'AI',
     lastUpdated: '20 June 2026',
     estimatedDownloadSize: '~130 KB',
     cacheCheckUrl: '/ai-models/local-weather-forecast/model.json',
+  },
+  {
+    id: 'local-weather-forecast-v2',
+    name: 'Local Weather Forecast V2',
+    description:
+      'Per-slot rain prediction (morning/afternoon/evening/night) for 287 Indonesian cities. 4 independent Random Forests with weather persistence feature — fully offline.',
+    label: 'AI',
+    lastUpdated: '22 June 2026',
+    estimatedDownloadSize: '~420 KB',
+    cacheCheckUrl: '/ai-models/local-weather-forecast-v2/model.json',
   },
   {
     id: 'tic-tac-toe',

@@ -12,6 +12,14 @@ export interface UpdateEntry {
 
 export const WEB_UPDATE_LOG: UpdateEntry[] = [
   {
+    date: '22 June 2026',
+    title: 'Local Weather Forecast V2 — per-slot rain prediction with prevDay feature',
+    status: 'moderate',
+    type: 'update',
+    version: '1.10.0',
+    description: 'New module: 4 independent Random Forests predict rain/no-rain per time slot (Pagi/Siang/Sore/Malam). Added prevDayRainSlots feature. 73% avg accuracy.',
+  },
+  {
     date: '21 June 2026',
     title: 'Swap info box order in Weather module, Tool label color to yellow',
     status: 'minor',
