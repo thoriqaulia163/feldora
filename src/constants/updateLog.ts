@@ -13,11 +13,11 @@ export interface UpdateEntry {
 export const WEB_UPDATE_LOG: UpdateEntry[] = [
   {
     date: '23 June 2026',
-    title: 'PWA selective asset download: pre-fetch visited route chunks on update',
+    title: 'PWA selective asset download: seamless offline preservation across deploys',
     status: 'moderate',
-    type: 'fixing',
+    type: 'update',
     version: '1.13.0',
-    description: 'SW now re-fetches HTML + JS/CSS chunks for previously visited pages before activate. Offline access preserved seamlessly across deploys.',
+    description: 'SW re-fetches HTML + JS/CSS for visited pages on update. Auto-activate when app relaunched, prompt only if user active. Offline works seamlessly after deploy.',
   },
   {
     date: '23 June 2026',

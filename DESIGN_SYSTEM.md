@@ -447,207 +447,37 @@ Pada mobile, status & type icon di-push ke ujung kanan (`ml-auto`) sejajar denga
 
 ## PWA (Progressive Web App)
 
-Feldora diimplementasikan sebagai PWA untuk pengalaman installable dan offline support. Menggunakan Workbox untuk caching strategies dan custom Service Worker dengan prompt-based update mechanism.
+Feldora diimplementasikan sebagai PWA installable dengan offline support.
 
-### Arsitektur Overview
+> Dokumentasi lengkap: **[PWA_OFFLINE.md](./PWA_OFFLINE.md)**
 
-```
-Build Time:
-  Vite build → route-manifest.json (maps routes → chunks)
-             → sw.js (bundled from src/sw.ts via esbuild + Workbox)
+### Ringkasan
 
-Runtime:
-  User visits routes → assets cached automatically (cache-first for hashed files)
-                     → navigation cached (network-first)
+| Aspek | Implementasi |
+|-------|-------------|
+| Service Worker | `public/sw.js` — plain JS, no bundling |
+| Caching | Cache-first (assets), Network-first (navigation) |
+| Update strategy | Selective download (hanya halaman yang pernah dikunjungi) |
+| Update UX | Seamless auto-activate saat app di-relaunch; prompt hanya jika user aktif |
+| Offline | Halaman yang pernah dibuka berfungsi penuh offline |
+| Manifest | `public/manifest.json` — standalone, dark theme |
 
-Update Flow:
-  New deploy → browser detects new SW → SW stays "waiting"
-            → SW fetches new route-manifest.json
-            → SW downloads new chunks ONLY for previously visited routes
-            → SW notifies client: "Update ready"
-            → User sees UpdatePrompt banner
-            → User clicks "Update now" → skipWaiting → reload
-            → Entire app runs on new version
-```
+### Key Behaviours
 
-### File PWA
+- **First install**: precache root + offline.html, activate langsung
+- **Update detected**: re-fetch HTML + JS/CSS chunks untuk visited pages → staging → activate
+- **Offline fallback**: exact URL → parent path → root → offline.html
+- **Version detection**: `SW_VERSION` constant di sw.js harus di-bump setiap deploy
 
-| File | Lokasi | Fungsi |
-|------|--------|--------|
-| `manifest.json` | `public/manifest.json` | Metadata app (nama, icon, display mode, warna) |
-| `sw.ts` | `src/sw.ts` | Service Worker source — di-bundle saat build |
-| `sw.js` | `public/sw.js` (dev) / `dist/client/sw.js` (prod) | Dev: no-op. Prod: bundled SW |
-| `offline.html` | `public/offline.html` | Halaman custom saat offline & cache kosong |
-| `route-manifest.json` | Generated at build | Maps routes → chunk files per version |
-| `vite-plugin-route-manifest.ts` | `plugins/` | Vite plugin: generate route manifest |
-| `vite-plugin-sw-build.ts` | `plugins/` | Vite plugin: bundle SW via esbuild |
-| `UpdatePrompt.tsx` | `src/components/ui/` | Update notification banner |
-
-### Service Worker Lifecycle
+### Files
 
 ```
-1. INSTALL (new SW detected)
-   - Do NOT call skipWaiting()
-   - Fetch route-manifest.json (new version)
-   - Inspect existing cache to determine which routes user has visited
-   - Download new chunks for: shared assets + previously visited route chunks
-   - Store in staging cache (feldora-staging)
-   - Notify client: postMessage({ type: 'UPDATE_READY' })
-
-2. WAITING
-   - SW stays in waiting state until user approves
-   - Old SW continues serving from existing cache
-   - All offline functionality preserved
-
-3. ACTIVATE (user clicked "Update now")
-   - Client sends postMessage({ type: 'SKIP_WAITING' })
-   - Move staging cache → active asset cache
-   - Delete legacy caches
-   - clients.claim()
-   - Client reloads → entire app on new version
+public/sw.js                         # Production Service Worker
+public/manifest.json                 # PWA manifest
+public/offline.html                  # Offline fallback page
+src/components/ui/UpdatePrompt.tsx   # Update notification (shown when user active)
+src/routes/__root.tsx                # Registration + event bridge
 ```
-
-### Cache Buckets
-
-| Cache | Name | Strategy | Content |
-|-------|------|----------|---------|
-| Pages | `feldora-pages` | NetworkFirst | HTML navigation responses |
-| Assets | `feldora-assets` | CacheFirst | JS, CSS, fonts, images, AI models |
-| Staging | `feldora-staging` | Write-only (during install) | New version assets before activation |
-
-### Routing Strategies
-
-| Resource | Strategy | Reason |
-|----------|----------|--------|
-| Navigation (HTML) | NetworkFirst → cache fallback | Fresh content when online, cached when offline |
-| JS/CSS (hashed) | CacheFirst | Content-hashed = immutable, safe to cache forever |
-| Fonts (woff2) | CacheFirst | Rarely change, large files |
-| Images | CacheFirst (30 day expiry) | Moderate expiration |
-| AI Models (.json) | CacheFirst (90 day expiry) | Large, rarely updated |
-| route-manifest.json | NetworkFirst | Always want latest version info |
-| Cross-origin | Not handled (network-only) | API responses, third-party CDN |
-
-### Selective Asset Download
-
-The most important feature: only download what the user actually uses.
-
-**Mechanism:**
-1. SW install fetches new `route-manifest.json`
-2. Inspects current `feldora-assets` cache for existing chunk files
-3. Cross-references with current manifest to determine which routes have been visited
-4. From new manifest, collects:
-   - All `shared` chunks (vendor, framework, CSS) — always needed
-   - Route-specific chunks ONLY for previously visited routes
-5. Downloads into `feldora-staging` cache
-6. Routes never visited remain lazy-loaded after update
-
-**Example:**
-```
-User visited: /, /about, /playground/local-weather-forecast
-Never visited: /story, /playground/local-weather-forecast-v2
-
-Update downloads: shared + / + /about + /playground/local-weather-forecast chunks
-Skips: /story chunks, /playground/local-weather-forecast-v2 chunks
-```
-
-### Route Usage Tracking
-
-**Method: Cache inspection** (no localStorage/IndexedDB needed)
-
-- SW inspects `feldora-assets` cache for existing chunk files
-- Cross-references with `route-manifest.json` to determine which routes "own" those chunks
-- If a route's chunk is in cache → user has visited that route
-- Root `/` is always included regardless
-
-**Why cache inspection over alternatives:**
-- SW has direct access (no cross-thread sync needed)
-- Single source of truth (cache IS the usage record)
-- No storage quota concerns
-- Survives browser restarts
-- Self-cleaning (when cache is cleared, tracking resets — which is correct behavior)
-
-### Route Manifest (Build-time)
-
-Generated by `plugins/vite-plugin-route-manifest.ts`:
-
-```json
-{
-  "version": "1.11.2",
-  "buildId": "abc123",
-  "timestamp": "2026-06-23T...",
-  "routes": {
-    "/": { "chunks": ["assets/index-Hk4x.js"] },
-    "/about": { "chunks": ["assets/about-Lm3y.js"] },
-    "/playground/local-weather-forecast": { "chunks": ["assets/weather-Rp2w.js"] }
-  },
-  "shared": ["assets/vendor-Xz1a.js", "assets/framework-Bc4d.js", "assets/global-Mn9p.css"],
-  "all": ["assets/index-Hk4x.js", "assets/about-Lm3y.js", ...]
-}
-```
-
-Maps TanStack Router file-based routes to Vite output chunks. Enables:
-- Cross-version chunk mapping (same route, different hash)
-- Selective download (know exactly which files belong to which route)
-
-### Update Prompt UI (`UpdatePrompt.tsx`)
-
-Persistent banner (bottom-left, does not auto-dismiss):
-- Shows when SW enters "waiting" state with new version ready
-- "Update now" → triggers skipWaiting + reload
-- "Later" → dismisses, old version continues working offline
-- Re-appears on next page load if update still pending
-
-Detection methods (layered for reliability):
-1. SW `postMessage({ type: 'UPDATE_READY' })` — direct from SW
-2. `updatefound` + `statechange` event — from registration script
-3. `reg.waiting` check on mount — catches already-waiting SW
-
-### Registration
-
-Enhanced inline script in `__root.tsx`:
-```js
-if ('serviceWorker' in navigator && location.hostname !== 'localhost') {
-  navigator.serviceWorker.register('/sw.js').then(function(reg) {
-    // Periodic update check (every 60 minutes)
-    setInterval(function(){ reg.update() }, 60*60*1000);
-    // Detect waiting SW on load
-    if (reg.waiting) window.dispatchEvent(new CustomEvent('sw-update-ready'));
-    // Detect new SW entering waiting state
-    reg.addEventListener('updatefound', function() { ... });
-  });
-}
-```
-
-### Version Consistency
-
-- Cache aktif dan staging **terpisah** — tidak pernah mixed-version
-- Activate hanya terjadi setelah staging lengkap terisi
-- Reload setelah activate memastikan HTML + JS + CSS semua versi baru
-- Jika staging download gagal (partial), update tidak ditawarkan ke user
-
-### Offline Fallback (Navigation)
-
-Workbox `NetworkFirst` strategy pada navigation requests. Fallback chain:
-1. Network response (if online) → cache response
-2. Cached exact URL
-3. Offline.html (precached as fallback)
-
-### Edge Cases
-
-| Skenario | Handling |
-|----------|----------|
-| User offline saat deploy baru | SW baru tidak ter-install sampai online |
-| Partial download fails | Staging incomplete → update not offered |
-| User clicks "Later" | Old SW stays active, full offline works |
-| "Later" then close browser | Waiting SW persists, prompt on next visit |
-| Route baru di versi baru | Lazy-loaded on first visit after update |
-| Legacy SW migration | Detects old `feldora-*-v2` caches, migrates page history |
-
-### Splash Screen
-
-- **Android**: Auto-generated dari manifest (`name` + `icons[512]` + `background_color`)
-- **iOS**: Tidak otomatis — perlu `apple-touch-startup-image` meta tags (belum diimplementasi)
-- **Desktop**: Tidak ada splash screen
 
 ---
 
