@@ -14,6 +14,7 @@
 const CACHE_PAGES = 'feldora-pages-v3'
 const CACHE_ASSETS = 'feldora-assets-v3'
 const CACHE_STAGING = 'feldora-staging-v3'
+const SW_VERSION = '1.12.1' // Must match package.json — triggers SW update detection
 
 // ─── Install ────────────────────────────────────────────────────────────────
 
@@ -25,13 +26,17 @@ async function handleInstall() {
   const isFirstInstall = !(await caches.has(CACHE_PAGES))
 
   if (isFirstInstall) {
-    // First install: precache essentials and activate immediately
     await precacheEssentials()
     self.skipWaiting()
   } else {
-    // Update: selectively download new assets for visited pages
-    await selectiveUpdate()
-    // Do NOT skipWaiting — wait for user approval via UpdatePrompt
+    // Update: try selective download, but don't let it block install if it fails
+    try {
+      await withTimeout(selectiveUpdate(), 60000) // 60s max
+    } catch (err) {
+      // selectiveUpdate failed or timed out — still enter waiting state
+      // User can still update, just won't have pre-downloaded assets
+    }
+    // Do NOT skipWaiting — wait for user approval
   }
 }
 
@@ -263,12 +268,6 @@ async function selectiveUpdate() {
     safeFetchToCache(staging, '/feldora-logo-192.png'),
     safeFetchToCache(staging, '/feldora-logo-512.png'),
   ])
-
-  // 6. Notify clients that update is ready
-  const clients = await self.clients.matchAll()
-  for (const client of clients) {
-    client.postMessage({ type: 'UPDATE_READY' })
-  }
 }
 
 // ─── Extract asset URLs from HTML ───────────────────────────────────────────
@@ -330,6 +329,13 @@ async function precacheEssentials() {
 
 function isStaticAsset(pathname) {
   return /\.(js|mjs|css|woff2?|ttf|otf|png|jpg|jpeg|webp|avif|svg|ico|gif|json)(\?.*)?$/.test(pathname)
+}
+
+function withTimeout(promise, ms) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms))
+  ])
 }
 
 async function safeFetchToCache(cache, url) {

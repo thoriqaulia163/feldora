@@ -17,12 +17,19 @@ export function UpdatePrompt({ version }: UpdatePromptProps) {
     // Listen for SW update messages (from SW postMessage)
     const msgHandler = (event: MessageEvent) => {
       if (event.data?.type === 'UPDATE_READY') {
-        setShow(true)
+        checkAndShow()
       }
     }
 
-    // Listen for custom event (from inline registration script, fires before React hydrates)
-    const eventHandler = () => setShow(true)
+    // Listen for custom event (from inline registration script)
+    const eventHandler = () => checkAndShow()
+
+    function checkAndShow() {
+      // Only show if there's actually a waiting SW (not auto-activated first install)
+      navigator.serviceWorker?.ready.then((reg) => {
+        if (reg.waiting) setShow(true)
+      })
+    }
 
     navigator.serviceWorker?.addEventListener('message', msgHandler)
     window.addEventListener('sw-update-ready', eventHandler)
