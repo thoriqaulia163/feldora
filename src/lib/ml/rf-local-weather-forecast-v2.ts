@@ -3,7 +3,7 @@
  *
  * Prediction-only implementation for in-browser inference.
  * Uses 4 independent forests (one per time slot), each performing
- * multiclass classification (4 classes: Cerah/Berawan/Gerimis/Hujan).
+ * binary classification (Tidak Hujan / Hujan) with per-slot thresholds.
  */
 
 import type {
@@ -14,48 +14,48 @@ import type {
 } from './typesV2'
 import { NUM_CLASSES, NUM_SLOTS } from './typesV2'
 
+/** Default threshold if model doesn't specify */
+const DEFAULT_THRESHOLD = 0.5
+
 /**
  * Predict weather for all 4 time slots given a feature vector.
- * Traverses each slot's independent forest and returns majority vote per slot.
+ * Uses per-slot thresholds for binary classification.
+ * @param tuned - if true, use model's optimized thresholds; if false, use 0.5 default
  */
 export function predictV2(
   model: SerializedModelV2,
-  features: number[]
+  features: number[],
+  tuned: boolean = true
 ): SlotPrediction[] {
   const categories = model.categoryNames as unknown as typeof WEATHER_CATEGORIES
+  const thresholds = tuned
+    ? (model.thresholds ?? Array(NUM_SLOTS).fill(DEFAULT_THRESHOLD))
+    : Array(NUM_SLOTS).fill(DEFAULT_THRESHOLD)
   const results: SlotPrediction[] = []
 
   for (let s = 0; s < NUM_SLOTS; s++) {
     const forest = model.forests[s]
     const nTrees = forest.trees.length
+    const threshold = thresholds[s] ?? DEFAULT_THRESHOLD
 
-    // Vote counts per class
-    const votes = new Array(NUM_CLASSES).fill(0)
-
+    // Count votes for class 1 (Hujan)
+    let hujanVotes = 0
     for (const tree of forest.trees) {
       let node: SerializedNodeV2 | undefined = tree.root
       while (node && node.f !== -1) {
         node = features[node.f] <= node.t ? node.l : node.r
       }
-      if (node?.p !== undefined) {
-        votes[node.p]++
-      }
+      if (node?.p === 1) hujanVotes++
     }
 
-    // Find majority vote
-    let maxVotes = 0
-    let maxClass = 0
-    for (let c = 0; c < NUM_CLASSES; c++) {
-      if (votes[c] > maxVotes) {
-        maxVotes = votes[c]
-        maxClass = c
-      }
-    }
+    const hujanProportion = hujanVotes / nTrees
+    const prediction = hujanProportion >= threshold ? 1 : 0
+    const confidence = prediction === 1 ? hujanProportion : 1 - hujanProportion
 
     results.push({
-      category: categories[maxClass],
-      categoryIndex: maxClass,
-      confidence: maxVotes / nTrees,
+      category: categories[prediction],
+      categoryIndex: prediction,
+      confidence,
     })
   }
 

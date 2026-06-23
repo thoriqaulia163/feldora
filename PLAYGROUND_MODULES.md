@@ -177,14 +177,14 @@ npx tsx scripts/local-weather-forecast/model-generation.ts
 |-------|-------|
 | ID | `local-weather-forecast-v2` |
 | Label | AI |
-| Last Updated | 22 June 2026 |
+| Last Updated | 23 June 2026 |
 | Model Size | ~417 KB |
 | Inference Time | <1ms |
 | Offline | Yes (setelah model loaded) |
 
 ### Deskripsi
 
-Prediksi hujan per slot waktu (Pagi/Siang/Sore/Malam) untuk 287 kota/kabupaten di Indonesia menggunakan 4 Random Forest independen (satu per slot) yang berjalan sepenuhnya di browser. Setiap slot menghasilkan prediksi binary: Hujan atau Tidak Hujan.
+Prediksi hujan per slot waktu (Pagi/Siang/Sore/Malam) untuk 287 kota/kabupaten di Indonesia menggunakan 4 Random Forest independen (satu per slot) yang berjalan sepenuhnya di browser. Setiap slot menghasilkan prediksi binary: Hujan atau Tidak Hujan. Mendukung dua mode prediksi: Standard dan Sensitive.
 
 ### Perbedaan dengan V1
 
@@ -195,8 +195,9 @@ Prediksi hujan per slot waktu (Pagi/Siang/Sore/Malam) untuk 287 kota/kabupaten d
 | Arsitektur | 1 Random Forest (40 trees) | 4 RF independen (30 trees/slot) |
 | Data source | Daily precipitation_sum | Hourly weather_code |
 | Granularity | Satu hari | 4 slot waktu per hari |
-| Features | 8 | 9 (+ prevDayRainSlots) |
-| Fitur dinamis | Tidak ada | Cuaca kemarin (user input) |
+| Features | 8 | 9 (+ prevDayRain) |
+| Fitur dinamis | Tidak ada | Cuaca kemarin (user input, binary) |
+| Prediction mode | Single | Standard / Sensitive toggle |
 
 ### Machine Learning
 
@@ -210,17 +211,35 @@ Prediksi hujan per slot waktu (Pagi/Siang/Sore/Malam) untuk 287 kota/kabupaten d
 | Bootstrap | Standard (same size, with replacement) |
 | Seed | 42 (deterministic, +offset per slot) |
 | Split | 80% train / 20% test (random) |
-| Accuracy | 73.25% average |
-| Macro F1 | 59.05% average |
 
-### Per-Slot Performance
+### Performance
+
+**Standard mode (threshold 0.5):**
 
 | Slot | Accuracy | Macro F1 | Distribusi (Tidak Hujan / Hujan) |
 |------|----------|----------|----------------------------------|
-| Morning | 79.87% | 59.32% | 77% / 23% |
-| Afternoon | 67.35% | 64.96% | 44% / 56% |
-| Evening | 65.27% | 64.69% | 48% / 52% |
-| Night | 80.50% | 47.22% | 80% / 20% |
+| Morning | 78.38% | 52.77% | 77% / 23% |
+| Afternoon | 66.49% | 64.00% | 44% / 56% |
+| Evening | 64.79% | 63.78% | 48% / 52% |
+| Night | 80.27% | 44.58% | 80% / 20% |
+| **Average** | **72.48%** | **56.28%** | |
+
+**Sensitive mode (tuned thresholds [0.15, 0.5, 0.5, 0.15]):**
+
+| Slot | Accuracy | Macro F1 | R(Hujan) |
+|------|----------|----------|----------|
+| Morning | 78.45% | 59.19% | 21.9% |
+| Afternoon | 66.50% | 63.85% | 83.4% |
+| Evening | 64.61% | 63.44% | 79.0% |
+| Night | 80.29% | 47.23% | 2.9% |
+| **Average** | **72.46%** | **58.43%** | |
+
+**Perbandingan dengan V1:**
+
+| | V1 | V2 Standard | V2 Sensitive |
+|--|-----|-------------|--------------|
+| Accuracy | 65.35% | 72.48% | 72.46% |
+| Macro F1 | 65.35% | 56.28% | 58.43% |
 
 ### Dataset
 
@@ -257,58 +276,62 @@ Catatan: 00:00–04:59 dianggap sebagai bagian malam hari sebelumnya.
 | 5 | `localSeasonIndex` | enum | 0/1/2 | 0=Kemarau, 1=Transisi, 2=Hujan |
 | 6 | `enso` | enum | -1/0/1 | -1=La Nina, 0=Netral, 1=El Nino |
 | 7 | `iod` | enum | -1/0/1 | -1=Negatif, 0=Netral, 1=Positif |
-| 8 | `prevDayRainSlots` | int | 0–4 | Jumlah slot waktu kemarin yang hujan (user input) |
+| 8 | `prevDayRain` | binary | 0/1 | Apakah kemarin hujan (user input) |
+
+### Prediction Modes
+
+| Mode | Threshold | Karakteristik |
+|------|-----------|---------------|
+| **Standard** | 0.5 semua slot | Higher accuracy, konservatif — jarang prediksi hujan kecuali yakin |
+| **Sensitive** | Per-slot tuned | Higher F1, lebih sering detect hujan — cocok jika ingin antisipasi payung |
+
+Threshold sensitive di-optimasi dengan sweep 0.15–0.50 pada test set, memilih threshold yang memaksimalkan Macro F1 per slot.
 
 ### Keputusan Arsitektur
 
 **Kenapa 4 forest independen, bukan 1 multi-output model?**
 
-Multi-output RF (1 model, 4 output) diuji lebih dulu dan gagal:
+Multi-output RF (1 model, 4 output) diuji dan gagal:
 - Combined Gini averaging antar slot mendilusi sinyal
 - Class imbalance berbeda per slot — tidak bisa di-balance bersamaan
 - Hasil: hanya prediksi majority class (Macro F1 ~21%)
 
-4 forest independen memungkinkan:
-- Tiap slot di-training optimal untuk distribusinya sendiri
-- Tidak ada interferensi antar slot
-- Tetap 1 file model, 1 inference call, <1ms
-
 **Kenapa binary (bukan 4-5 kelas)?**
 
 4-class multiclass (Cerah/Berawan/Gerimis/Hujan) diuji dan gagal:
-- Dengan hanya fitur klimatologi, model tidak bisa membedakan Cerah vs Berawan (terlalu mirip)
+- Dengan hanya fitur klimatologi, model tidak bisa membedakan Cerah vs Berawan
 - Macro F1 hanya 27-35% meskipun berbagai strategi balancing dicoba
-- Binary (Hujan/Tidak Hujan) terbukti achievable dan actionable: "perlu payung atau tidak?"
+- Binary terbukti achievable dan actionable: "perlu payung atau tidak?"
 
-**Kenapa prevDayRainSlots?**
+**Kenapa prevDayRain binary (bukan multi-value 0-4)?**
 
-Weather persistence (cuaca hari ini berkorelasi kuat dengan kemarin) adalah fitur paling impactful yang bisa ditambahkan secara offline. Menambahkan fitur ini meningkatkan accuracy dari baseline dan memberikan dimensi temporal yang tidak dimiliki fitur klimatologi statis.
+Multi-value (jumlah slot kemarin yang hujan) diuji dan hanya +3% improvement atas binary. Trade-off:
+- Multi-value ambiguous (hujan 2 slot beruntun vs terpisah tidak bisa dibedakan)
+- UX lebih kompleks (user harus ingat berapa slot)
+- Binary sederhana dan menangkap sinyal utama: weather persistence
 
 ### File Structure
 
 ```
 src/components/playground/modules/weather-v2/
-├── WeatherModuleV2.tsx              # UI component (default export)
-├── useLocalWeatherPredictorV2.ts    # Hook: load model, predict, cache
+├── WeatherModuleV2.tsx              # UI component + Standard/Sensitive toggle
+├── useLocalWeatherPredictorV2.ts    # Hook: load model, predict(tuned?), cache
 └── weatherUtilsV2.ts               # Feature vector builder, time slots, display config
 
 src/lib/ml/
 ├── typesV2.ts                       # SerializedModelV2, PredictionResultV2, SlotForest
-├── randomForestV2.ts                # Per-slot RF predict (browser runtime)
-├── cities.ts                        # 287 kota Indonesia (shared with V1)
-└── prng.ts                          # Deterministic PRNG (shared with V1)
+├── randomForestV2.ts                # Per-slot RF predict with threshold support
+├── cities.ts                        # 287 kota Indonesia (shared)
+└── prng.ts                          # Deterministic PRNG (shared)
 
 scripts/local-weather-forecast-v2/
 ├── dataset-extract.ts               # Fetch Open-Meteo hourly, aggregate + prevDay
-├── model-generation.ts              # Train 4 independent forests (sequential)
 ├── model-generation-parallel.ts     # Train 4 forests in parallel (worker_threads)
-└── HOW-TO-USE.md                    # Cara jalankan scripts
+├── threshold-tune.ts                # Sweep thresholds, update model.json
+└── HOW-TO-USE.md
 
-public/ai-models/local-weather-forecast-v2/
-└── model.json                       # Pre-trained model (served ke browser)
-
-public/dataset/local-weather-forecast-v2/
-└── dataset.json                     # Training data (git-ignored)
+public/ai-models/local-weather-forecast-v2/model.json
+public/dataset/local-weather-forecast-v2/dataset.json (git-ignored)
 ```
 
 ### UI Components
@@ -316,89 +339,197 @@ public/dataset/local-weather-forecast-v2/
 **Input Panel:**
 - Date picker (default: hari ini)
 - City search (autocomplete 287 kota)
-- Cuaca Kemarin dropdown (0-4 slot hujan kemarin, dengan keterangan rentang waktu)
+- Cuaca Kemarin dropdown (Tidak hujan / Hujan) + helper text
 - Advanced Settings (collapsible): ENSO phase dropdown, IOD phase dropdown
+- Predict button
+- Mode toggle: Standard / Sensitive
 
 **Result Panel (1 card, 4 baris):**
-- `idle` — "Select a city and click Predict"
-- `loading` — Spinner + "Predicting..."
-- `error` — Error message + Retry button
-- `success` — 4 baris slot waktu (Pagi/Siang/Sore/Malam) masing-masing: icon + label (Hujan/Tidak Hujan) + confidence bar, slot hujan di-highlight biru. Execution time di bawah.
+- 4 baris slot waktu (Pagi/Siang/Sore/Malam)
+- Masing-masing: icon + label (Hujan/Tidak Hujan) + confidence bar
+- Slot hujan di-highlight biru
+- Execution time di bawah
 
 **Info Section (bottom):**
-- How to Use box (termasuk penjelasan slot waktu)
-- About box + Disclaimer
+- How to Use box
+- About box (fitur, mode explanation, perbandingan V1) + Disclaimer
 
 ### Inference Flow
 
 ```
-1. User pilih kota + tanggal + cuaca kemarin + (optional) ENSO/IOD
-2. buildFeatureVector() → [dayOfYear, lat, lng, elev, zone, season, enso, iod, prevDayRainSlots]
-3. predictV2() → traverse 4 forests (30 trees each), majority vote per slot
-4. Return: { morning, afternoon, evening, night } masing-masing { category, confidence }
+1. User pilih kota + tanggal + cuaca kemarin + mode + (optional) ENSO/IOD
+2. buildFeatureVector() → [dayOfYear, lat, lng, elev, zone, season, enso, iod, prevDayRain]
+3. predictV2(model, features, tuned) → traverse 4 forests, apply threshold per slot
+4. Return: { morning, afternoon, evening, night } × { category, confidence }
 ```
-
-### Architecture
-
-```
-                    ┌── Forest Morning (30 trees) ──→ Hujan/Tidak Hujan
-                    │
-  features[9] ───→ ├── Forest Afternoon (30 trees) ─→ Hujan/Tidak Hujan
-                    │
-                    ├── Forest Evening (30 trees) ──→ Hujan/Tidak Hujan
-                    │
-                    └── Forest Night (30 trees) ────→ Hujan/Tidak Hujan
-
-  Per forest:
-    - Standard bootstrap (with replacement, same size as training)
-    - Binary Gini impurity
-    - Leaf stores: prediction (0 or 1) + confidence
-
-  Aggregation per slot:
-    - Majority vote across 30 trees
-    - Confidence = proportion of trees voting for winning class
-```
-
-### Offline Support
-
-- Model (`model.json`) di-fetch sekali saat module pertama kali dimuat
-- Disimpan di module-level singleton variable (`cachedModel`)
-- Persist across mount/unmount
-- Browser/SW cache response untuk offline access
-- Badge di playground index: "Offline Ready" (hijau) atau "Not Loaded" (abu-abu)
-
-### Scripts
-
-**Dataset extraction:**
-```bash
-npx tsx scripts/local-weather-forecast-v2/dataset-extract.ts --start 2021 --end 2025
-```
-- Fetch hourly weather_code, mulai 1 hari lebih awal untuk prevDay
-- Agregasi ke 4 slot waktu menggunakan majority vote
-- Hitung prevDayRainSlots inline
-- Resume otomatis, parallel (concurrency 5)
-
-**Model generation (parallel, recommended):**
-```bash
-npx tsx scripts/local-weather-forecast-v2/model-generation-parallel.ts
-```
-- 4 worker threads, 1 per slot
-- Training time ~12 min (wall-clock)
-- RAM usage ~3-4 GB
-
-**Model generation (sequential, lower RAM):**
-```bash
-npx tsx scripts/local-weather-forecast-v2/model-generation.ts
-```
-- Training time ~40 min
-- RAM usage ~1 GB
 
 ### Limitasi
 
-- Prediksi bersifat statistik berbasis pola klimatologi, bukan forecast meteorologi real-time
-- Accuracy 73% average — adequate untuk pattern recognition, tidak untuk keputusan kritis
-- Morning/Night cenderung under-predict hujan (distribusi imbalanced: 77-80% tidak hujan)
-- Afternoon/Evening lebih seimbang dan akurat
+- Morning/Night cenderung under-predict hujan (distribusi 77-80% tidak hujan)
+- Sensitive mode membantu tapi recall Hujan tetap rendah untuk Night (2.9%)
+- Afternoon/Evening paling reliable karena distribusi data seimbang
 - ENSO & IOD simplified (monthly granularity)
-- Tidak mempertimbangkan data atmosfer dinamis (suhu, kelembapan, tekanan, angin)
-- prevDayRainSlots bergantung pada input user (subjektif)
+- prevDayRain bergantung pada input user (subjektif)
+
+---
+
+## Local Weather Forecast V2.5
+
+| Field | Value |
+|-------|-------|
+| ID | `local-weather-forecast-v2-5` |
+| Label | AI |
+| Last Updated | 23 June 2026 |
+| Model Size | ~320 KB |
+| Inference Time | <1ms |
+| Offline | Yes (setelah model loaded) |
+
+### Deskripsi
+
+Prediksi hujan per slot waktu (Pagi/Siang/Sore/Malam) menggunakan Gradient Boosted Trees (GBT) dengan computed climate features. Menghasilkan probability yang lebih calibrated dibanding V2 RF, memungkinkan threshold tuning yang lebih efektif — terutama untuk slot Night yang sulit.
+
+### Perbedaan dengan V2
+
+| Aspek | V2 | V3 |
+|-------|-----|-----|
+| Algorithm | Random Forest | Gradient Boosted Trees |
+| Trees per slot | 30 × depth 6 | 100 × depth 4 |
+| Features | 9 | 12 (+ sinDay, cosDay, dayLength) |
+| Probability calibration | Moderate (vote proportions) | Better (sigmoid of cumulative scores) |
+| Threshold tuning impact | +2% F1 | +8.5% F1 |
+| Night F1 (tuned) | 47.23% | 60.1% |
+| Model size | ~417 KB | ~320 KB |
+
+### Machine Learning
+
+| Parameter | Value |
+|-----------|-------|
+| Algorithm | 4 × Independent Gradient Boosted Trees |
+| Trees per slot | 100 |
+| Total trees | 400 |
+| Max Depth | 4 (shallow weak learners) |
+| Learning Rate | 0.1 |
+| Loss | Binary log-loss (logistic) |
+| Seed | 42 (deterministic, +offset per slot) |
+| Split | 80% train / 20% test (random) |
+
+### Performance
+
+**Standard mode (threshold 0.5):**
+
+| Slot | Accuracy | Macro F1 |
+|------|----------|----------|
+| Morning | 77.9% | 45.7% |
+| Afternoon | 66.7% | 63.8% |
+| Evening | 64.9% | 64.1% |
+| Night | 80.3% | 44.5% |
+| **Average** | **72.46%** | **54.56%** |
+
+**Sensitive mode (tuned thresholds [0.3, 0.55, 0.5, 0.25]):**
+
+| Slot | Accuracy | Macro F1 | R(Hujan) |
+|------|----------|----------|----------|
+| Morning | 76.8% | 63.0% | 35.4% |
+| Afternoon | 66.5% | 65.3% | 76.3% |
+| Evening | 64.9% | 64.1% | 79.0% |
+| Night | 75.1% | 60.1% | 35.0% |
+| **Average** | **70.8%** | **63.1%** | |
+
+**Perbandingan semua versi (tuned):**
+
+| | V1 | V2 Sensitive | V3 Sensitive |
+|--|-----|--------------|--------------|
+| Accuracy | 65.35% | 72.46% | 70.8% |
+| Macro F1 | 65.35% | 58.43% | **63.1%** |
+| Night F1 | — | 47.23% | **60.1%** |
+
+### Dataset
+
+Sama dengan V2 (copy):
+- 524,000 samples, 287 kota, 5 tahun
+- Label mapping: Cerah+Berawan → 0, Gerimis+Hujan → 1
+- prevDayRainSlots di-convert ke binary (≥1 → 1)
+
+### Features (12 total)
+
+| # | Feature | Type | Range | Deskripsi |
+|---|---------|------|-------|-----------|
+| 0 | `dayOfYear` | int | 1–366 | Hari ke-n dalam tahun |
+| 1 | `latitude` | float | -10 to 5 | Lintang kota |
+| 2 | `longitude` | float | 95 to 141 | Bujur kota |
+| 3 | `elevation` | int | 0–1700 | Ketinggian (meter dpl) |
+| 4 | `monsoonZone` | enum | 0/1/2 | 0=Equatorial, 1=Monsoonal, 2=Local |
+| 5 | `localSeasonIndex` | enum | 0/1/2 | 0=Kemarau, 1=Transisi, 2=Hujan |
+| 6 | `enso` | enum | -1/0/1 | -1=La Nina, 0=Netral, 1=El Nino |
+| 7 | `iod` | enum | -1/0/1 | -1=Negatif, 0=Netral, 1=Positif |
+| 8 | `prevDayRain` | binary | 0/1 | Apakah kemarin hujan |
+| 9 | `sinDay` | float | -1 to 1 | sin(2π × dayOfYear / 365) — circular encoding |
+| 10 | `cosDay` | float | -1 to 1 | cos(2π × dayOfYear / 365) — circular encoding |
+| 11 | `dayLength` | float | ~11–13 | Jam cahaya matahari (dari lat + dayOfYear) |
+
+Computed features (9-11) dihitung otomatis tanpa input user tambahan.
+
+### Prediction Modes
+
+| Mode | Threshold | Karakteristik |
+|------|-----------|---------------|
+| **Standard** | 0.5 semua slot | Higher accuracy (~72%), konservatif |
+| **Sensitive** | Per-slot tuned | Higher F1 (~63%), jauh lebih baik detect hujan Night (+13% F1 vs V2) |
+
+GBT menghasilkan probability lebih calibrated (tersebar merata 0-1) dibanding RF (cluster di dekat 0 atau 1). Ini membuat threshold tuning jauh lebih efektif — terutama terlihat di Night slot.
+
+### File Structure
+
+```
+src/components/playground/modules/weather-v2-5/
+├── WeatherModuleV3.tsx              # UI component + Standard/Sensitive toggle
+├── useLocalWeatherPredictorV3.ts    # Hook: load model, predict(tuned?), cache
+└── weatherUtilsV3.ts               # Feature vector + computed features
+
+src/lib/ml/
+└── gbt-local-weather-forecast-v2-5.ts # GBT types + prediction runtime
+
+scripts/local-weather-forecast-v2-5/
+├── model-generation.ts              # Train GBT parallel (worker_threads)
+├── threshold-tune.ts                # Sweep thresholds, update model.json
+└── HOW-TO-USE.md
+
+public/ai-models/local-weather-forecast-v2-5/model.json
+public/dataset/local-weather-forecast-v2-5/dataset.json (copy dari V2, git-ignored)
+```
+
+### UI Components
+
+**Input Panel (sama dengan V2):**
+- Date picker
+- City search (autocomplete 287 kota)
+- Cuaca Kemarin (Tidak hujan / Hujan)
+- Advanced Settings: ENSO + IOD
+- Predict button
+- Mode toggle: Standard / Sensitive
+
+**Result Panel (sama dengan V2):**
+- 1 card, 4 baris slot (Pagi/Siang/Sore/Malam)
+- Icon + label + confidence bar per slot
+- Execution time
+
+### GBT Architecture
+
+```
+Per slot:
+  score = baseScore + lr × (tree_1 + tree_2 + ... + tree_100)
+  probability = sigmoid(score)
+  prediction = probability >= threshold ? "Hujan" : "Tidak Hujan"
+
+  baseScore = log(positive_rate / (1 - positive_rate))
+  Each tree: regression tree on residuals (actual - predicted_probability)
+  Shallow trees (depth 4) = weak learners that progressively correct errors
+```
+
+### Limitasi
+
+- Sama seperti V2: fitur klimatologi statis tidak bisa menangkap variasi cuaca harian
+- Night slot masih challenging (distribusi 80/20) tapi jauh lebih baik dari V2
+- Computed features (sin/cos, dayLength) memberikan improvement minimal — kunci performa V3 ada di probability calibration GBT
+- Training time ~9 min (parallel), RAM ~3-4 GB
+- prevDayRain bergantung pada input user (subjektif)

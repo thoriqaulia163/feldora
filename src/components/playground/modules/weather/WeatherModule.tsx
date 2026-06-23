@@ -120,7 +120,7 @@ export default function WeatherModule() {
           <div className="card-polygon p-6 space-y-5">
             {/* Date */}
             <div>
-              <label className="text-feldora-muted font-mono text-[10px] uppercase tracking-wider block mb-2">
+              <label className="text-feldora-text font-mono text-[10px] uppercase tracking-wider block mb-2">
                 {COPY.dateLabel}
               </label>
               <div
@@ -141,7 +141,7 @@ export default function WeatherModule() {
 
             {/* City */}
             <div className="relative">
-              <label className="text-feldora-muted font-mono text-[10px] uppercase tracking-wider block mb-2">
+              <label className="text-feldora-text font-mono text-[10px] uppercase tracking-wider block mb-2">
                 {COPY.provinceLabel}
               </label>
               <div className="relative">
@@ -220,7 +220,7 @@ export default function WeatherModule() {
                 <div className="mt-4 space-y-4 pl-4 border-l-2 border-feldora-border/30">
                   {/* ENSO */}
                   <div>
-                    <label className="text-feldora-muted font-mono text-[10px] uppercase tracking-wider block mb-2">
+                    <label className="text-feldora-text font-mono text-[10px] uppercase tracking-wider block mb-2">
                       {COPY.ensoLabel}
                     </label>
                     <select
@@ -236,7 +236,7 @@ export default function WeatherModule() {
 
                   {/* IOD */}
                   <div>
-                    <label className="text-feldora-muted font-mono text-[10px] uppercase tracking-wider block mb-2">
+                    <label className="text-feldora-text font-mono text-[10px] uppercase tracking-wider block mb-2">
                       {COPY.iodLabel}
                     </label>
                     <select

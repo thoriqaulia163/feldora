@@ -51,13 +51,46 @@ export const PLAYGROUND_COPY = {
       'Search and select a city.',
       'Pilih kondisi hujan kemarin — dari 4 slot waktu (Pagi 05–10, Siang 11–14, Sore 15–17, Malam 18–04), berapa yang hujan.',
       '(Optional) Set ENSO & IOD phase in Advanced Settings.',
+      'Toggle mode: Standard (conservative, high accuracy) or Sensitive (better rain detection, higher F1).',
       'Click Predict to see rain forecast for all time slots.',
     ],
     aboutTitle: 'About',
     aboutDescription:
-      'This module predicts rain/no-rain for four time slots — Pagi (05:00–10:59), Siang (11:00–14:59), Sore (15:00–17:59), Malam (18:00–04:59) — using independent Random Forests trained on 5 years of hourly historical data from 287 Indonesian cities.',
+      'This module predicts rain/no-rain for four time slots — Pagi (05:00–10:59), Siang (11:00–14:59), Sore (15:00–17:59), Malam (18:00–04:59) — using independent Random Forests trained on 5 years of hourly historical data from 287 Indonesian cities. Two prediction modes: Standard (threshold 0.5, higher accuracy ~72%, conservative) and Sensitive (tuned thresholds, higher F1 ~58%, better rain detection). V1 predicts a single daily rain status at 65% accuracy/F1; V2 provides per-slot granularity with similar performance per balanced slot.',
     aboutFeatures:
-      'Features: day of year, latitude, longitude, elevation, monsoon zone, local season, ENSO phase, IOD phase, and previous day\'s rain pattern (how many of the 4 time slots had rain yesterday). Runs entirely in-browser with no API calls.',
+      'Features: day of year, latitude, longitude, elevation, monsoon zone, local season, ENSO phase, IOD phase, and previous day rain (binary). Runs entirely in-browser with no API calls.',
+    disclaimer:
+      'Predictions are experimental and should not be used as a primary reference. Results are based on historical climatological patterns with limited parameters, not real-time atmospheric data. Use official meteorological services (BMKG) for critical decisions.',
+  },
+  weatherV2_5: {
+    name: 'Local Weather Forecast V2.5',
+    description:
+      'Per-slot rain prediction using Gradient Boosted Trees with computed climate features.',
+    cityLabel: 'City',
+    cityPlaceholder: 'Search city...',
+    dateLabel: 'Date',
+    prevDayLabel: 'Cuaca Kemarin',
+    advancedLabel: 'Advanced Settings',
+    ensoLabel: 'ENSO Phase',
+    iodLabel: 'IOD Phase',
+    predictButton: 'Predict',
+    resultTitle: 'Prediction Result',
+    executionTimeLabel: 'Execution Time',
+    idleMessage: 'Select a city and click Predict',
+    howToUseTitle: 'How to Use',
+    howToUseSteps: [
+      'Select a date (default: today).',
+      'Search and select a city.',
+      'Select yesterday\'s weather condition.',
+      '(Optional) Set ENSO & IOD phase in Advanced Settings.',
+      'Toggle mode: Standard (conservative, high accuracy) or Sensitive (better rain detection, higher F1).',
+      'Click Predict to see rain forecast for all time slots.',
+    ],
+    aboutTitle: 'About',
+    aboutDescription:
+      'This module predicts rain/no-rain for four time slots — Pagi (05:00–10:59), Siang (11:00–14:59), Sore (15:00–17:59), Malam (18:00–04:59) — using Gradient Boosted Trees trained on 5 years of hourly historical data from 287 Indonesian cities. Two prediction modes: Standard (threshold 0.5, higher accuracy ~72%) and Sensitive (tuned thresholds, higher F1 ~63%, significantly better rain detection especially at night). Compared to V2 (Random Forest), V3 produces better-calibrated probabilities enabling more effective threshold tuning.',
+    aboutFeatures:
+      'Features: day of year (+ sin/cos encoding), latitude, longitude, elevation, monsoon zone, local season, ENSO phase, IOD phase, previous day rain, and computed day length. Runs entirely in-browser.',
     disclaimer:
       'Predictions are experimental and should not be used as a primary reference. Results are based on historical climatological patterns with limited parameters, not real-time atmospheric data. Use official meteorological services (BMKG) for critical decisions.',
   },

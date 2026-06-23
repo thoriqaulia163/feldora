@@ -340,7 +340,7 @@ function SlideAbout() {
 
             {/* Bottom: version badge */}
             <div className="flex items-center justify-between mt-3">
-              <span className="text-feldora-muted font-mono text-[9px]">v{__APP_VERSION__}</span>
+              <span className="text-feldora-muted font-mono text-[9px]">v{typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : ''}</span>
               <div className="flex items-center gap-1">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                 <span className="text-emerald-400 font-mono text-[8px] uppercase">Active</span>

@@ -68,7 +68,7 @@ export function Footer() {
             © FELDORA 2026. All rights reserved.
           </span>
           <span className="text-feldora-muted font-mono text-[10px] uppercase tracking-wider">
-            v{__APP_VERSION__} — Built with precision & angular philosophy.
+            v{typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : ''} — Built with precision & angular philosophy.
           </span>
         </div>
       </div>

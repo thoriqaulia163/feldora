@@ -56,6 +56,7 @@ export interface SerializedModelV2 {
   featureNames: string[]
   slotNames: string[]
   categoryNames: string[]
+  thresholds?: number[]
   forests: SlotForest[]
   metadata?: {
     trainedAt: string

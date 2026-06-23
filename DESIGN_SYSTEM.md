@@ -48,7 +48,7 @@ src/
 │   ├── home/            # Homepage sections (Hero, Featured, Updates, CTA)
 │   ├── layout/          # Navbar, Footer (persistent layout)
 │   ├── playground/      # Playground shell, module registry, types
-│   │   └── modules/     # Module implementations (weather/, weather-v2/, etc.)
+│   │   └── modules/     # Module implementations (weather/, weather-v2/, weather-v3/, etc.)
 │   ├── story/           # Story list & detail components
 │   └── ui/              # Reusable UI components (LogCard, Carousel)
 ├── constants/
@@ -64,7 +64,14 @@ src/
 │   └── updateLog.ts       # Update log data & types
 ├── lib/
 │   ├── graphql.ts       # GraphQL queries & types (Hygraph)
-│   ├── ml/              # Machine learning (cities data, types, RF algorithm, PRNG)
+│   ├── ml/              # Machine learning predictors & types
+│   │   ├── rf-local-weather-forecast-v1.ts   # RF train/predict (V1)
+│   │   ├── rf-local-weather-forecast-v2.ts   # RF per-slot predict (V2)
+│   │   ├── gbt-local-weather-forecast-v2-5.ts # GBT per-slot predict (V2.5)
+│   │   ├── types.ts     # V1 model types
+│   │   ├── typesV2.ts   # V2 model types
+│   │   ├── cities.ts    # 287 kota Indonesia
+│   │   └── prng.ts      # Deterministic PRNG (Mulberry32)
 │   ├── queries.ts       # React Query hooks (useGetPosts, useGetPostDetail)
 │   └── queryClient.ts   # Query client factory
 ├── routes/
@@ -75,6 +82,7 @@ src/
 │   ├── playground.index.tsx  # Playground module list
 │   ├── playground.local-weather-forecast.tsx  # Weather module V1 route
 │   ├── playground.local-weather-forecast-v2.tsx  # Weather module V2 route
+│   ├── playground.local-weather-forecast-v2-5.tsx  # Weather module V2.5 route
 │   ├── story.tsx        # Story layout (Outlet)
 │   ├── story.index.tsx  # Story list page (/story)
 │   └── story.$slug.tsx  # Story detail page (/story/:slug)
@@ -99,6 +107,29 @@ public/
 scripts/
 └── local-weather-forecast/  # Dataset extraction & model training scripts
 ```
+
+---
+
+## ML Predictor Naming Convention
+
+File predictor di `src/lib/ml/` menggunakan format:
+
+```
+{model}-{module}-{version}.ts
+```
+
+| File | Model | Module | Version |
+|------|-------|--------|---------|
+| `rf-local-weather-forecast-v1.ts` | Random Forest | Local Weather Forecast | V1 |
+| `rf-local-weather-forecast-v2.ts` | Random Forest | Local Weather Forecast | V2 |
+| `gbt-local-weather-forecast-v2-5.ts` | Gradient Boosted Trees | Local Weather Forecast | V2.5 |
+
+Konvensi ini memudahkan identifikasi:
+- **Model** yang digunakan (rf, gbt, nn, dll)
+- **Module** playground mana yang menggunakannya
+- **Version** iterasi mana
+
+File types (`types.ts`, `typesV2.ts`) dan shared utilities (`cities.ts`, `prng.ts`) tidak mengikuti konvensi ini karena bersifat generic/shared.
 
 ---
 
@@ -327,6 +358,23 @@ interface UpdateEntry {
 - **`description`**: Maksimal **150 karakter**. Ringkas, padat, tanpa detail implementasi. Jika perlu lebih detail, tulis di commit message atau PR description.
 - **`title`**: Ringkasan perubahan utama dalam satu baris.
 - **`version`**: Mengikuti semver — major (breaking/rebuild), moderate (fitur baru), minor (fix/tweak).
+
+### Versioning Rules
+
+Format: `MAJOR.MINOR.PATCH`
+
+| Increment | Kapan | Contoh |
+|-----------|-------|--------|
+| **MAJOR** | Rebuild/redesign fundamental, breaking changes | 1.0.0 → 2.0.0 |
+| **MINOR** | Fitur baru, module baru, perubahan signifikan | 1.10.0 → 1.11.0 |
+| **PATCH** | Bug fix, UI tweak, refactor kecil | 1.11.0 → 1.11.1 |
+
+Aturan:
+- Log harus **descending** (terbaru di atas)
+- Version harus **monoton naik** — setiap entry memiliki version lebih tinggi dari entry di bawahnya
+- `package.json` version selalu sama dengan entry log teratas
+- Jangan skip version (1.10.0 → 1.12.0) kecuali ada alasan kuat
+- Jika beberapa perubahan di hari yang sama, tetap gunakan version terpisah per entry
 
 ### Status Mapping (Warna Tag)
 
@@ -720,7 +768,7 @@ npm run lint     # TypeScript type check (tsc --noEmit)
 
 10. **Copywriting terpusat** — Semua teks/copy di-manage dari `src/constants/copy/`. Setiap halaman punya file sendiri (`home.ts`, `about.ts`, `log.ts`, `story.ts`). Untuk ubah teks di website, cukup edit file di directory ini tanpa perlu sentuh komponen.
 
-11. **Auto-version di Footer** — Footer menampilkan versi website yang otomatis dibaca dari `package.json` via Vite `define`. Didefinisikan di `vite.config.ts` sebagai `__APP_VERSION__` (string replacement saat build, zero runtime cost). Cukup update `version` di `package.json`, footer otomatis ikut. Perlu restart dev server jika version berubah saat dev sedang jalan.
+11. **Auto-version di Footer** — Footer menampilkan versi website yang otomatis dibaca dari `package.json` via Vite `define`. Didefinisikan di `vite.config.ts` sebagai `__APP_VERSION__` (string replacement saat build, zero runtime cost). Cukup update `version` di `package.json`, footer otomatis ikut. Perlu restart dev server jika version berubah saat dev sedang jalan. Gunakan `typeof __APP_VERSION__ !== 'undefined'` guard untuk mencegah ReferenceError di SSR context.
 
 ---
 

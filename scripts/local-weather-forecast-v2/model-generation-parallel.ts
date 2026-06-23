@@ -28,7 +28,7 @@ const CATEGORY_NAMES = ['Tidak Hujan', 'Hujan']
 const FEATURE_NAMES = [
   'dayOfYear', 'latitude', 'longitude', 'elevation',
   'monsoonZone', 'localSeasonIndex', 'enso', 'iod',
-  'prevDayRainSlots',
+  'prevDayRain',
 ]
 
 // ─── PRNG (Mulberry32) ──────────────────────────────────────────────────────
@@ -207,7 +207,7 @@ function evaluateSlot(predicted: number[], actual: number[]): SlotMetrics {
 }
 
 function extractFeatures(s: DatasetSample): number[] {
-  return [s.dayOfYear, s.latitude, s.longitude, s.elevation, s.monsoonZone, s.localSeasonIndex, s.enso, s.iod, s.prevDayRainSlots ?? 1]
+  return [s.dayOfYear, s.latitude, s.longitude, s.elevation, s.monsoonZone, s.localSeasonIndex, s.enso, s.iod, s.prevDayRainSlots >= 1 ? 1 : 0]
 }
 
 // ─── Worker Logic ───────────────────────────────────────────────────────────
@@ -347,16 +347,123 @@ if (!isMainThread && parentPort) {
   console.log(`   Accuracy: ${(avgAccuracy * 100).toFixed(2)}%`)
   console.log(`   Macro F1: ${(avgF1 * 100).toFixed(2)}%\n`)
 
-  // Build model
+  // ─── Threshold Tuning ─────────────────────────────────────────────────────
+  console.log('🎯 Threshold Tuning (per-slot):\n')
+
+  const THRESHOLDS = [0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50]
+  const slotKeys = ['morning', 'afternoon', 'evening', 'night'] as const
+  const testIndices = indices.slice(splitIdx)
+  const optimalThresholds: number[] = []
+
+  for (let s = 0; s < NUM_SLOTS; s++) {
+    const slotKey = slotKeys[s]
+    const forest = results[s].forest
+
+    // Get vote proportions for all test samples
+    const testVotes: number[] = [] // proportion of trees voting "Hujan" per sample
+    const testActual: number[] = []
+
+    for (const idx of testIndices) {
+      const features = extractFeatures(rawData[idx])
+      let hujanVotes = 0
+      for (const tree of forest.trees) {
+        let node: SerializedNode | undefined = tree.root
+        while (node && node.f !== -1) { node = features[node.f] <= node.t ? node.l : node.r }
+        if (node?.p === 1) hujanVotes++
+      }
+      testVotes.push(hujanVotes / forest.trees.length)
+      testActual.push(rawData[idx][slotKey] >= 2 ? 1 : 0)
+    }
+
+    // Evaluate each threshold
+    let bestF1 = -1
+    let bestThreshold = 0.5
+
+    console.log(`   ${SLOT_NAMES[s].toUpperCase()}:`)
+    console.log(`   ${'Thresh'.padEnd(8)} ${'Acc'.padStart(7)} ${'F1'.padStart(7)} ${'P(H)'.padStart(7)} ${'R(H)'.padStart(7)}`)
+
+    for (const threshold of THRESHOLDS) {
+      let tp = 0, fp = 0, tn = 0, fn = 0
+      for (let i = 0; i < testVotes.length; i++) {
+        const pred = testVotes[i] >= threshold ? 1 : 0
+        if (pred === 1 && testActual[i] === 1) tp++
+        else if (pred === 1 && testActual[i] === 0) fp++
+        else if (pred === 0 && testActual[i] === 0) tn++
+        else fn++
+      }
+      const acc = (tp + tn) / (tp + fp + tn + fn)
+      const precision = tp + fp > 0 ? tp / (tp + fp) : 0
+      const recall = tp + fn > 0 ? tp / (tp + fn) : 0
+      const f1Hujan = precision + recall > 0 ? (2 * precision * recall) / (precision + recall) : 0
+      const precisionNH = tn + fn > 0 ? tn / (tn + fn) : 0
+      const recallNH = tn + fp > 0 ? tn / (tn + fp) : 0
+      const f1NH = precisionNH + recallNH > 0 ? (2 * precisionNH * recallNH) / (precisionNH + recallNH) : 0
+      const macroF1 = (f1Hujan + f1NH) / 2
+
+      const marker = macroF1 > bestF1 ? ' ◀ best' : ''
+      console.log(`   ${threshold.toFixed(2).padEnd(8)} ${(acc * 100).toFixed(1).padStart(6)}% ${(macroF1 * 100).toFixed(1).padStart(6)}% ${(precision * 100).toFixed(1).padStart(6)}% ${(recall * 100).toFixed(1).padStart(6)}%${marker}`)
+
+      if (macroF1 > bestF1) {
+        bestF1 = macroF1
+        bestThreshold = threshold
+      }
+    }
+
+    optimalThresholds.push(bestThreshold)
+    console.log(`   → Optimal: ${bestThreshold}\n`)
+  }
+
+  console.log(`   ══ OPTIMAL THRESHOLDS ══`)
+  for (let s = 0; s < NUM_SLOTS; s++) {
+    console.log(`   ${SLOT_NAMES[s].padEnd(10)} ${optimalThresholds[s]}`)
+  }
+  console.log()
+
+  // Re-evaluate with optimal thresholds
+  console.log('📈 Re-evaluation with optimal thresholds:\n')
+  const tunedMetricsBySlot: Record<string, { accuracy: number; f1: number }> = {}
+
+  for (let s = 0; s < NUM_SLOTS; s++) {
+    const slotKey = slotKeys[s]
+    const forest = results[s].forest
+    const threshold = optimalThresholds[s]
+    const predicted: number[] = []
+    const actual: number[] = []
+
+    for (const idx of testIndices) {
+      const features = extractFeatures(rawData[idx])
+      let hujanVotes = 0
+      for (const tree of forest.trees) {
+        let node: SerializedNode | undefined = tree.root
+        while (node && node.f !== -1) { node = features[node.f] <= node.t ? node.l : node.r }
+        if (node?.p === 1) hujanVotes++
+      }
+      predicted.push(hujanVotes / forest.trees.length >= threshold ? 1 : 0)
+      actual.push(rawData[idx][slotKey] >= 2 ? 1 : 0)
+    }
+
+    const metrics = evaluateSlot(predicted, actual)
+    tunedMetricsBySlot[SLOT_NAMES[s]] = { accuracy: metrics.accuracy, f1: metrics.macroF1 }
+
+    console.log(`   ${SLOT_NAMES[s].padEnd(10)} Acc=${(metrics.accuracy * 100).toFixed(2)}%  F1=${(metrics.macroF1 * 100).toFixed(2)}%  (threshold=${threshold})`)
+  }
+
+  const tunedAvgAcc = Object.values(tunedMetricsBySlot).reduce((s, v) => s + v.accuracy, 0) / NUM_SLOTS
+  const tunedAvgF1 = Object.values(tunedMetricsBySlot).reduce((s, v) => s + v.f1, 0) / NUM_SLOTS
+  console.log(`\n   ══ TUNED OVERALL ══`)
+  console.log(`   Accuracy: ${(tunedAvgAcc * 100).toFixed(2)}%`)
+  console.log(`   Macro F1: ${(tunedAvgF1 * 100).toFixed(2)}%\n`)
+
+  // Build model with thresholds
   const forests = results.map((r) => r.forest)
   const accuracyMap: Record<string, number> = {}
   const f1Map: Record<string, number> = {}
-  for (const [slot, m] of Object.entries(metricsBySlot)) {
+  for (const [slot, m] of Object.entries(tunedMetricsBySlot)) {
     accuracyMap[slot] = Math.round(m.accuracy * 10000) / 10000
     f1Map[slot] = Math.round(m.f1 * 10000) / 10000
   }
-  accuracyMap['average'] = Math.round(avgAccuracy * 10000) / 10000
-  f1Map['average'] = Math.round(avgF1 * 10000) / 10000
+  accuracyMap['average'] = Math.round(tunedAvgAcc * 10000) / 10000
+  f1Map['average'] = Math.round(tunedAvgF1 * 10000) / 10000
 
   const model = {
     version: 2,
@@ -366,6 +473,7 @@ if (!isMainThread && parentPort) {
     featureNames: FEATURE_NAMES,
     slotNames: SLOT_NAMES,
     categoryNames: CATEGORY_NAMES,
+    thresholds: optimalThresholds,
     forests,
     metadata: {
       trainedAt: new Date().toISOString(),

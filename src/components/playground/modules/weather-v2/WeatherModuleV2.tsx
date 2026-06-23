@@ -25,11 +25,8 @@ const IOD_OPTIONS = [
 ]
 
 const PREV_WEATHER_OPTIONS = [
-  { value: 0, label: 'Tidak hujan sama sekali' },
-  { value: 1, label: 'Hujan di 1 waktu' },
-  { value: 2, label: 'Hujan di 2 waktu (misal: pagi & sore)' },
-  { value: 3, label: 'Hujan di 3 waktu' },
-  { value: 4, label: 'Hujan di semua waktu' },
+  { value: 0, label: 'Tidak hujan' },
+  { value: 1, label: 'Hujan' },
 ]
 
 export default function WeatherModuleV2() {
@@ -44,7 +41,8 @@ export default function WeatherModuleV2() {
   })
   const [enso, setEnso] = useState(0)
   const [iod, setIod] = useState(0)
-  const [prevDayRainSlots, setPrevDayRainSlots] = useState(1)
+  const [prevDayRain, setPrevDayRain] = useState(0)
+  const [useTuned, setUseTuned] = useState(true)
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [result, setResult] = useState<PredictionResultV2 | null>(null)
   const [predictState, setPredictState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
@@ -64,13 +62,13 @@ export default function WeatherModuleV2() {
     Promise.resolve().then(() => {
       try {
         const date = new Date(selectedDate + 'T00:00:00')
-        const fv = buildFeatureVector(selectedCity, enso, iod, prevDayRainSlots, date)
+        const fv = buildFeatureVector(selectedCity, enso, iod, prevDayRain, date)
         if (!fv) {
           setPredictError('Failed to build feature vector. Please check your inputs.')
           setPredictState('error')
           return
         }
-        const r = predict(fv.features, fv.featureMap)
+        const r = predict(fv.features, fv.featureMap, useTuned)
         if (!r) {
           setPredictError('Prediction failed. Model may not be loaded correctly.')
           setPredictState('error')
@@ -127,7 +125,7 @@ export default function WeatherModuleV2() {
           <div className="card-polygon p-6 space-y-5">
             {/* Date */}
             <div>
-              <label className="text-feldora-muted font-mono text-[10px] uppercase tracking-wider block mb-2">
+              <label className="text-feldora-text font-mono text-[10px] uppercase tracking-wider block mb-2">
                 {COPY.dateLabel}
               </label>
               <div
@@ -156,7 +154,7 @@ export default function WeatherModuleV2() {
 
             {/* City */}
             <div className="relative">
-              <label className="text-feldora-muted font-mono text-[10px] uppercase tracking-wider block mb-2">
+              <label className="text-feldora-text font-mono text-[10px] uppercase tracking-wider block mb-2">
                 {COPY.cityLabel}
               </label>
               <div className="relative">
@@ -218,12 +216,12 @@ export default function WeatherModuleV2() {
 
             {/* Previous Day Weather */}
             <div>
-              <label className="text-feldora-muted font-mono text-[10px] uppercase tracking-wider block mb-2">
+              <label className="text-feldora-text font-mono text-[10px] uppercase tracking-wider block mb-2">
                 {COPY.prevDayLabel}
               </label>
               <select
-                value={prevDayRainSlots}
-                onChange={(e) => { setPrevDayRainSlots(Number(e.target.value)); setResult(null); setPredictState('idle') }}
+                value={prevDayRain}
+                onChange={(e) => { setPrevDayRain(Number(e.target.value)); setResult(null); setPredictState('idle') }}
                 className="w-full bg-feldora-surface-light border border-feldora-border/50 text-feldora-text text-sm px-3 py-2.5 focus:outline-none focus:border-feldora-accent/60 transition-colors"
               >
                 {PREV_WEATHER_OPTIONS.map((o) => (
@@ -231,8 +229,7 @@ export default function WeatherModuleV2() {
                 ))}
               </select>
               <p className="mt-1.5 text-feldora-muted text-[10px] leading-relaxed">
-                4 waktu: Pagi (05:00–10:59), Siang (11:00–14:59), Sore (15:00–17:59), Malam (18:00–04:59).
-                Berapa dari 4 waktu tersebut yang hujan kemarin?
+                Apakah kemarin hujan di kota ini?
               </p>
             </div>
 
@@ -255,7 +252,7 @@ export default function WeatherModuleV2() {
                 <div className="mt-4 space-y-4 pl-4 border-l-2 border-feldora-border/30">
                   {/* ENSO */}
                   <div>
-                    <label className="text-feldora-muted font-mono text-[10px] uppercase tracking-wider block mb-2">
+                    <label className="text-feldora-text font-mono text-[10px] uppercase tracking-wider block mb-2">
                       {COPY.ensoLabel}
                     </label>
                     <select
@@ -271,7 +268,7 @@ export default function WeatherModuleV2() {
 
                   {/* IOD */}
                   <div>
-                    <label className="text-feldora-muted font-mono text-[10px] uppercase tracking-wider block mb-2">
+                    <label className="text-feldora-text font-mono text-[10px] uppercase tracking-wider block mb-2">
                       {COPY.iodLabel}
                     </label>
                     <select
@@ -296,6 +293,20 @@ export default function WeatherModuleV2() {
             >
               {COPY.predictButton}
             </button>
+
+            {/* Prediction Mode Toggle */}
+            <div className="flex items-center justify-between pt-2 border-t border-feldora-border/20">
+              <span className="text-feldora-text font-mono text-[10px] uppercase tracking-wider">Mode</span>
+              <button
+                onClick={() => { setUseTuned(!useTuned); setResult(null); setPredictState('idle') }}
+                className={`relative w-[88px] h-7 rounded-full border transition-colors duration-300 ${useTuned ? 'bg-feldora-accent-secondary/20 border-feldora-accent-secondary' : 'bg-feldora-surface-light border-feldora-border'}`}
+              >
+                <span className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full transition-all duration-300 ${useTuned ? 'translate-x-[60px] bg-feldora-accent-secondary' : 'translate-x-0 bg-feldora-text'}`} />
+                <span className={`absolute inset-0 flex items-center font-mono text-[9px] uppercase tracking-wider ${useTuned ? 'justify-start pl-2 text-feldora-accent-secondary' : 'justify-end pr-2 text-feldora-text'}`}>
+                  {useTuned ? 'Sens' : 'Std'}
+                </span>
+              </button>
+            </div>
           </div>
 
           {/* Result Panel */}

@@ -12,6 +12,38 @@ export interface UpdateEntry {
 
 export const WEB_UPDATE_LOG: UpdateEntry[] = [
   {
+    date: '23 June 2026',
+    title: 'Weather modules UI polish: label colors, toggle redesign',
+    status: 'minor',
+    type: 'fixing',
+    version: '1.11.2',
+    description: 'Input labels changed to white for visibility. Standard/Sensitive toggle redesigned as orange pill toggle. How to Use updated with mode explanation.',
+  },
+  {
+    date: '23 June 2026',
+    title: 'Local Weather Forecast V2.5 — Gradient Boosted Trees with computed features',
+    status: 'moderate',
+    type: 'update',
+    version: '1.11.1',
+    description: 'New module: GBT (100 trees × depth 4) per slot with sin/cos day, day length features. Better F1 via probability calibration + threshold tuning.',
+  },
+  {
+    date: '23 June 2026',
+    title: 'Weather V2 & V2.5: Standard/Sensitive prediction mode toggle',
+    status: 'minor',
+    type: 'update',
+    version: '1.11.0',
+    description: 'Added prediction mode toggle. Standard: threshold 0.5, higher accuracy. Sensitive: tuned thresholds, better rain detection (higher F1).',
+  },
+  {
+    date: '23 June 2026',
+    title: 'Fix __APP_VERSION__ ReferenceError in SSR context',
+    status: 'minor',
+    type: 'fixing',
+    version: '1.10.1',
+    description: 'Added typeof guard for __APP_VERSION__ in HeroSection and Footer to prevent crash when Vite define is unavailable during SSR.',
+  },
+  {
     date: '22 June 2026',
     title: 'Local Weather Forecast V2 — per-slot rain prediction with prevDay feature',
     status: 'moderate',

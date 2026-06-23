@@ -22,6 +22,16 @@ export const PLAYGROUND_MODULES: PlaygroundModule[] = [
     cacheCheckUrl: '/ai-models/local-weather-forecast-v2/model.json',
   },
   {
+    id: 'local-weather-forecast-v2-5',
+    name: 'Local Weather Forecast V2.5',
+    description:
+      'Per-slot rain prediction using Gradient Boosted Trees with computed climate features. Improved accuracy over V2 — fully offline.',
+    label: 'AI',
+    lastUpdated: '23 June 2026',
+    estimatedDownloadSize: '~320 KB',
+    cacheCheckUrl: '/ai-models/local-weather-forecast-v2-5/model.json',
+  },
+  {
     id: 'tic-tac-toe',
     name: 'Tic Tac Toe',
     description: 'Coming soon',

@@ -1,8 +1,7 @@
 import { INDONESIA_CITIES, type CityData } from '~/lib/ml/cities'
 
 /**
- * Time slot definitions for V2.
- * Morning: 05:00–10:59, Afternoon: 11:00–14:59, Evening: 15:00–17:59, Night: 18:00–04:59
+ * Time slot definitions.
  */
 export const TIME_SLOT_LABELS = [
   { key: 'morning', label: 'Pagi', range: '05:00 – 10:59' },
@@ -11,20 +10,15 @@ export const TIME_SLOT_LABELS = [
   { key: 'night', label: 'Malam', range: '18:00 – 04:59' },
 ] as const
 
-/**
- * Weather category icons and colors for display.
- */
 export const WEATHER_DISPLAY = [
   { label: 'Tidak Hujan', icon: '☀️', color: 'text-amber-400' },
   { label: 'Hujan', icon: '🌧️', color: 'text-blue-400' },
 ] as const
 
 /**
- * Get local season index based on month and monsoon zone.
- * 0 = Kemarau (dry), 1 = Transisi (transition), 2 = Hujan (wet)
+ * Local season index: 0=Kemarau, 1=Transisi, 2=Hujan
  */
-export function getLocalSeasonIndex(month: number, monsoonZone: number): number {
-  // Equatorial zone
+function getLocalSeasonIndex(month: number, monsoonZone: number): number {
   if (monsoonZone === 0) {
     const wetMonths = [3, 4, 5, 9, 10, 11]
     const transitionMonths = [6, 7, 12, 1]
@@ -32,21 +26,36 @@ export function getLocalSeasonIndex(month: number, monsoonZone: number): number 
     if (transitionMonths.includes(month)) return 1
     return 0
   }
-  // Monsoonal zone
   if (monsoonZone === 1) {
     if (month >= 11 || month <= 3) return 2
     if (month >= 5 && month <= 9) return 0
     return 1
   }
-  // Local zone (2)
   if (month >= 5 && month <= 9) return 2
   if (month >= 11 || month <= 2) return 0
   return 1
 }
 
 /**
- * Build feature vector for V2 prediction.
- * Feature order: [dayOfYear, latitude, longitude, elevation, monsoonZone, localSeasonIndex, enso, iod, prevDayRainSlots]
+ * Day length (hours of sunlight) using simplified astronomical formula.
+ * Accurate enough for climate modeling purposes.
+ */
+function computeDayLength(latitude: number, dayOfYear: number): number {
+  const latRad = latitude * Math.PI / 180
+  // Solar declination (simplified)
+  const declination = 23.45 * Math.sin((2 * Math.PI / 365) * (dayOfYear - 81)) * Math.PI / 180
+  // Hour angle at sunrise/sunset
+  const cosHourAngle = -Math.tan(latRad) * Math.tan(declination)
+  // Clamp for polar regions (not relevant for Indonesia but safe)
+  if (cosHourAngle > 1) return 0
+  if (cosHourAngle < -1) return 24
+  const hourAngle = Math.acos(cosHourAngle)
+  return (2 * hourAngle * 180 / Math.PI) / 15 // Convert to hours
+}
+
+/**
+ * Build feature vector for V3.
+ * 12 features: [dayOfYear, lat, lng, elev, monsoonZone, localSeasonIndex, enso, iod, prevDayRain, sinDay, cosDay, dayLength]
  */
 export function buildFeatureVector(
   cityName: string,
@@ -64,6 +73,11 @@ export function buildFeatureVector(
   const month = targetDate.getMonth() + 1
   const localSeasonIndex = getLocalSeasonIndex(month, city.monsoonZone)
 
+  // Computed features
+  const sinDay = Math.sin((2 * Math.PI * dayOfYear) / 365)
+  const cosDay = Math.cos((2 * Math.PI * dayOfYear) / 365)
+  const dayLength = computeDayLength(city.latitude, dayOfYear)
+
   const features = [
     dayOfYear,
     city.latitude,
@@ -74,6 +88,9 @@ export function buildFeatureVector(
     enso,
     iod,
     prevDayRain,
+    sinDay,
+    cosDay,
+    dayLength,
   ]
 
   const featureMap: Record<string, number> = {
@@ -86,10 +103,13 @@ export function buildFeatureVector(
     enso,
     iod,
     prevDayRain,
+    sinDay: Math.round(sinDay * 1000) / 1000,
+    cosDay: Math.round(cosDay * 1000) / 1000,
+    dayLength: Math.round(dayLength * 100) / 100,
   }
 
   return { features, featureMap }
 }
 
-export { INDONESIA_CITIES } from '~/lib/ml/cities'
-export type { CityData } from '~/lib/ml/cities'
+export { INDONESIA_CITIES }
+export type { CityData }
