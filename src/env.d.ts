@@ -2,6 +2,7 @@
 
 interface ImportMetaEnv {
   readonly VITE_GRAPH_CMS_ENDPOINT: string
+  readonly VITE_SPLIT_BILL_KEK: string
 }
 
 interface ImportMeta {

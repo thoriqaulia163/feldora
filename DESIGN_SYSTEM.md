@@ -48,7 +48,7 @@ src/
 │   ├── home/            # Homepage sections (Hero, Featured, Updates, CTA)
 │   ├── layout/          # Navbar, Footer (persistent layout)
 │   ├── playground/      # Playground shell, module registry, types
-│   │   └── modules/     # Module implementations (weather/, weather-v2/, weather-v2.5/, etc.)
+│   │   └── modules/     # Module implementations (weather/, weather-v2/, weather-v2-5/, split-bill/)
 │   ├── story/           # Story list & detail components
 │   └── ui/              # Reusable UI components (LogCard, Carousel)
 ├── constants/
@@ -63,6 +63,12 @@ src/
 │   ├── placeholderStories.ts  # Static placeholder articles
 │   └── updateLog.ts       # Update log data & types
 ├── lib/
+│   ├── crypto/          # Reusable encryption layer (DEK + KEK)
+│   │   ├── aes.ts       # AES-GCM encrypt/decrypt primitives
+│   │   ├── kek.ts       # KEK derivation (env passphrase / PIN)
+│   │   ├── dek.ts       # DEK generation, wrap/unwrap
+│   │   ├── types.ts     # EncryptedPayload, WrappedDEK types
+│   │   └── index.ts     # Barrel export
 │   ├── graphql.ts       # GraphQL queries & types (Hygraph)
 │   ├── ml/              # Machine learning predictors & types
 │   │   ├── rf-local-weather-forecast-v1.ts   # RF train/predict (V1)
@@ -83,6 +89,11 @@ src/
 │   ├── playground.local-weather-forecast.tsx  # Weather module V1 route
 │   ├── playground.local-weather-forecast-v2.tsx  # Weather module V2 route
 │   ├── playground.local-weather-forecast-v2-5.tsx  # Weather module V2.5 route
+│   ├── playground.split-bill.tsx            # Split Bill layout (crypto gate)
+│   ├── playground.split-bill.index.tsx      # Split Bill home
+│   ├── playground.split-bill.create.tsx     # Create bill
+│   ├── playground.split-bill.detail.$id.tsx # Bill detail
+│   ├── playground.split-bill.edit.$id.tsx   # Edit bill
 │   ├── story.tsx        # Story layout (Outlet)
 │   ├── story.index.tsx  # Story list page (/story)
 │   └── story.$slug.tsx  # Story detail page (/story/:slug)
@@ -665,6 +676,7 @@ npm run lint     # TypeScript type check (tsc --noEmit)
 
 **Environment Variables (Vercel Dashboard → Settings → Environment Variables):**
 - `VITE_GRAPH_CMS_ENDPOINT` — Hygraph GraphQL endpoint
+- `VITE_SPLIT_BILL_KEK` — Encryption passphrase for Split Bill module (required to enable the module)
 
 **Catatan:**
 - Tanpa plugin `nitro`, build output ke `dist/` yang tidak dipahami Vercel untuk SSR

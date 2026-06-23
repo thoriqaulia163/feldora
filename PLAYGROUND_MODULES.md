@@ -533,3 +533,122 @@ Per slot:
 - Computed features (sin/cos, dayLength) memberikan improvement minimal — kunci performa V2.5 ada di probability calibration GBT
 - Training time ~9 min (parallel), RAM ~3-4 GB
 - prevDayRain bergantung pada input user (subjektif)
+
+---
+
+## Split Bill
+
+| Field | Value |
+|-------|-------|
+| ID | `split-bill` |
+| Label | Tool |
+| Last Updated | 23 June 2026 |
+| Download Size | ~0 KB (no model) |
+| Offline | Yes (IndexedDB + Web Crypto) |
+
+### Description
+
+Offline bill splitting tool with encrypted local storage. Supports 3 split modes: Equal, Custom, and Itemized. Data encrypted with AES-GCM (DEK + KEK architecture). Optional PIN protection.
+
+### Features
+
+- **Fully offline** — All data in IndexedDB, no server dependency
+- **Encrypted** — AES-GCM encryption prevents casual reading of stored data
+- **3 split modes** — Equal (total ÷ people), Custom (manual per-person), Itemized (pay for own items)
+- **Global participants** — Reusable people list shared across bills
+- **PIN protection** — Optional toggle, re-wraps DEK without re-encrypting bills
+- **Payment tracking** — Simple paid/unpaid toggle per participant
+
+### Split Modes
+
+| Mode | How it works |
+|------|-------------|
+| **Equal** | Total of all items ÷ number of people = each person pays |
+| **Custom** | User manually sets how much each person pays (must equal total) |
+| **Itemized** | Each person pays the sum of their own items |
+
+### Data Model
+
+Each participant in a bill owns items (name + price). The bill total is auto-computed from all items.
+
+```
+Bill {
+  title, splitMode,
+  participants: [{ name, items: [{name, price}], customTotal? }],
+  payments: [{ participantId, status: 'paid'|'unpaid' }]
+}
+```
+
+### Encryption (DEK + KEK)
+
+```
+Mode A (no PIN): VITE_SPLIT_BILL_KEK env → PBKDF2 → KEK → decrypt DEK → decrypt bills
+Mode B (PIN):    user PIN → PBKDF2 → KEK → decrypt DEK → decrypt bills
+```
+
+PIN toggle only re-wraps the DEK — bills are never re-encrypted.
+
+### Routing
+
+| Route | Page |
+|-------|------|
+| `/playground/split-bill` | Home — people list + bills list |
+| `/playground/split-bill/create` | Create new bill |
+| `/playground/split-bill/detail/:id` | Bill detail + payment toggles |
+| `/playground/split-bill/edit/:id` | Edit bill (resets payments) |
+
+### File Structure
+
+```
+src/components/playground/modules/split-bill/
+├── CryptoProvider.tsx       # DEK context shared across routes
+├── types.ts                 # BillPayload, BillParticipant, BillItem, etc.
+├── splitCalculator.ts       # Equal/Custom/Itemized compute logic
+├── validation.ts            # Form validation + error collection
+├── db/
+│   ├── schema.ts            # IndexedDB schema (idb)
+│   ├── database.ts          # openDB singleton
+│   ├── services.ts          # CRUD: participants, bills, settings
+│   └── index.ts             # Barrel
+├── hooks/
+│   ├── useCrypto.ts         # DEK init/unlock, PIN toggle
+│   ├── useParticipants.ts   # Global people CRUD
+│   ├── useBillData.ts       # Bill list + detail + payment toggle
+│   ├── useSplitForm.ts      # Create/edit form state
+│   └── index.ts
+├── components/
+│   ├── Modals.tsx           # ParticipantModal + DeleteConfirmModal
+│   ├── Placeholders.tsx     # Skeletons + EmptyState
+│   ├── ParticipantList.tsx  # Scrollable people list
+│   ├── BillCard.tsx         # Bill list item
+│   ├── BillForm.tsx         # Create/edit form + ParticipantSearch
+│   ├── BillBreakdown.tsx    # Detail view + payment toggles
+│   ├── SplitModeSelector.tsx
+│   ├── PaymentToggle.tsx
+│   ├── PinGate.tsx          # Lock screen
+│   ├── PinSetup.tsx         # PIN toggle UI
+│   └── index.ts
+├── pages/
+│   ├── HomePage.tsx
+│   ├── CreatePage.tsx
+│   ├── DetailPage.tsx
+│   └── EditPage.tsx
+
+src/lib/crypto/              # Reusable encryption layer
+├── aes.ts, kek.ts, dek.ts, types.ts, index.ts
+```
+
+### Environment Variable
+
+```
+VITE_SPLIT_BILL_KEK="your-passphrase-here"
+```
+
+Module is **disabled** if this env var is not set.
+
+### Limitations
+
+- Not security-grade — prevents casual reading of IndexedDB, not a secure vault
+- No export/import (future scope)
+- No partial payments (only paid/unpaid)
+- Clearing browser data = all bills lost (no cloud backup)

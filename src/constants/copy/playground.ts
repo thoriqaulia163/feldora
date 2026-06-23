@@ -94,4 +94,25 @@ export const PLAYGROUND_COPY = {
     disclaimer:
       'Predictions are experimental and should not be used as a primary reference. Results are based on historical climatological patterns with limited parameters, not real-time atmospheric data. Use official meteorological services (BMKG) for critical decisions.',
   },
+  splitBill: {
+    name: 'Split Bill',
+    description: 'Offline bill splitting with encrypted local storage.',
+    homePeople: 'Peserta',
+    homeBills: 'Bills',
+    addPerson: 'Tambah Peserta',
+    createBill: 'Buat Bill',
+    settings: 'Pengaturan',
+    pinLabel: 'Proteksi PIN',
+    pinActiveDesc: 'Aktif — data terkunci dengan PIN',
+    pinInactiveDesc: 'Nonaktif — data terenkripsi tanpa PIN',
+    splitModes: {
+      equal: 'Equal',
+      custom: 'Custom',
+      itemized: 'Itemized',
+    },
+    paymentStatus: {
+      paid: 'Paid',
+      unpaid: 'Unpaid',
+    },
+  },
 } as const

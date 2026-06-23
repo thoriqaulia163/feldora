@@ -42,9 +42,9 @@ export const PLAYGROUND_MODULES: PlaygroundModule[] = [
   {
     id: 'split-bill',
     name: 'Split Bill',
-    description: 'Coming soon',
+    description: 'Fully offline bill splitting with encrypted storage. Supports equal, custom, and itemized split modes. PIN-protectable.',
     label: 'Tool',
-    lastUpdated: '-',
-    estimatedDownloadSize: '-',
+    lastUpdated: '23 June 2026',
+    estimatedDownloadSize: '~0 KB',
   },
 ]

@@ -13,6 +13,14 @@ export interface UpdateEntry {
 export const WEB_UPDATE_LOG: UpdateEntry[] = [
   {
     date: '23 June 2026',
+    title: 'Split Bill module — offline encrypted bill splitting with PIN protection',
+    status: 'moderate',
+    type: 'update',
+    version: '1.14.0',
+    description: 'New playground module: split bills (equal/custom/itemized), encrypted IndexedDB with DEK+KEK, optional PIN lock, global reusable participants.',
+  },
+  {
+    date: '23 June 2026',
     title: 'PWA selective asset download: seamless offline preservation across deploys',
     status: 'moderate',
     type: 'update',

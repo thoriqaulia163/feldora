@@ -47,7 +47,8 @@ src/
 │   └── ui/         # Shared UI (Skeleton, Toast, ErrorState)
 ├── constants/      # Static data, copy, config
 ├── lib/            # API layer + ML engine
-│   └── ml/         # Random Forest, cities data, types
+│   ├── crypto/     # Reusable AES-GCM encryption (DEK + KEK)
+│   └── ml/         # Random Forest, GBT, cities data, types
 ├── routes/         # File-based routes (TanStack Router)
 ├── styles/         # Global CSS
 └── utils/          # Utility functions
@@ -64,8 +65,8 @@ public/
 
 - `/` — Home
 - `/about` — About Feldora
-- `/log` — Update changelog
 - `/playground` — AI & experiment modules
+- `/playground/split-bill` — Split Bill tool (encrypted, offline)
 - `/story` — Stories (blog)
 - `/story/:slug` — Individual story
 
@@ -75,7 +76,13 @@ Create a `.env` file:
 
 ```
 VITE_GRAPH_CMS_ENDPOINT="your-hygraph-endpoint"
+VITE_SPLIT_BILL_KEK="your-encryption-passphrase"
 ```
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `VITE_GRAPH_CMS_ENDPOINT` | Yes | Hygraph GraphQL endpoint for Story/blog content |
+| `VITE_SPLIT_BILL_KEK` | For Split Bill | Passphrase for local data encryption. Module disabled if not set. |
 
 ## Build & Deploy
 
