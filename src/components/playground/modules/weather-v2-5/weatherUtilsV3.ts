@@ -54,7 +54,7 @@ function computeDayLength(latitude: number, dayOfYear: number): number {
 }
 
 /**
- * Build feature vector for V3.
+ * Build feature vector for V2.5.
  * 12 features: [dayOfYear, lat, lng, elev, monsoonZone, localSeasonIndex, enso, iod, prevDayRain, sinDay, cosDay, dayLength]
  */
 export function buildFeatureVector(

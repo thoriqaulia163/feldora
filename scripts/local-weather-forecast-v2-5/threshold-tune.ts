@@ -1,5 +1,5 @@
 /**
- * Threshold Tuning for V3 (GBT) — no retrain needed.
+ * Threshold Tuning for V2.5 (GBT) — no retrain needed.
  *
  * Usage:
  *   npx tsx scripts/local-weather-forecast-v2-5/threshold-tune.ts
@@ -39,7 +39,7 @@ function main() {
   const modelPath = path.resolve(__dirname, '..', '..', 'public', 'ai-models', 'local-weather-forecast-v2-5', 'model.json')
   if (!fs.existsSync(datasetPath) || !fs.existsSync(modelPath)) { console.error('❌ Files not found.'); process.exit(1) }
 
-  console.log('\n🎯 Threshold Tuning V3 (GBT)\n')
+  console.log('\n🎯 Threshold Tuning V2.5 (GBT)\n')
   const model: Model = JSON.parse(fs.readFileSync(modelPath, 'utf-8'))
   const rawData: DatasetSample[] = JSON.parse(fs.readFileSync(datasetPath, 'utf-8'))
 

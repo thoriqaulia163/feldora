@@ -1,5 +1,5 @@
 /**
- * Gradient Boosted Trees — Local Weather Forecast V3
+ * Gradient Boosted Trees — Local Weather Forecast V2.5
  * Browser runtime: prediction only.
  *
  * Binary classification per time slot (Hujan / Tidak Hujan).

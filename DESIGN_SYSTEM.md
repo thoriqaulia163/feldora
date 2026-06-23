@@ -48,7 +48,7 @@ src/
 │   ├── home/            # Homepage sections (Hero, Featured, Updates, CTA)
 │   ├── layout/          # Navbar, Footer (persistent layout)
 │   ├── playground/      # Playground shell, module registry, types
-│   │   └── modules/     # Module implementations (weather/, weather-v2/, weather-v3/, etc.)
+│   │   └── modules/     # Module implementations (weather/, weather-v2/, weather-v2.5/, etc.)
 │   ├── story/           # Story list & detail components
 │   └── ui/              # Reusable UI components (LogCard, Carousel)
 ├── constants/
@@ -541,7 +541,7 @@ const CACHE_NAME   = 'feldora-v2'      // general
 const CACHE_PAGES  = 'feldora-pages-v2'
 const CACHE_ASSETS = 'feldora-assets-v2'
 ```
-Ubah semua suffix angka secara bersamaan (e.g., `v2` → `v3`). SW akan otomatis hapus cache lama saat activate via `caches.keys()` cleanup.
+Ubah semua suffix angka secara bersamaan (e.g., `v2` → `v2.5`). SW akan otomatis hapus cache lama saat activate via `caches.keys()` cleanup.
 
 ### Splash Screen
 

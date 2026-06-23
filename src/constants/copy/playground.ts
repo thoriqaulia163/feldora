@@ -88,7 +88,7 @@ export const PLAYGROUND_COPY = {
     ],
     aboutTitle: 'About',
     aboutDescription:
-      'This module predicts rain/no-rain for four time slots — Pagi (05:00–10:59), Siang (11:00–14:59), Sore (15:00–17:59), Malam (18:00–04:59) — using Gradient Boosted Trees trained on 5 years of hourly historical data from 287 Indonesian cities. Two prediction modes: Standard (threshold 0.5, higher accuracy ~72%) and Sensitive (tuned thresholds, higher F1 ~63%, significantly better rain detection especially at night). Compared to V2 (Random Forest), V3 produces better-calibrated probabilities enabling more effective threshold tuning.',
+      'This module predicts rain/no-rain for four time slots — Pagi (05:00–10:59), Siang (11:00–14:59), Sore (15:00–17:59), Malam (18:00–04:59) — using Gradient Boosted Trees trained on 5 years of hourly historical data from 287 Indonesian cities. Two prediction modes: Standard (threshold 0.5, higher accuracy ~72%) and Sensitive (tuned thresholds, higher F1 ~63%, significantly better rain detection especially at night). Compared to V2 (Random Forest), V2.5 produces better-calibrated probabilities enabling more effective threshold tuning.',
     aboutFeatures:
       'Features: day of year (+ sin/cos encoding), latitude, longitude, elevation, monsoon zone, local season, ENSO phase, IOD phase, previous day rain, and computed day length. Runs entirely in-browser.',
     disclaimer:

@@ -1,5 +1,5 @@
 /**
- * Model Generation for Local Weather Forecast V3
+ * Model Generation for Local Weather Forecast 2.5
  *
  * Gradient Boosted Trees (GBT), 4 independent models (per slot), parallel training.
  * 100 trees × depth 4 per slot, learning rate 0.1, binary classification.
@@ -269,7 +269,7 @@ if (!isMainThread && parentPort) {
   const rawData: DatasetSample[] = JSON.parse(fs.readFileSync(datasetPath, 'utf-8'))
   const splitIdx = Math.floor(rawData.length * 0.8)
 
-  console.log('\n🌳 Model Generation V3: Gradient Boosted Trees (PARALLEL)')
+  console.log('\n🌳 Model Generation V2.5: Gradient Boosted Trees (PARALLEL)')
   console.log(`   Config: ${N_TREES} trees/slot × ${NUM_SLOTS} slots, depth ${MAX_DEPTH}, lr ${LEARNING_RATE}`)
   console.log(`   Features: ${FEATURE_NAMES.length} (${FEATURE_NAMES.join(', ')})`)
   console.log(`   Dataset: ${rawData.length.toLocaleString()} (train: ${splitIdx.toLocaleString()} | test: ${(rawData.length - splitIdx).toLocaleString()})`)

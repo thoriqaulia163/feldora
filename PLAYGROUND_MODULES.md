@@ -390,7 +390,7 @@ Prediksi hujan per slot waktu (Pagi/Siang/Sore/Malam) menggunakan Gradient Boost
 
 ### Perbedaan dengan V2
 
-| Aspek | V2 | V3 |
+| Aspek | V2 | V2.5 |
 |-------|-----|-----|
 | Algorithm | Random Forest | Gradient Boosted Trees |
 | Trees per slot | 30 × depth 6 | 100 × depth 4 |
@@ -437,7 +437,7 @@ Prediksi hujan per slot waktu (Pagi/Siang/Sore/Malam) menggunakan Gradient Boost
 
 **Perbandingan semua versi (tuned):**
 
-| | V1 | V2 Sensitive | V3 Sensitive |
+| | V1 | V2 Sensitive | V2.5 Sensitive |
 |--|-----|--------------|--------------|
 | Accuracy | 65.35% | 72.46% | 70.8% |
 | Macro F1 | 65.35% | 58.43% | **63.1%** |
@@ -530,6 +530,6 @@ Per slot:
 
 - Sama seperti V2: fitur klimatologi statis tidak bisa menangkap variasi cuaca harian
 - Night slot masih challenging (distribusi 80/20) tapi jauh lebih baik dari V2
-- Computed features (sin/cos, dayLength) memberikan improvement minimal — kunci performa V3 ada di probability calibration GBT
+- Computed features (sin/cos, dayLength) memberikan improvement minimal — kunci performa V2.5 ada di probability calibration GBT
 - Training time ~9 min (parallel), RAM ~3-4 GB
 - prevDayRain bergantung pada input user (subjektif)

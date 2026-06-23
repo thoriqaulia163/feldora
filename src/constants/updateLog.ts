@@ -13,6 +13,14 @@ export interface UpdateEntry {
 export const WEB_UPDATE_LOG: UpdateEntry[] = [
   {
     date: '23 June 2026',
+    title: 'Cleaning "V3" copywriting in some file',
+    status: 'minor',
+    type: 'fixing',
+    version: '1.11.3',
+    description: 'Cleaning "V3" copywriting in some file',
+  },
+  {
+    date: '23 June 2026',
     title: 'Weather modules UI polish: label colors, toggle redesign',
     status: 'minor',
     type: 'fixing',
