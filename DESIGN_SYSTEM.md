@@ -447,101 +447,201 @@ Pada mobile, status & type icon di-push ke ujung kanan (`ml-auto`) sejajar denga
 
 ## PWA (Progressive Web App)
 
-Feldora diimplementasikan sebagai PWA untuk pengalaman installable dan offline support.
+Feldora diimplementasikan sebagai PWA untuk pengalaman installable dan offline support. Menggunakan Workbox untuk caching strategies dan custom Service Worker dengan prompt-based update mechanism.
+
+### Arsitektur Overview
+
+```
+Build Time:
+  Vite build → route-manifest.json (maps routes → chunks)
+             → sw.js (bundled from src/sw.ts via esbuild + Workbox)
+
+Runtime:
+  User visits routes → assets cached automatically (cache-first for hashed files)
+                     → navigation cached (network-first)
+
+Update Flow:
+  New deploy → browser detects new SW → SW stays "waiting"
+            → SW fetches new route-manifest.json
+            → SW downloads new chunks ONLY for previously visited routes
+            → SW notifies client: "Update ready"
+            → User sees UpdatePrompt banner
+            → User clicks "Update now" → skipWaiting → reload
+            → Entire app runs on new version
+```
 
 ### File PWA
 
 | File | Lokasi | Fungsi |
 |------|--------|--------|
 | `manifest.json` | `public/manifest.json` | Metadata app (nama, icon, display mode, warna) |
-| `sw.js` | `public/sw.js` | Service worker — caching & offline fallback |
-| `offline.html` | `public/offline.html` | Halaman custom saat user offline dan cache tidak tersedia |
+| `sw.ts` | `src/sw.ts` | Service Worker source — di-bundle saat build |
+| `sw.js` | `public/sw.js` (dev) / `dist/client/sw.js` (prod) | Dev: no-op. Prod: bundled SW |
+| `offline.html` | `public/offline.html` | Halaman custom saat offline & cache kosong |
+| `route-manifest.json` | Generated at build | Maps routes → chunk files per version |
+| `vite-plugin-route-manifest.ts` | `plugins/` | Vite plugin: generate route manifest |
+| `vite-plugin-sw-build.ts` | `plugins/` | Vite plugin: bundle SW via esbuild |
+| `UpdatePrompt.tsx` | `src/components/ui/` | Update notification banner |
 
-### Manifest
+### Service Worker Lifecycle
 
-```json
-{
-  "short_name": "Feldora",
-  "name": "FELDORA — A Cinematic Digital Universe",
-  "start_url": "/",
-  "display": "standalone",
-  "theme_color": "#0a0a0f",
-  "background_color": "#0a0a0f",
-  "orientation": "portrait-primary"
-}
 ```
+1. INSTALL (new SW detected)
+   - Do NOT call skipWaiting()
+   - Fetch route-manifest.json (new version)
+   - Inspect existing cache to determine which routes user has visited
+   - Download new chunks for: shared assets + previously visited route chunks
+   - Store in staging cache (feldora-staging)
+   - Notify client: postMessage({ type: 'UPDATE_READY' })
 
-- `display: standalone` — app terbuka tanpa browser UI (address bar hilang)
-- Warna theme & background menggunakan `feldora-bg` agar splash screen konsisten
+2. WAITING
+   - SW stays in waiting state until user approves
+   - Old SW continues serving from existing cache
+   - All offline functionality preserved
+
+3. ACTIVATE (user clicked "Update now")
+   - Client sends postMessage({ type: 'SKIP_WAITING' })
+   - Move staging cache → active asset cache
+   - Delete legacy caches
+   - clients.claim()
+   - Client reloads → entire app on new version
+```
 
 ### Cache Buckets
 
-SW menggunakan tiga cache terpisah untuk isolasi yang lebih baik:
+| Cache | Name | Strategy | Content |
+|-------|------|----------|---------|
+| Pages | `feldora-pages` | NetworkFirst | HTML navigation responses |
+| Assets | `feldora-assets` | CacheFirst | JS, CSS, fonts, images, AI models |
+| Staging | `feldora-staging` | Write-only (during install) | New version assets before activation |
 
-| Cache | Nama | Isi |
-|-------|------|-----|
-| Pages | `feldora-pages-v2` | HTML response semua halaman (navigation requests) |
-| Assets | `feldora-assets-v2` | JS, CSS, font, image, dan `offline.html` |
-| General | `feldora-v2` | Reserved — tidak aktif dipakai, hanya dijaga agar tidak terhapus |
+### Routing Strategies
 
-### Service Worker Strategy
-
-| Resource | Strategy | Alasan |
+| Resource | Strategy | Reason |
 |----------|----------|--------|
-| Navigation (halaman HTML) | **Network-first → layered cache fallback** | Selalu coba fresh dari server; fallback bertingkat saat offline |
-| Static assets (JS/CSS/font/image) | **Cache-first → network fallback** | Aman karena Vite output content-hashed filenames — file baru = URL baru |
-| Cross-origin (Hygraph API, Google Fonts) | **Network-only** | Tidak di-cache untuk menghindari stale data dari third-party |
+| Navigation (HTML) | NetworkFirst → cache fallback | Fresh content when online, cached when offline |
+| JS/CSS (hashed) | CacheFirst | Content-hashed = immutable, safe to cache forever |
+| Fonts (woff2) | CacheFirst | Rarely change, large files |
+| Images | CacheFirst (30 day expiry) | Moderate expiration |
+| AI Models (.json) | CacheFirst (90 day expiry) | Large, rarely updated |
+| route-manifest.json | NetworkFirst | Always want latest version info |
+| Cross-origin | Not handled (network-only) | API responses, third-party CDN |
 
-### Offline Fallback Chain (Navigation)
+### Selective Asset Download
 
-Ketika user offline dan membuka halaman, SW mencoba fallback secara berurutan:
+The most important feature: only download what the user actually uses.
 
+**Mechanism:**
+1. SW install fetches new `route-manifest.json`
+2. Inspects current `feldora-assets` cache for existing chunk files
+3. Cross-references with current manifest to determine which routes have been visited
+4. From new manifest, collects:
+   - All `shared` chunks (vendor, framework, CSS) — always needed
+   - Route-specific chunks ONLY for previously visited routes
+5. Downloads into `feldora-staging` cache
+6. Routes never visited remain lazy-loaded after update
+
+**Example:**
 ```
-1. Cache exact URL  →  ada? serve
-2. Cache URL tanpa query params  →  ada? serve
-3. Khusus /story/* → cache /story list  →  ada? serve
-4. Cache /  →  selalu ada (precached saat install)  →  serve
-5. Cache /offline.html  →  selalu ada (precached saat install)  →  serve
-6. Bare 503 inline HTML  →  last resort, praktis tidak pernah tercapai
+User visited: /, /about, /playground/local-weather-forecast
+Never visited: /story, /playground/local-weather-forecast-v2
+
+Update downloads: shared + / + /about + /playground/local-weather-forecast chunks
+Skips: /story chunks, /playground/local-weather-forecast-v2 chunks
 ```
 
-Karena `/` dan `/offline.html` selalu di-precache saat SW install, user tidak akan pernah melihat error browser native saat offline.
+### Route Usage Tracking
 
-### Precache
+**Method: Cache inspection** (no localStorage/IndexedDB needed)
 
-Di-precache otomatis saat SW install (non-fatal — satu gagal tidak block yang lain):
+- SW inspects `feldora-assets` cache for existing chunk files
+- Cross-references with `route-manifest.json` to determine which routes "own" those chunks
+- If a route's chunk is in cache → user has visited that route
+- Root `/` is always included regardless
 
-**Routes** (masuk ke `feldora-pages-v2`):
-- `/`, `/about`, `/log`, `/story`
+**Why cache inspection over alternatives:**
+- SW has direct access (no cross-thread sync needed)
+- Single source of truth (cache IS the usage record)
+- No storage quota concerns
+- Survives browser restarts
+- Self-cleaning (when cache is cleared, tracking resets — which is correct behavior)
 
-**Assets** (masuk ke `feldora-assets-v2`):
-- `/feldora-logo-192.png`, `/feldora-logo-512.png`, `/offline.html`
+### Route Manifest (Build-time)
 
-### Registration
+Generated by `plugins/vite-plugin-route-manifest.ts`:
 
-Service worker di-register via inline script di `__root.tsx`, **hanya di production** (bukan localhost):
-```js
-if ('serviceWorker' in navigator && location.hostname !== 'localhost') {
-  navigator.serviceWorker.register('/sw.js')
+```json
+{
+  "version": "1.11.2",
+  "buildId": "abc123",
+  "timestamp": "2026-06-23T...",
+  "routes": {
+    "/": { "chunks": ["assets/index-Hk4x.js"] },
+    "/about": { "chunks": ["assets/about-Lm3y.js"] },
+    "/playground/local-weather-forecast": { "chunks": ["assets/weather-Rp2w.js"] }
+  },
+  "shared": ["assets/vendor-Xz1a.js", "assets/framework-Bc4d.js", "assets/global-Mn9p.css"],
+  "all": ["assets/index-Hk4x.js", "assets/about-Lm3y.js", ...]
 }
 ```
 
-Ini mencegah caching yang mengganggu saat development. Di localhost, perubahan code langsung terlihat tanpa perlu unregister SW.
+Maps TanStack Router file-based routes to Vite output chunks. Enables:
+- Cross-version chunk mapping (same route, different hash)
+- Selective download (know exactly which files belong to which route)
 
-### Offline Page (`public/offline.html`)
+### Update Prompt UI (`UpdatePrompt.tsx`)
 
-Halaman static HTML dengan styling Feldora (dark bg, diamond markers, angular button).
-Di-precache saat SW install sehingga selalu tersedia. Ditampilkan hanya sebagai last resort — ketika semua halaman lain (termasuk `/`) tidak ada di cache. Dalam praktik normal tidak akan pernah muncul.
+Persistent banner (bottom-left, does not auto-dismiss):
+- Shows when SW enters "waiting" state with new version ready
+- "Update now" → triggers skipWaiting + reload
+- "Later" → dismisses, old version continues working offline
+- Re-appears on next page load if update still pending
 
-### Cache Versioning
+Detection methods (layered for reliability):
+1. SW `postMessage({ type: 'UPDATE_READY' })` — direct from SW
+2. `updatefound` + `statechange` event — from registration script
+3. `reg.waiting` check on mount — catches already-waiting SW
 
-Terdapat tiga cache name yang perlu di-bump saat deploy perubahan besar:
+### Registration
+
+Enhanced inline script in `__root.tsx`:
 ```js
-const CACHE_NAME   = 'feldora-v2'      // general
-const CACHE_PAGES  = 'feldora-pages-v2'
-const CACHE_ASSETS = 'feldora-assets-v2'
+if ('serviceWorker' in navigator && location.hostname !== 'localhost') {
+  navigator.serviceWorker.register('/sw.js').then(function(reg) {
+    // Periodic update check (every 60 minutes)
+    setInterval(function(){ reg.update() }, 60*60*1000);
+    // Detect waiting SW on load
+    if (reg.waiting) window.dispatchEvent(new CustomEvent('sw-update-ready'));
+    // Detect new SW entering waiting state
+    reg.addEventListener('updatefound', function() { ... });
+  });
+}
 ```
-Ubah semua suffix angka secara bersamaan (e.g., `v2` → `v2.5`). SW akan otomatis hapus cache lama saat activate via `caches.keys()` cleanup.
+
+### Version Consistency
+
+- Cache aktif dan staging **terpisah** — tidak pernah mixed-version
+- Activate hanya terjadi setelah staging lengkap terisi
+- Reload setelah activate memastikan HTML + JS + CSS semua versi baru
+- Jika staging download gagal (partial), update tidak ditawarkan ke user
+
+### Offline Fallback (Navigation)
+
+Workbox `NetworkFirst` strategy pada navigation requests. Fallback chain:
+1. Network response (if online) → cache response
+2. Cached exact URL
+3. Offline.html (precached as fallback)
+
+### Edge Cases
+
+| Skenario | Handling |
+|----------|----------|
+| User offline saat deploy baru | SW baru tidak ter-install sampai online |
+| Partial download fails | Staging incomplete → update not offered |
+| User clicks "Later" | Old SW stays active, full offline works |
+| "Later" then close browser | Waiting SW persists, prompt on next visit |
+| Route baru di versi baru | Lazy-loaded on first visit after update |
+| Legacy SW migration | Detects old `feldora-*-v2` caches, migrates page history |
 
 ### Splash Screen
 

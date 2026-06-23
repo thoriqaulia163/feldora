@@ -13,6 +13,14 @@ export interface UpdateEntry {
 export const WEB_UPDATE_LOG: UpdateEntry[] = [
   {
     date: '23 June 2026',
+    title: 'PWA offline redesign: prompt-based updates, selective asset download, Workbox',
+    status: 'major',
+    type: 'revamp',
+    version: '1.12.0',
+    description: 'New SW with route-manifest mapping, selective chunk download for visited routes only, staging cache, UpdatePrompt UI, and Workbox caching strategies.',
+  },
+  {
+    date: '23 June 2026',
     title: 'Cleaning "V3" copywriting in some file',
     status: 'minor',
     type: 'fixing',

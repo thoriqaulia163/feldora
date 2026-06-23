@@ -4,6 +4,8 @@ import react from '@vitejs/plugin-react'
 import { nitro } from 'nitro/vite'
 import path from 'node:path'
 import { readFileSync } from 'node:fs'
+import routeManifestPlugin from './plugins/vite-plugin-route-manifest'
+import swBuildPlugin from './plugins/vite-plugin-sw-build'
 
 const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'))
 
@@ -19,5 +21,5 @@ export default defineConfig({
       '~': path.resolve(__dirname, './src'),
     },
   },
-  plugins: [tanstackStart(), nitro(), react()],
+  plugins: [tanstackStart(), nitro(), react(), routeManifestPlugin(), swBuildPlugin()],
 })

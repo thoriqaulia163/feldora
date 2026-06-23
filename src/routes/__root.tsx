@@ -13,6 +13,7 @@ import { ErrorPage } from '~/components/layout/ErrorPage'
 import { GlobalLoader } from '~/components/ui/GlobalLoader'
 import { OfflineBanner } from '~/components/ui/OfflineBanner'
 import { ToastProvider } from '~/components/ui/Toast'
+import { UpdatePrompt } from '~/components/ui/UpdatePrompt'
 import appCss from '~/styles/global.css?url'
 
 export const Route = createRootRoute({
@@ -64,6 +65,7 @@ function RootComponent() {
         <RootDocument>
           <GlobalLoader />
           <OfflineBanner />
+          <UpdatePrompt />
           <Navbar />
           <main className="relative min-h-screen">
             <Outlet />
@@ -86,7 +88,28 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
         <Scripts />
         <script
           dangerouslySetInnerHTML={{
-            __html: `if('serviceWorker' in navigator && location.hostname !== 'localhost'){navigator.serviceWorker.register('/sw.js')}`,
+            __html: `
+if('serviceWorker' in navigator && location.hostname !== 'localhost'){
+  navigator.serviceWorker.register('/sw.js').then(function(reg){
+    // Check for updates periodically (every 60 min)
+    setInterval(function(){ reg.update() }, 60*60*1000);
+    // If a waiting SW exists on page load, notify immediately
+    if(reg.waiting){
+      navigator.serviceWorker.controller && navigator.serviceWorker.controller.postMessage({type:'__CHECK'});
+      window.dispatchEvent(new CustomEvent('sw-update-ready'));
+    }
+    // Listen for new SW entering waiting state
+    reg.addEventListener('updatefound', function(){
+      var newSW = reg.installing;
+      if(!newSW) return;
+      newSW.addEventListener('statechange', function(){
+        if(newSW.state === 'installed' && navigator.serviceWorker.controller){
+          window.dispatchEvent(new CustomEvent('sw-update-ready'));
+        }
+      });
+    });
+  });
+}`,
           }}
         />
       </body>
