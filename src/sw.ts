@@ -57,9 +57,15 @@ self.addEventListener('install', (event: ExtendableEvent) => {
 })
 
 async function handleInstall(): Promise<void> {
+  const isFirstInstall = !(await getCurrentManifest())
+
   // Fetch the new route manifest
   const newManifest = await fetchManifest()
-  if (!newManifest) return
+  if (!newManifest) {
+    // No manifest available — do basic precache for offline fallback
+    await precacheEssentials()
+    return
+  }
 
   // Determine which routes were previously used by inspecting existing cache
   const usedRoutes = await getUsedRoutes(newManifest)
@@ -97,7 +103,33 @@ async function handleInstall(): Promise<void> {
 
   await Promise.allSettled(downloads)
 
-  // Store the new manifest in staging for reference during activation
+  // Store the new manifest in active assets cache (not staging for first install)
+  if (isFirstInstall) {
+    // First install: put directly in active cache and skipWaiting immediately
+    const assets = await caches.open(CACHE_ASSETS)
+    const stagedKeys = await staging.keys()
+    for (const request of stagedKeys) {
+      const response = await staging.match(request)
+      if (response) await assets.put(request, response)
+    }
+    await caches.delete(CACHE_STAGING)
+
+    await assets.put(
+      '/route-manifest.json',
+      new Response(JSON.stringify(newManifest), {
+        headers: { 'Content-Type': 'application/json' },
+      })
+    )
+
+    // Precache essential pages for offline navigation
+    await precacheEssentials()
+
+    // First install: activate immediately (no prompt needed)
+    await (self as unknown as ServiceWorkerGlobalScope).skipWaiting()
+    return
+  }
+
+  // Subsequent installs (updates): stage assets and notify client
   await staging.put(
     '/route-manifest.json',
     new Response(JSON.stringify(newManifest), {
@@ -115,6 +147,41 @@ async function handleInstall(): Promise<void> {
   }
 }
 
+/**
+ * Precache essential pages for basic offline functionality.
+ * Called on first install and when manifest is unavailable.
+ */
+async function precacheEssentials(): Promise<void> {
+  const pages = await caches.open(CACHE_PAGES)
+  const essentialPages = ['/', '/offline.html']
+
+  await Promise.allSettled(
+    essentialPages.map(async (url) => {
+      try {
+        const response = await fetch(url, { credentials: 'same-origin' })
+        if (response.ok) await pages.put(url, response)
+      } catch {
+        // Non-fatal
+      }
+    })
+  )
+
+  // Also cache static assets that are always needed
+  const assets = await caches.open(CACHE_ASSETS)
+  const essentialAssets = ['/feldora-logo-192.png', '/feldora-logo-512.png']
+
+  await Promise.allSettled(
+    essentialAssets.map(async (url) => {
+      try {
+        const response = await fetch(url)
+        if (response.ok) await assets.put(url, response)
+      } catch {
+        // Non-fatal
+      }
+    })
+  )
+}
+
 // ─── Activate Event ─────────────────────────────────────────────────────────
 // Called when user approves the update (after skipWaiting is triggered by message)
 
@@ -123,32 +190,31 @@ self.addEventListener('activate', (event: ExtendableEvent) => {
 })
 
 async function handleActivate(): Promise<void> {
-  // Move staging cache to active asset cache
-  const staging = await caches.open(CACHE_STAGING)
-  const assets = await caches.open(CACHE_ASSETS)
+  // Move staging cache to active asset cache (if staging exists from an update)
+  const stagingExists = (await caches.keys()).includes(CACHE_STAGING)
 
-  const stagedKeys = await staging.keys()
-  for (const request of stagedKeys) {
-    const response = await staging.match(request)
-    if (response) {
-      await assets.put(request, response)
+  if (stagingExists) {
+    const staging = await caches.open(CACHE_STAGING)
+    const assets = await caches.open(CACHE_ASSETS)
+
+    const stagedKeys = await staging.keys()
+    for (const request of stagedKeys) {
+      const response = await staging.match(request)
+      if (response) {
+        await assets.put(request, response)
+      }
     }
+    await caches.delete(CACHE_STAGING)
   }
 
-  // Delete old caches
+  // Delete old/legacy caches
   const allCaches = await caches.keys()
-  const keepCaches = new Set([CACHE_ASSETS, CACHE_PAGES, CACHE_STAGING])
+  const keepCaches = new Set([CACHE_ASSETS, CACHE_PAGES])
   for (const name of allCaches) {
-    // Delete legacy caches and staging
-    if (!keepCaches.has(name) || name === CACHE_STAGING) {
+    if (!keepCaches.has(name)) {
       await caches.delete(name)
     }
   }
-
-  // Delete legacy v2 caches from old SW
-  await caches.delete('feldora-v2')
-  await caches.delete('feldora-pages-v2')
-  await caches.delete('feldora-assets-v2')
 
   // Claim all clients so the new SW takes over immediately
   clientsClaim()
