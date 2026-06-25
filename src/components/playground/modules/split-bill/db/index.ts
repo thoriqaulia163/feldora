@@ -2,17 +2,16 @@
  * Split Bill Database Layer — Barrel Export
  */
 
-export { getDB, closeDB } from './database'
+export { getDB, closeDB, deleteDatabase } from './database'
 export {
   getAllParticipants,
-  getParticipant,
   addParticipant,
   updateParticipant,
   deleteParticipant,
   participantNameExists,
-  getAllBills,
   getActiveBills,
   getBillRecord,
+  decryptBillTitle,
   decryptBillPayload,
   createBill,
   updateBill,
@@ -22,6 +21,8 @@ export {
   setSetting,
   deleteSetting,
   hasSetting,
+  type DecryptedParticipant,
+  type BillListRecord,
 } from './services'
 export type { ParticipantRecord, BillRecord, SplitBillDB, SettingsKey } from './schema'
 export { DB_NAME, DB_VERSION } from './schema'

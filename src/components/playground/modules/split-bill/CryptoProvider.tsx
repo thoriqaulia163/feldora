@@ -15,6 +15,7 @@ interface CryptoContextValue {
   unlockWithPIN: (pin: string) => Promise<boolean>
   enablePIN: (pin: string) => Promise<void>
   disablePIN: (currentPin: string) => Promise<boolean>
+  resetAll: () => Promise<void>
   error: string | null
 }
 

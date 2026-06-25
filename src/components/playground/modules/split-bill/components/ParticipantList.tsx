@@ -6,11 +6,11 @@
  */
 
 import { useState } from 'react'
-import type { ParticipantRecord } from '../db'
+import type { DecryptedParticipant } from '../db'
 import { DeleteConfirmModal } from './Modals'
 
 interface ParticipantListProps {
-  readonly participants: ParticipantRecord[]
+  readonly participants: DecryptedParticipant[]
   readonly onDelete: (id: string) => void
 }
 

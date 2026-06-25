@@ -3,26 +3,30 @@
  *
  * Database: db-playground-split-bill
  * Stores:
- *   - participants: global reusable people
- *   - splitBills: encrypted bill data
+ *   - participants: global reusable people (name encrypted)
+ *   - splitBills: bill data (title + payload encrypted, metadata plain)
  *   - settings: key-value config (crypto keys, preferences)
  */
 
 import type { DBSchema } from 'idb'
 import type { EncryptedPayload } from '~/lib/crypto'
 
-/** Participant record in global store */
+/** Participant record — name is encrypted */
 export interface ParticipantRecord {
   id: string
-  name: string
+  /** Encrypted name */
+  encryptedName: EncryptedPayload
   createdAt: number
 }
 
-/** Bill record with encrypted payload */
+/** Bill record — title + payload encrypted, metadata plain */
 export interface BillRecord {
   id: string
-  title: string
+  /** Encrypted title */
+  encryptedTitle: EncryptedPayload
+  /** Encrypted bill payload (participants, items, payments, splitMode) */
   encryptedPayload: EncryptedPayload
+  /** Plaintext metadata */
   createdAt: number
   updatedAt: number
   status: 'active' | 'archived'
@@ -41,7 +45,6 @@ export interface SplitBillDB extends DBSchema {
   participants: {
     key: string
     value: ParticipantRecord
-    indexes: { 'by-name': string }
   }
   splitBills: {
     key: string
@@ -55,4 +58,4 @@ export interface SplitBillDB extends DBSchema {
 }
 
 export const DB_NAME = 'db-playground-split-bill'
-export const DB_VERSION = 1
+export const DB_VERSION = 2

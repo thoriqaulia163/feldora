@@ -17,7 +17,7 @@ import {
   generateSalt,
   type EncryptedPayload,
 } from '~/lib/crypto'
-import { getSetting, setSetting } from '../db'
+import { getSetting, setSetting, deleteDatabase } from '../db'
 
 /** Crypto state stored in IndexedDB settings */
 interface StoredCryptoState {
@@ -41,6 +41,8 @@ interface UseCryptoReturn {
   enablePIN: (pin: string) => Promise<void>
   /** Disable PIN protection (requires current PIN) */
   disablePIN: (currentPin: string) => Promise<boolean>
+  /** Reset all data and start fresh (for key mismatch recovery) */
+  resetAll: () => Promise<void>
   /** Error message if status === 'error' */
   error: string | null
 }
@@ -166,5 +168,15 @@ export function useCrypto(): UseCryptoReturn {
     }
   }, [])
 
-  return { status, dek, pinEnabled, unlockWithPIN, enablePIN, disablePIN, error }
+  const resetAll = useCallback(async (): Promise<void> => {
+    await deleteDatabase()
+    // Re-initialize with fresh state
+    setDek(null)
+    setError(null)
+    setPinEnabled(false)
+    initRef.current = false
+    await firstTimeSetup()
+  }, [])
+
+  return { status, dek, pinEnabled, unlockWithPIN, enablePIN, disablePIN, resetAll, error }
 }

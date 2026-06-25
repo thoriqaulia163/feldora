@@ -17,7 +17,7 @@ import { computeTotalBill, computeOwes, sumItems, formatCurrency } from '../spli
 import { validateBillForm, hasErrors, collectErrorMessages } from '../validation'
 import { SplitModeSelector } from './SplitModeSelector'
 import type { BillParticipant, DecryptedBill } from '../types'
-import type { ParticipantRecord } from '../db'
+import type { DecryptedParticipant } from '../db'
 
 interface BillFormProps {
   readonly dek: CryptoKey
@@ -27,7 +27,7 @@ interface BillFormProps {
 }
 
 export function BillForm({ dek, existingBill, onSuccess, onCancel }: BillFormProps) {
-  const { participants: globalParticipants, addParticipant } = useParticipants()
+  const { participants: globalParticipants, addParticipant } = useParticipants(dek)
   const { toast } = useToast()
 
   const {
@@ -69,7 +69,7 @@ export function BillForm({ dek, existingBill, onSuccess, onCancel }: BillFormPro
     }
   }
 
-  function handleSelectPerson(p: ParticipantRecord) {
+  function handleSelectPerson(p: DecryptedParticipant) {
     const exists = form.participants.some((fp) => fp.participantId === p.id)
     if (!exists) {
       addParticipantToForm(p.id, p.name)
@@ -79,7 +79,7 @@ export function BillForm({ dek, existingBill, onSuccess, onCancel }: BillFormPro
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* 1. Title */}
-      <FieldGroup label="Title">
+      <FieldGroup label="Title" icon={<svg className="w-3.5 h-3.5 text-feldora-accent-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" /></svg>}>
         <input
           type="text"
           value={form.title}
@@ -91,7 +91,7 @@ export function BillForm({ dek, existingBill, onSuccess, onCancel }: BillFormPro
       </FieldGroup>
 
       {/* 2. Split Mode */}
-      <FieldGroup label="Split Method">
+      <FieldGroup label="Split Method" icon={<svg className="w-3.5 h-3.5 text-feldora-accent-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" /></svg>}>
         <SplitModeSelector value={form.splitMode} onChange={setSplitMode} />
         <p className="text-[11px] text-feldora-muted mt-1.5">
           {form.splitMode === 'equal' && 'Total bill divided equally among all people'}
@@ -101,7 +101,7 @@ export function BillForm({ dek, existingBill, onSuccess, onCancel }: BillFormPro
       </FieldGroup>
 
       {/* 3. Participants — searchable dropdown */}
-      <FieldGroup label="People">
+      <FieldGroup label="People" icon={<svg className="w-3.5 h-3.5 text-feldora-accent-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" /></svg>}>
         <ParticipantSearch
           globalParticipants={globalParticipants}
           selectedIds={form.participants.map((p) => p.participantId)}
@@ -190,9 +190,9 @@ function ParticipantSearch({
   onSelect,
   onAddNew,
 }: Readonly<{
-  globalParticipants: ParticipantRecord[]
+  globalParticipants: DecryptedParticipant[]
   selectedIds: string[]
-  onSelect: (p: ParticipantRecord) => void
+  onSelect: (p: DecryptedParticipant) => void
   onAddNew: (name: string) => void
 }>) {
   const [query, setQuery] = useState('')
@@ -221,7 +221,7 @@ function ParticipantSearch({
     (p) => p.name.toLowerCase() === query.trim().toLowerCase()
   )
 
-  function handleSelect(p: ParticipantRecord) {
+  function handleSelect(p: DecryptedParticipant) {
     onSelect(p)
     setQuery('')
     setOpen(false)
@@ -255,8 +255,29 @@ function ParticipantSearch({
       </div>
 
       {/* Dropdown */}
-      {open && (filtered.length > 0 || canAddNew) && (
+      {open && (
         <div className="absolute z-20 mt-1 w-full max-h-40 overflow-y-auto bg-feldora-surface border border-feldora-border rounded shadow-lg" style={{ scrollbarWidth: 'thin' }}>
+          {/* Always show +Add as first option */}
+          {canAddNew && (
+            <button
+              type="button"
+              onClick={handleAddNew}
+              className="w-full text-left px-3 py-2 text-sm text-feldora-accent hover:bg-feldora-surface-light transition-colors"
+            >
+              + Add &quot;{query.trim()}&quot;
+            </button>
+          )}
+          {!canAddNew && query.trim().length === 0 && (
+            <button
+              type="button"
+              onClick={() => inputRef.current?.focus()}
+              className="w-full text-left px-3 py-2 text-sm text-feldora-muted cursor-default"
+              disabled
+            >
+              Type a name to add...
+            </button>
+          )}
+          {/* Existing participants */}
           {filtered.slice(0, 10).map((p) => (
             <button
               key={p.id}
@@ -267,15 +288,6 @@ function ParticipantSearch({
               {p.name}
             </button>
           ))}
-          {canAddNew && (
-            <button
-              type="button"
-              onClick={handleAddNew}
-              className="w-full text-left px-3 py-2 text-sm text-feldora-accent border-t border-feldora-border/30 hover:bg-feldora-surface-light transition-colors"
-            >
-              + Add &quot;{query.trim()}&quot;
-            </button>
-          )}
         </div>
       )}
     </div>
@@ -397,14 +409,17 @@ function getSubmitLabel(isEdit: boolean): string {
 
 function FieldGroup({
   label,
+  icon,
   children,
 }: Readonly<{
   label: string
+  icon?: React.ReactNode
   children: React.ReactNode
 }>) {
   return (
     <div>
-      <p className="block text-xs text-white font-mono uppercase tracking-wider mb-2">
+      <p className="flex items-center gap-1.5 text-xs text-white font-mono uppercase tracking-wider mb-2">
+        {icon}
         {label}
       </p>
       {children}

@@ -1,7 +1,10 @@
 /**
  * DB Services — Participants, Bills, Settings
  *
- * All IndexedDB CRUD operations for the Split Bill module.
+ * Encryption strategy:
+ * - Participants: name encrypted, id plain
+ * - Bills: title + payload encrypted, metadata (createdAt, updatedAt, status) plain
+ * - Settings: DEK wrapper + config (not user data)
  */
 
 import { encrypt, decrypt, type EncryptedPayload } from '~/lib/crypto'
@@ -20,103 +23,184 @@ function generateBillId(): string {
 
 // ─── Participants ────────────────────────────────────────────────────
 
-export async function getAllParticipants(): Promise<ParticipantRecord[]> {
+/** Decrypted participant for in-memory use */
+export interface DecryptedParticipant {
+  id: string
+  name: string
+  createdAt: number
+}
+
+/**
+ * Get all participants and decrypt names.
+ * Returns decrypted records sorted by name.
+ */
+export async function getAllParticipants(dek: CryptoKey): Promise<DecryptedParticipant[]> {
   const db = await getDB()
   const all = await db.getAll('participants')
-  return all.sort((a, b) => a.name.localeCompare(b.name))
+  const decrypted: DecryptedParticipant[] = []
+
+  for (const record of all) {
+    try {
+      const name = await decrypt(record.encryptedName, dek)
+      decrypted.push({ id: record.id, name, createdAt: record.createdAt })
+    } catch {
+      // Skip corrupted records
+    }
+  }
+
+  return decrypted.sort((a, b) => a.name.localeCompare(b.name))
 }
 
-export async function getParticipant(id: string): Promise<ParticipantRecord | undefined> {
+/**
+ * Add a new participant (encrypt name).
+ */
+export async function addParticipant(name: string, dek: CryptoKey): Promise<DecryptedParticipant> {
   const db = await getDB()
-  return db.get('participants', id)
-}
-
-export async function addParticipant(name: string): Promise<ParticipantRecord> {
-  const db = await getDB()
+  const encryptedName = await encrypt(name.trim(), dek)
   const record: ParticipantRecord = {
     id: generateParticipantId(),
-    name: name.trim(),
+    encryptedName,
     createdAt: Date.now(),
   }
   await db.put('participants', record)
-  return record
+  return { id: record.id, name: name.trim(), createdAt: record.createdAt }
 }
 
-export async function updateParticipant(id: string, name: string): Promise<ParticipantRecord | undefined> {
+/**
+ * Update participant name (re-encrypt).
+ */
+export async function updateParticipant(id: string, name: string, dek: CryptoKey): Promise<DecryptedParticipant | undefined> {
   const db = await getDB()
   const existing = await db.get('participants', id)
   if (!existing) return undefined
-  const updated: ParticipantRecord = { ...existing, name: name.trim() }
+
+  const encryptedName = await encrypt(name.trim(), dek)
+  const updated: ParticipantRecord = { ...existing, encryptedName }
   await db.put('participants', updated)
-  return updated
+  return { id, name: name.trim(), createdAt: existing.createdAt }
 }
 
+/**
+ * Delete a participant.
+ */
 export async function deleteParticipant(id: string): Promise<void> {
   const db = await getDB()
   await db.delete('participants', id)
 }
 
-export async function participantNameExists(name: string): Promise<boolean> {
-  const all = await getAllParticipants()
+/**
+ * Check if a participant name exists (requires decrypting all names).
+ */
+export async function participantNameExists(name: string, dek: CryptoKey): Promise<boolean> {
+  const all = await getAllParticipants(dek)
   const normalized = name.trim().toLowerCase()
   return all.some((p) => p.name.toLowerCase() === normalized)
 }
 
 // ─── Bills ───────────────────────────────────────────────────────────
 
-export async function getAllBills(): Promise<BillRecord[]> {
-  const db = await getDB()
-  const all = await db.getAll('splitBills')
-  return all.sort((a, b) => b.updatedAt - a.updatedAt)
+/** Decrypted bill title for list display */
+export interface BillListRecord {
+  id: string
+  title: string
+  createdAt: number
+  updatedAt: number
+  status: 'active' | 'archived'
 }
 
-export async function getActiveBills(): Promise<BillRecord[]> {
+/**
+ * Get all active bills with decrypted titles (no payload decrypt).
+ * Sorted by updatedAt DESC.
+ */
+export async function getActiveBills(dek: CryptoKey): Promise<BillListRecord[]> {
   const db = await getDB()
   const all = await db.getAllFromIndex('splitBills', 'by-status', 'active')
-  return all.sort((a, b) => b.updatedAt - a.updatedAt)
+  const results: BillListRecord[] = []
+
+  for (const record of all) {
+    try {
+      const title = await decrypt(record.encryptedTitle, dek)
+      results.push({ id: record.id, title, createdAt: record.createdAt, updatedAt: record.updatedAt, status: record.status })
+    } catch {
+      results.push({ id: record.id, title: '[Encrypted]', createdAt: record.createdAt, updatedAt: record.updatedAt, status: record.status })
+    }
+  }
+
+  return results.sort((a, b) => b.updatedAt - a.updatedAt)
 }
 
+/**
+ * Get a single bill record (raw, still encrypted).
+ */
 export async function getBillRecord(id: string): Promise<BillRecord | undefined> {
   const db = await getDB()
   return db.get('splitBills', id)
 }
 
+/**
+ * Decrypt a bill's title.
+ */
+export async function decryptBillTitle(record: BillRecord, dek: CryptoKey): Promise<string> {
+  return decrypt(record.encryptedTitle, dek)
+}
+
+/**
+ * Decrypt a bill's payload.
+ */
 export async function decryptBillPayload<T>(encryptedPayload: EncryptedPayload, dek: CryptoKey): Promise<T> {
   const json = await decrypt(encryptedPayload, dek)
   return JSON.parse(json) as T
 }
 
-export async function createBill(title: string, payload: unknown, dek: CryptoKey): Promise<BillRecord> {
+/**
+ * Create a new bill (encrypt title + payload).
+ */
+export async function createBill(title: string, payload: unknown, dek: CryptoKey): Promise<BillListRecord> {
   const db = await getDB()
   const now = Date.now()
+  const encryptedTitle = await encrypt(title.trim(), dek)
   const encryptedPayload = await encrypt(JSON.stringify(payload), dek)
+
   const record: BillRecord = {
     id: generateBillId(),
-    title: title.trim(),
+    encryptedTitle,
     encryptedPayload,
     createdAt: now,
     updatedAt: now,
     status: 'active',
   }
   await db.put('splitBills', record)
-  return record
+  return { id: record.id, title: title.trim(), createdAt: now, updatedAt: now, status: 'active' }
 }
 
-export async function updateBill(id: string, title: string, payload: unknown, dek: CryptoKey): Promise<BillRecord | undefined> {
+/**
+ * Update an existing bill (re-encrypt title + payload).
+ */
+export async function updateBill(id: string, title: string, payload: unknown, dek: CryptoKey): Promise<BillListRecord | undefined> {
   const db = await getDB()
   const existing = await db.get('splitBills', id)
   if (!existing) return undefined
+
+  const encryptedTitle = await encrypt(title.trim(), dek)
   const encryptedPayload = await encrypt(JSON.stringify(payload), dek)
-  const updated: BillRecord = { ...existing, title: title.trim(), encryptedPayload, updatedAt: Date.now() }
+  const now = Date.now()
+
+  const updated: BillRecord = { ...existing, encryptedTitle, encryptedPayload, updatedAt: now }
   await db.put('splitBills', updated)
-  return updated
+  return { id, title: title.trim(), createdAt: existing.createdAt, updatedAt: now, status: existing.status }
 }
 
+/**
+ * Delete a bill.
+ */
 export async function deleteBill(id: string): Promise<void> {
   const db = await getDB()
   await db.delete('splitBills', id)
 }
 
+/**
+ * Archive a bill (soft delete — metadata only, no decrypt needed).
+ */
 export async function archiveBill(id: string): Promise<void> {
   const db = await getDB()
   const existing = await db.get('splitBills', id)

@@ -1,5 +1,8 @@
 /**
  * useBills + useBillDetail — Bill list & detail hooks
+ *
+ * List: decrypt titles only (no payload decrypt for performance).
+ * Detail: decrypt full payload on demand.
  */
 
 import { useState, useEffect, useCallback } from 'react'
@@ -7,19 +10,18 @@ import {
   getActiveBills,
   deleteBill as dbDeleteBill,
   getBillRecord,
-  updateBill,
+  decryptBillTitle,
   decryptBillPayload,
+  updateBill,
+  type BillListRecord,
 } from '../db'
-import type { BillRecord } from '../db/schema'
 import type { BillPayload, DecryptedBill, PaymentStatus } from '../types'
-import { generateBillSummaryText } from '../splitCalculator'
 
-// ─── useBills (list) ─────────────────────────────────────────────────
+// ─── useBills (list — title only, no payload decrypt) ────────────────
 
 export interface BillListItem {
   id: string
   title: string
-  summary: string
   createdAt: number
   updatedAt: number
 }
@@ -42,9 +44,8 @@ export function useBills(dek: CryptoKey | null): UseBillsReturn {
 
     try {
       setLoading(true)
-      const records = await getActiveBills()
-      const items = await decryptBillSummaries(records, dek)
-      setBills(items)
+      const records = await getActiveBills(dek)
+      setBills(records.map((r) => ({ id: r.id, title: r.title, createdAt: r.createdAt, updatedAt: r.updatedAt })))
       setError(null)
     } catch (err) {
       setError('Failed to load bills')
@@ -70,27 +71,7 @@ export function useBills(dek: CryptoKey | null): UseBillsReturn {
   return { bills, loading, error, deleteBill, refresh: loadBills }
 }
 
-async function decryptBillSummaries(records: BillRecord[], dek: CryptoKey): Promise<BillListItem[]> {
-  const items: BillListItem[] = []
-  for (const record of records) {
-    try {
-      const payload = await decryptBillPayload<BillPayload>(record.encryptedPayload, dek)
-      items.push({
-        id: record.id,
-        title: record.title,
-        summary: generateBillSummaryText(payload.participants, payload.splitMode),
-        createdAt: record.createdAt,
-        updatedAt: record.updatedAt,
-      })
-    } catch (err) {
-      console.warn(`[useBills] Failed to decrypt bill ${record.id}:`, err)
-      items.push({ id: record.id, title: record.title, summary: 'Unable to decrypt', createdAt: record.createdAt, updatedAt: record.updatedAt })
-    }
-  }
-  return items
-}
-
-// ─── useBillDetail (single) ──────────────────────────────────────────
+// ─── useBillDetail (full payload decrypt) ────────────────────────────
 
 interface UseBillDetailReturn {
   bill: DecryptedBill | null
@@ -113,8 +94,9 @@ export function useBillDetail(id: string, dek: CryptoKey | null): UseBillDetailR
       const record = await getBillRecord(id)
       if (!record) { setError('Bill not found'); setLoading(false); return }
 
+      const title = await decryptBillTitle(record, dek)
       const payload = await decryptBillPayload<BillPayload>(record.encryptedPayload, dek)
-      setBill({ id: record.id, title: record.title, createdAt: record.createdAt, updatedAt: record.updatedAt, status: record.status, payload })
+      setBill({ id: record.id, title, createdAt: record.createdAt, updatedAt: record.updatedAt, status: record.status, payload })
       setError(null)
     } catch (err) {
       setError('Failed to load bill detail')

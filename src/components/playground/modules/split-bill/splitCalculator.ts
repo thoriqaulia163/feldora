@@ -78,7 +78,7 @@ export function generateBillSummaryText(
   participants: BillParticipant[],
   splitMode: string
 ): string {
-  const people = `${participants.length} orang`
+  const people = `${participants.length} people`
   const total = formatCurrency(computeTotalBill(participants))
   const mode = splitMode.charAt(0).toUpperCase() + splitMode.slice(1)
   return `${people} · ${total} · ${mode}`

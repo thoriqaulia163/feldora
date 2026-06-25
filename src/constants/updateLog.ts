@@ -13,6 +13,22 @@ export interface UpdateEntry {
 export const WEB_UPDATE_LOG: UpdateEntry[] = [
   {
     date: '23 June 2026',
+    title: 'Split Bill: QR sharing (generate, scan, import)',
+    status: 'minor',
+    type: 'update',
+    version: '1.14.2',
+    description: 'Share bills via encrypted QR code. Scan from camera or import image. Confirm step with editable title before saving imported bill.',
+  },
+  {
+    date: '23 June 2026',
+    title: 'Split Bill: full encryption (title + participant names) & bill search',
+    status: 'minor',
+    type: 'update',
+    version: '1.14.1',
+    description: 'Bill title and participant names now encrypted in IndexedDB. Added bill search on home. Removed summary text from bill list for privacy.',
+  },
+  {
+    date: '23 June 2026',
     title: 'Split Bill module — offline encrypted bill splitting with PIN protection',
     status: 'moderate',
     type: 'update',

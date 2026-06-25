@@ -571,22 +571,33 @@ Offline bill splitting tool with encrypted local storage. Supports 3 split modes
 
 Each participant in a bill owns items (name + price). The bill total is auto-computed from all items.
 
+**Storage encryption:**
+
+| Field | Encrypted? | Decrypt when |
+|-------|-----------|--------------|
+| Participant `name` | Yes | Home page load (all, cached in memory) |
+| Bill `title` | Yes | Home page load (all, cached in memory) |
+| Bill `payload` (items, payments, splitMode) | Yes | Detail page open (single, on-demand) |
+| Bill metadata (`createdAt`, `updatedAt`, `status`) | No | Never (already raw) |
+| Participant `id` | No | Never |
+
 ```
-Bill {
-  title, splitMode,
-  participants: [{ name, items: [{name, price}], customTotal? }],
-  payments: [{ participantId, status: 'paid'|'unpaid' }]
-}
+IndexedDB schema:
+  participants: { id (plain), encryptedName, createdAt }
+  splitBills: { id, encryptedTitle, encryptedPayload, createdAt, updatedAt, status }
+  settings: { key, value }
 ```
 
 ### Encryption (DEK + KEK)
 
 ```
-Mode A (no PIN): VITE_SPLIT_BILL_KEK env → PBKDF2 → KEK → decrypt DEK → decrypt bills
-Mode B (PIN):    user PIN → PBKDF2 → KEK → decrypt DEK → decrypt bills
+Mode A (no PIN): VITE_SPLIT_BILL_KEK env → PBKDF2 → KEK → decrypt DEK → decrypt data
+Mode B (PIN):    user PIN → PBKDF2 → KEK → decrypt DEK → decrypt data
 ```
 
-PIN toggle only re-wraps the DEK — bills are never re-encrypted.
+PIN toggle only re-wraps the DEK — encrypted data is never re-encrypted.
+
+If the encryption key (env var) changes, existing data cannot be decrypted. A "Reset All Data" option is provided to start fresh with the new key.
 
 ### Routing
 
@@ -646,9 +657,42 @@ VITE_SPLIT_BILL_KEK="your-passphrase-here"
 
 Module is **disabled** if this env var is not set.
 
+### QR Sharing
+
+Bills can be shared via QR code between users with the same encryption key.
+
+**Share flow (Detail page):**
+1. Click Share button (share + QR icon) → ShareModal opens
+2. QR code generated from encrypted + compressed bill data
+3. Options: Share via Web Share API, or Download as PNG
+
+**Import flow (Home page):**
+1. Click "QR" button next to search → ImportQRModal opens
+2. Choose: Scan with Camera (live video) or Import from Image (file picker)
+3. QR decoded successfully → **Confirm step**: modal shows "Add this bill?" with editable title input
+4. User can modify title (content stays same) → click Save
+5. Bill created → navigate to detail page
+
+**Technical details:**
+- Encode: JSON → AES-GCM encrypt (DEK) → pako deflate → base64 → QR image
+- Decode: QR string → base64 → pako inflate → AES-GCM decrypt (DEK) → JSON
+- Max QR capacity: ~2,900 bytes compressed. Bills exceeding this show error.
+- Libraries: `qrcode` (generate), `jsqr` (read/scan), `pako` (compress/decompress)
+- QR prefix: `FDSB:` (Feldora Split Bill marker for validation)
+
+**Files:**
+```
+src/components/playground/modules/split-bill/
+├── qr.ts                        # Encode/decode utilities
+├── components/ShareModal.tsx    # QR display + share + download
+├── components/ImportQRModal.tsx # Camera scan + file import + confirm step
+```
+
 ### Limitations
 
 - Not security-grade — prevents casual reading of IndexedDB, not a secure vault
-- No export/import (future scope)
+- QR sharing requires same VITE_SPLIT_BILL_KEK on both devices
+- Large bills (10+ people × 15+ items) may exceed QR capacity (~2,900 bytes compressed)
+- No export/import for bulk data (only single bill via QR)
 - No partial payments (only paid/unpaid)
 - Clearing browser data = all bills lost (no cloud backup)
