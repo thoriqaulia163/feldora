@@ -13,6 +13,14 @@ export interface UpdateEntry {
 export const WEB_UPDATE_LOG: UpdateEntry[] = [
   {
     date: '23 June 2026',
+    title: 'Split Bill: fix QR cross-device decrypt, import always visible',
+    status: 'minor',
+    type: 'fixing',
+    version: '1.14.3',
+    description: 'QR now uses shared key from env (not per-device DEK). Import QR button visible even with empty bill list. PIN state does not affect QR compatibility.',
+  },
+  {
+    date: '23 June 2026',
     title: 'Split Bill: QR sharing (generate, scan, import)',
     status: 'minor',
     type: 'update',

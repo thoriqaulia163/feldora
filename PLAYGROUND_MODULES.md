@@ -674,11 +674,13 @@ Bills can be shared via QR code between users with the same encryption key.
 5. Bill created → navigate to detail page
 
 **Technical details:**
-- Encode: JSON → AES-GCM encrypt (DEK) → pako deflate → base64 → QR image
-- Decode: QR string → base64 → pako inflate → AES-GCM decrypt (DEK) → JSON
+- Encode: JSON → AES-GCM encrypt (shared QR key) → pako deflate → base64 → QR image
+- Decode: QR string → base64 → pako inflate → AES-GCM decrypt (shared QR key) → JSON
+- **QR key** is derived from `VITE_SPLIT_BILL_KEK` + fixed salt — NOT from DEK or PIN. This ensures all devices with the same env var can decrypt regardless of PIN state.
 - Max QR capacity: ~2,900 bytes compressed. Bills exceeding this show error.
 - Libraries: `qrcode` (generate), `jsqr` (read/scan), `pako` (compress/decompress)
 - QR prefix: `FDSB:` (Feldora Split Bill marker for validation)
+- Import QR button always visible (even when bill list is empty)
 
 **Files:**
 ```
