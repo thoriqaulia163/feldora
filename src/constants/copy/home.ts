@@ -1,9 +1,9 @@
 export const HOME_COPY = {
   hero: {
     label: 'Enter the Universe',
-    subtitle: 'A cinematic digital platform where technology meets bold storytelling. Explore stories, discover updates, and experience the future of the web.',
+    subtitle: 'A cinematic digital platform where technology meets bold storytelling. Explore stories, discover experiments, and experience the craftmanship of idea & story.',
     cta: {
-      primary: 'Explore Stories',
+      primary: 'Explore Now',
       secondary: 'Learn More',
     },
   },

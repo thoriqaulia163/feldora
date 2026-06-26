@@ -45,6 +45,6 @@ export const PLAYGROUND_MODULES: PlaygroundModule[] = [
     description: 'Fully offline bill splitting with encrypted storage. Supports equal, custom, and itemized split modes. PIN-protectable.',
     label: 'Tool',
     lastUpdated: '23 June 2026',
-    estimatedDownloadSize: '~0 KB',
+    estimatedDownloadSize: '~150 KB',
   },
 ]

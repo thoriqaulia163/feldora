@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { HOME_COPY } from '~/constants/copy'
-import { HERO_CAROUSEL_CONFIG } from './heroCarouselConfig'
+import { PLAYGROUND_MODULES } from '~/components/playground/moduleRegistry'
 import { useGetPosts } from '~/lib/queries'
 import { Carousel } from '~/components/ui/Carousel'
 import type { Post } from '~/lib/graphql'
@@ -42,6 +42,7 @@ export function HeroSection() {
         <Carousel autoScroll interval={10000} pauseOnHover>
           <SlideIntro />
           <SlidePlayground />
+          <SlideSplitBill />
           <SlideStory post={latestPost} />
           <SlideAbout />
         </Carousel>
@@ -87,9 +88,16 @@ function SlideIntro() {
         </div>
 
         <div className="mt-10 flex flex-wrap items-center gap-4">
-          <Link to="/story" className="btn-angular-primary">
+          <button
+            type="button"
+            onClick={() => {
+              const section = document.getElementById('featured-section')
+              section?.scrollIntoView({ behavior: 'smooth' })
+            }}
+            className="btn-angular-primary"
+          >
             {HOME_COPY.hero.cta.primary}
-          </Link>
+          </button>
           <Link to="/about" className="btn-angular-outline">
             {HOME_COPY.hero.cta.secondary}
           </Link>
@@ -117,7 +125,7 @@ function SlideIntro() {
 // ─── Slide: Playground Highlight ───────────────────────────────────────────
 
 function SlidePlayground() {
-  const mod = HERO_CAROUSEL_CONFIG.highlightedModule
+  const mod = PLAYGROUND_MODULES.find((m) => m.id === 'local-weather-forecast') ?? PLAYGROUND_MODULES[0]
 
   return (
     <div className="grid lg:grid-cols-12 gap-8 items-center w-full">
@@ -194,6 +202,107 @@ function SlidePlayground() {
           {/* 514 cities badge */}
           <div className="absolute -bottom-3 -right-3 bg-feldora-accent-secondary px-2 py-1">
             <span className="text-white font-mono text-[9px] font-bold">514 CITIES</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── Slide: Split Bill ─────────────────────────────────────────────────────
+
+function SlideSplitBill() {
+  const splitBill = PLAYGROUND_MODULES.find((m) => m.id === 'split-bill')
+
+  return (
+    <div className="grid lg:grid-cols-12 gap-8 items-center w-full">
+      <div className="lg:col-span-7">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="diamond-marker" />
+          <span className="text-feldora-accent-secondary font-mono text-xs uppercase tracking-[0.4em]">
+            Playground
+          </span>
+        </div>
+
+        <h2 className="text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight leading-[0.85] mb-4">
+          <span className="text-feldora-text">Split </span>
+          <span className="text-feldora-accent">Bill</span>
+        </h2>
+
+        <div className="pl-4 border-l-2 border-feldora-accent/50 mb-6">
+          <p className="text-feldora-text-secondary text-base md:text-lg leading-relaxed max-w-xl">
+            {splitBill?.description ?? 'Offline bill splitting with encrypted local storage. Equal, custom, and itemized split modes with QR sharing.'}
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3 mb-8">
+          <span className="font-mono text-[10px] uppercase tracking-wider px-2.5 py-1 border bg-amber-400/20 text-amber-400 border-amber-400/30">
+            Tool
+          </span>
+          <span className="font-mono text-[10px] uppercase tracking-wider px-2.5 py-1 border bg-feldora-surface-light text-feldora-muted border-feldora-border/50">
+            Offline
+          </span>
+          <span className="font-mono text-[10px] uppercase tracking-wider px-2.5 py-1 border bg-feldora-surface-light text-feldora-muted border-feldora-border/50">
+            Encrypted
+          </span>
+        </div>
+
+        <Link to="/playground/split-bill" className="btn-angular-primary">
+          View Module
+        </Link>
+      </div>
+
+      {/* Visual: Split Bill illustration */}
+      <div className="lg:col-span-5 hidden lg:flex items-center justify-center">
+        <div className="relative w-full max-w-[340px] aspect-square">
+          {/* Outer frame */}
+          <div className="absolute inset-0 border border-feldora-accent/20 rotate-3" />
+          <div className="absolute inset-3 border border-feldora-border/40 -rotate-2" />
+
+          {/* Central bill illustration */}
+          <div className="absolute inset-8 bg-feldora-surface/60 border border-feldora-border/30 flex flex-col items-center justify-center gap-4 p-5">
+            {/* Bill/receipt icon */}
+            <svg className="w-14 h-14 text-feldora-accent" viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M16 8h32v48l-4-3-4 3-4-3-4 3-4-3-4 3-4-3-4 3V8z" />
+              <path d="M24 20h16M24 28h12M24 36h14" strokeLinecap="round" />
+              <circle cx="44" cy="36" r="6" fill="currentColor" opacity="0.2" />
+              <path d="M42 36h4M44 34v4" strokeLinecap="round" strokeWidth="1.5" />
+            </svg>
+
+            {/* Fake split preview */}
+            <div className="w-full space-y-2">
+              <div className="flex items-center justify-between px-2 py-1.5 bg-feldora-bg/60 border border-feldora-border/30 rounded">
+                <span className="text-feldora-text text-[10px] font-semibold">Andi</span>
+                <span className="text-feldora-accent font-mono text-[10px]">Rp 45.000</span>
+              </div>
+              <div className="flex items-center justify-between px-2 py-1.5 bg-feldora-bg/60 border border-feldora-border/30 rounded">
+                <span className="text-feldora-text text-[10px] font-semibold">Budi</span>
+                <span className="text-feldora-accent font-mono text-[10px]">Rp 35.000</span>
+              </div>
+              <div className="flex items-center justify-between px-2 py-1.5 bg-feldora-bg/60 border border-feldora-border/30 rounded">
+                <span className="text-feldora-text text-[10px] font-semibold">Citra</span>
+                <span className="text-feldora-accent font-mono text-[10px]">Rp 20.000</span>
+              </div>
+            </div>
+
+            {/* QR hint */}
+            <div className="flex items-center gap-1.5 text-feldora-muted">
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 3.75 9.375v-4.5ZM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5ZM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 13.5 9.375v-4.5Z" />
+              </svg>
+              <span className="font-mono text-[8px] uppercase tracking-wider">QR Share</span>
+            </div>
+          </div>
+
+          {/* Corner accents */}
+          <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-feldora-accent-secondary" />
+          <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-feldora-accent-secondary" />
+          <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-feldora-accent-secondary" />
+          <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-feldora-accent-secondary" />
+
+          {/* Encrypted badge */}
+          <div className="absolute -bottom-3 -right-3 bg-feldora-accent-secondary px-2 py-1">
+            <span className="text-white font-mono text-[9px] font-bold">ENCRYPTED</span>
           </div>
         </div>
       </div>

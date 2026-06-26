@@ -11,6 +11,18 @@ export default defineConfig({
   server: {
     port: 3210,
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          // Bundle all split-bill module files into a single chunk
+          if (id.includes('modules/split-bill') || id.includes('routes/playground.split-bill')) {
+            return 'split-bill'
+          }
+        },
+      },
+    },
+  },
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
   },

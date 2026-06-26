@@ -12,7 +12,23 @@ export interface UpdateEntry {
 
 export const WEB_UPDATE_LOG: UpdateEntry[] = [
   {
-    date: '23 June 2026',
+    date: '26 June 2026',
+    title: 'Split Bill: single chunk loading via Vite manualChunks',
+    status: 'minor',
+    type: 'refactor',
+    version: '1.14.5',
+    description: 'All split-bill routes and components bundled into one chunk. Opening the module loads everything at once — no extra requests for sub-pages.',
+  },
+  {
+    date: '26 June 2026',
+    title: 'Hero carousel: Split Bill slide, intro CTA scroll, remove config file',
+    status: 'minor',
+    type: 'refactor',
+    version: '1.14.4',
+    description: 'Added Split Bill slide to hero carousel (now 5 slides). Intro CTA scrolls to Featured section instead of navigating. Removed heroCarouselConfig.ts. Updated hero subtitle & CTA copy.',
+  },
+  {
+    date: '25 June 2026',
     title: 'Split Bill: fix QR cross-device decrypt, import always visible',
     status: 'minor',
     type: 'fixing',
@@ -20,7 +36,7 @@ export const WEB_UPDATE_LOG: UpdateEntry[] = [
     description: 'QR now uses shared key from env (not per-device DEK). Import QR button visible even with empty bill list. PIN state does not affect QR compatibility.',
   },
   {
-    date: '23 June 2026',
+    date: '25 June 2026',
     title: 'Split Bill: QR sharing (generate, scan, import)',
     status: 'minor',
     type: 'update',
@@ -28,7 +44,7 @@ export const WEB_UPDATE_LOG: UpdateEntry[] = [
     description: 'Share bills via encrypted QR code. Scan from camera or import image. Confirm step with editable title before saving imported bill.',
   },
   {
-    date: '23 June 2026',
+    date: '25 June 2026',
     title: 'Split Bill: full encryption (title + participant names) & bill search',
     status: 'minor',
     type: 'update',
@@ -36,7 +52,7 @@ export const WEB_UPDATE_LOG: UpdateEntry[] = [
     description: 'Bill title and participant names now encrypted in IndexedDB. Added bill search on home. Removed summary text from bill list for privacy.',
   },
   {
-    date: '23 June 2026',
+    date: '25 June 2026',
     title: 'Split Bill module — offline encrypted bill splitting with PIN protection',
     status: 'moderate',
     type: 'update',
@@ -44,7 +60,7 @@ export const WEB_UPDATE_LOG: UpdateEntry[] = [
     description: 'New playground module: split bills (equal/custom/itemized), encrypted IndexedDB with DEK+KEK, optional PIN lock, global reusable participants.',
   },
   {
-    date: '23 June 2026',
+    date: '24 June 2026',
     title: 'PWA selective asset download: seamless offline preservation across deploys',
     status: 'moderate',
     type: 'update',

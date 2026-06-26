@@ -246,15 +246,15 @@ Tombol CTA dengan clip-path parallelogram — bukan rounded, bukan square.
 
 ### Hero Section
 - Full-height (`min-h-screen`)
-- **Carousel** dengan 4 slide (auto-scroll 10 detik, pause on hover):
-  1. **Intro** — Grid 7:5 (judul FELDORA + deskripsi kiri, geometric art kanan)
-  2. **Playground Highlight** — Configurable module showcase (default: Local Weather Forecast) dengan ilustrasi interaktif
-  3. **Latest Story** — Judul + excerpt dari Hygraph API (dengan featured image), fallback "Explore Stories" jika offline
-  4. **About/Log** — Ringkasan platform dengan ilustrasi blueprint/design system
+- **Carousel** dengan 5 slide (auto-scroll 10 detik, pause on hover):
+  1. **Intro** — Grid 7:5 (judul FELDORA + deskripsi kiri, geometric art kanan). CTA scroll ke Featured section.
+  2. **Playground: Weather** — Local Weather Forecast module showcase dengan ilustrasi rain prediction
+  3. **Playground: Split Bill** — Split Bill module showcase dengan ilustrasi receipt + QR sharing
+  4. **Latest Story** — Judul + excerpt dari Hygraph API (dengan featured image), fallback "Explore Stories" jika offline
+  5. **About/Log** — Ringkasan platform dengan ilustrasi blueprint/design system
 - Background: subtle grid pattern + diagonal accent slabs
 - Corner frame decorations (border-corner elements)
 - Bottom: SVG angular cut sebagai divider
-- Konfigurasi carousel: `src/components/home/heroCarouselConfig.ts` (ubah `HIGHLIGHTED_MODULE_ID` untuk ganti module yang di-feature)
 
 ### Content Sections
 - Skewed background panels (`-skew-y-1`) untuk visual depth
@@ -301,7 +301,7 @@ HEADING HEADINGACCENT(ungu)           [trailing element]
 ### Carousel Component (`src/components/ui/Carousel.tsx`)
 
 Komponen reusable untuk carousel/slider. Digunakan di:
-- **HeroSection** (home) — 4 slides, autoScroll 10 detik
+- **HeroSection** (home) — 5 slides, autoScroll 10 detik
 
 #### Props
 
@@ -635,6 +635,7 @@ Styling via `.prose-feldora` class yang men-style:
 
 - **SSR by default** — TanStack Start renders all pages server-side
 - **Automatic code splitting** — setiap route di-lazy-load
+- **Manual chunk grouping** — Module dengan multi-route (seperti Split Bill) di-bundle menjadi 1 chunk via Vite `manualChunks` di `vite.config.ts`. Ini memastikan seluruh module ter-load sekali saat pertama kali dibuka, tanpa request tambahan untuk sub-pages.
 - **CSS-only animations** — tanpa Framer Motion atau runtime library
 - **Lazy loading images** — `loading="lazy"` pada semua non-critical images
 - **Minimal dependencies** — hanya 8 production deps
