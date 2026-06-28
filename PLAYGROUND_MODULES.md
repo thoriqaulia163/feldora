@@ -599,6 +599,19 @@ PIN toggle only re-wraps the DEK — encrypted data is never re-encrypted.
 
 If the encryption key (env var) changes, existing data cannot be decrypted. A "Reset All Data" option is provided to start fresh with the new key.
 
+### UI Details
+
+**Bill Detail page (`/detail/:id`):**
+- Meta cards grid (2x2): Total Bill (green), Method (purple), People (orange), Status (green/amber based on completion)
+- Each card has icon + label + value with colored background
+- Per-participant rows: person icon avatar (green if paid, purple if unpaid), name, amount, payment toggle
+- Paid rows have green tint background + strikethrough amount
+- Item list with tag icons indented under each person
+
+**Create/Edit form:**
+- Person icon avatar next to each participant name in the items section
+- Searchable dropdown for adding people ("+Add" always first option)
+
 ### Routing
 
 | Route | Page |

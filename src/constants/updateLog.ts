@@ -12,6 +12,14 @@ export interface UpdateEntry {
 
 export const WEB_UPDATE_LOG: UpdateEntry[] = [
   {
+    date: '28 June 2026',
+    title: 'Split Bill: colorful detail page with icons and person avatars',
+    status: 'minor',
+    type: 'update',
+    version: '1.14.6',
+    description: 'Bill detail page redesigned with colored meta cards, person icon avatars, item tag icons, and paid/unpaid visual states. Avatars also applied to create/edit form.',
+  },
+  {
     date: '26 June 2026',
     title: 'Split Bill: single chunk loading via Vite manualChunks',
     status: 'minor',
