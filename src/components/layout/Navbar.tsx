@@ -16,6 +16,9 @@ export function Navbar() {
           <span className="text-lg font-black uppercase tracking-[0.15em] text-feldora-text">
             FELDORA
           </span>
+          <span className="text-[9px] font-mono text-feldora-muted">
+            {typeof __APP_VERSION__ !== 'undefined' ? `v${__APP_VERSION__}` : ''}
+          </span>
         </Link>
 
         {/* Desktop Nav */}

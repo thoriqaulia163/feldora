@@ -13,6 +13,14 @@ export interface UpdateEntry {
 export const WEB_UPDATE_LOG: UpdateEntry[] = [
   {
     date: '28 June 2026',
+    title: 'Navbar version badge, weather about copy centralized',
+    status: 'minor',
+    type: 'update',
+    version: '1.14.7',
+    description: 'App version shown in navbar next to logo. Weather V1/V2/V2.5 about sections moved to centralized copy with accuracy & F1 scores.',
+  },
+  {
+    date: '28 June 2026',
     title: 'Split Bill: colorful detail page with icons and person avatars',
     status: 'minor',
     type: 'update',

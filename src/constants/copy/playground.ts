@@ -29,6 +29,13 @@ export const PLAYGROUND_COPY = {
     confidenceLabel: 'Confidence',
     executionTimeLabel: 'Execution Time',
     featuresTitle: 'Features Used',
+    aboutTitle: 'About',
+    aboutDescription:
+      'This module uses a Random Forest model (40 decision trees, max depth 6) trained on historical precipitation data from Open-Meteo covering 287 Indonesian cities between 2021–2025. Accuracy: 65.35%, Macro F1: 65.35%. The model predicts whether significant rainfall (>5mm) will occur on a given day.',
+    aboutFeatures:
+      'Features: day of year, latitude, longitude, elevation, monsoon zone, local season, ENSO phase, and IOD phase. Runs entirely in-browser with no API calls.',
+    disclaimer:
+      'Predictions are experimental and should not be used as a primary reference. Results are based on historical climatological patterns with limited parameters, not real-time atmospheric data. Use official meteorological services (BMKG) for critical decisions.',
   },
   weatherV2: {
     name: 'Local Weather Forecast V2',
@@ -56,7 +63,7 @@ export const PLAYGROUND_COPY = {
     ],
     aboutTitle: 'About',
     aboutDescription:
-      'This module predicts rain/no-rain for four time slots — Pagi (05:00–10:59), Siang (11:00–14:59), Sore (15:00–17:59), Malam (18:00–04:59) — using independent Random Forests trained on 5 years of hourly historical data from 287 Indonesian cities. Two prediction modes: Standard (threshold 0.5, higher accuracy ~72%, conservative) and Sensitive (tuned thresholds, higher F1 ~58%, better rain detection). V1 predicts a single daily rain status at 65% accuracy/F1; V2 provides per-slot granularity with similar performance per balanced slot.',
+      'This module predicts rain/no-rain for four time slots — Pagi (05:00–10:59), Siang (11:00–14:59), Sore (15:00–17:59), Malam (18:00–04:59) — using 4 independent Random Forests (30 trees each) trained on 5 years of hourly historical data from 287 Indonesian cities. Standard mode: 72.48% accuracy, 56.28% F1. Sensitive mode: 72.46% accuracy, 58.43% F1 (tuned thresholds for better rain detection).',
     aboutFeatures:
       'Features: day of year, latitude, longitude, elevation, monsoon zone, local season, ENSO phase, IOD phase, and previous day rain (binary). Runs entirely in-browser with no API calls.',
     disclaimer:
@@ -88,7 +95,7 @@ export const PLAYGROUND_COPY = {
     ],
     aboutTitle: 'About',
     aboutDescription:
-      'This module predicts rain/no-rain for four time slots — Pagi (05:00–10:59), Siang (11:00–14:59), Sore (15:00–17:59), Malam (18:00–04:59) — using Gradient Boosted Trees trained on 5 years of hourly historical data from 287 Indonesian cities. Two prediction modes: Standard (threshold 0.5, higher accuracy ~72%) and Sensitive (tuned thresholds, higher F1 ~63%, significantly better rain detection especially at night). Compared to V2 (Random Forest), V2.5 produces better-calibrated probabilities enabling more effective threshold tuning.',
+      'This module predicts rain/no-rain for four time slots — Pagi (05:00–10:59), Siang (11:00–14:59), Sore (15:00–17:59), Malam (18:00–04:59) — using Gradient Boosted Trees (100 trees per slot, depth 4) trained on 5 years of hourly historical data from 287 Indonesian cities. Standard mode: 72.46% accuracy, 54.56% F1. Sensitive mode: 70.8% accuracy, 63.1% F1 (best overall F1, significantly better rain detection especially at night: 60.1% F1 vs 47.2% in V2).',
     aboutFeatures:
       'Features: day of year (+ sin/cos encoding), latitude, longitude, elevation, monsoon zone, local season, ENSO phase, IOD phase, previous day rain, and computed day length. Runs entirely in-browser.',
     disclaimer:

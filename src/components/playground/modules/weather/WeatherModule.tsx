@@ -417,19 +417,12 @@ export default function WeatherModule() {
             <h4 className="text-xs font-bold uppercase tracking-wider text-feldora-text">About</h4>
           </div>
           <div className="text-feldora-text-secondary text-xs leading-relaxed space-y-2">
-            <p>
-              This module uses a <span className="text-feldora-text">Random Forest</span> model (40 decision trees, max depth 6) trained on historical precipitation data from <span className="text-feldora-text">Open-Meteo</span> covering 514 Indonesian cities between 2021–2025.
-            </p>
-            <p>
-              The model considers geographic features (latitude, longitude, elevation), temporal patterns (day of year, local season), monsoon zone classification, and large-scale climate drivers (ENSO and IOD phases) to predict whether significant rainfall (&gt;5mm) will occur.
-            </p>
-            <p>
-              Designed with an offline-first philosophy — once loaded, predictions run entirely in-browser with zero network requests, making it usable on any device regardless of connectivity.
-            </p>
+            <p>{PLAYGROUND_COPY.weather.aboutDescription}</p>
+            <p>{PLAYGROUND_COPY.weather.aboutFeatures}</p>
             <div className="mt-3 p-2.5 bg-feldora-surface-light border border-amber-500/20">
               <p className="text-amber-400/90 text-[10px] font-mono uppercase tracking-wider mb-1">Disclaimer</p>
               <p className="text-feldora-muted text-[10px] leading-relaxed">
-                Predictions are experimental and should not be used as a primary reference. Results are based on historical climatological patterns with limited parameters, not real-time atmospheric data. Use official meteorological services (BMKG) for critical decisions.
+                {PLAYGROUND_COPY.weather.disclaimer}
               </p>
             </div>
           </div>
