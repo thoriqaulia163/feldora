@@ -48,7 +48,7 @@ src/
 │   ├── home/            # Homepage sections (Hero, Featured, Updates, CTA)
 │   ├── layout/          # Navbar, Footer (persistent layout)
 │   ├── playground/      # Playground shell, module registry, types
-│   │   └── modules/     # Module implementations (weather/, weather-v2/, weather-v2-5/, split-bill/)
+│   │   └── modules/     # Module implementations (weather/, weather-v2/, weather-v2-5/, split-bill/, tic-tac-toe/)
 │   ├── story/           # Story list & detail components
 │   └── ui/              # Reusable UI components (LogCard, Carousel)
 ├── constants/
@@ -94,6 +94,7 @@ src/
 │   ├── playground.split-bill.create.tsx     # Create bill
 │   ├── playground.split-bill.detail.$id.tsx # Bill detail
 │   ├── playground.split-bill.edit.$id.tsx   # Edit bill
+│   ├── playground.tic-tac-toe.tsx           # Tic Tac Toe route (lazy loaded)
 │   ├── story.tsx        # Story layout (Outlet)
 │   ├── story.index.tsx  # Story list page (/story)
 │   └── story.$slug.tsx  # Story detail page (/story/:slug)
@@ -151,6 +152,7 @@ File types (`types.ts`, `typesV2.ts`) dan shared utilities (`cities.ts`, `prng.t
 | `/` | Home | Landing page — Hero carousel + Featured (API) + CTA (Playground) + Updates |
 | `/about` | About | Vision, design philosophy, development philosophy, update log (infinite scroll) |
 | `/playground` | Playground | Module eksperimen (AI, Tool, Game) — dynamic loading |
+| `/playground/tic-tac-toe` | Tic Tac Toe | Game 3×3, PvP & PvC (bot Easy/Medium/Hard Minimax) |
 | `/story` | Story List | Grid card articles (dari Hygraph atau placeholder) |
 | `/story/:slug` | Story Detail | Full article — title, meta, image, content HTML |
 | `*` (catch-all) | 404 Not Found | Error page untuk route yang tidak ada |

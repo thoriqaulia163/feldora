@@ -97,7 +97,7 @@ function ModuleCard({ module: mod }: { module: PlaygroundModule }) {
 
   return (
     <Link
-      to={`/playground/${mod.id}` as '/playground/local-weather-forecast' | '/playground/local-weather-forecast-v2' | '/playground/local-weather-forecast-v2-5' | '/playground/split-bill'}
+      to={`/playground/${mod.id}` as '/playground/local-weather-forecast' | '/playground/local-weather-forecast-v2' | '/playground/local-weather-forecast-v2-5' | '/playground/split-bill' | '/playground/tic-tac-toe'}
       className="card-polygon p-6 flex flex-col hover:border-feldora-accent/40 transition-all duration-300"
     >
       <div className="flex items-center justify-between mb-3">

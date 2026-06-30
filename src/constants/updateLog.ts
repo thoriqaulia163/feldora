@@ -13,6 +13,14 @@ export interface UpdateEntry {
 export const WEB_UPDATE_LOG: UpdateEntry[] = [
   {
     date: '30 June 2026',
+    title: 'Tic Tac Toe module — PvP and PvC with three bot difficulty levels',
+    status: 'moderate',
+    type: 'update',
+    version: '1.15.0',
+    description: 'New Game module: Tic Tac Toe. PvP mode for two players on one device. PvC mode pits you against a bot at Easy (random), Medium (win/block/random), or Hard (unbeatable Minimax). Confirm modals guard mode changes, difficulty changes, and resets while a game is in progress.',
+  },
+  {
+    date: '30 June 2026',
     title: 'Story localization toggle, footer copy sync, navbar version',
     status: 'minor',
     type: 'update',

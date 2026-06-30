@@ -101,6 +101,37 @@ export const PLAYGROUND_COPY = {
     disclaimer:
       'Predictions are experimental and should not be used as a primary reference. Results are based on historical climatological patterns with limited parameters, not real-time atmospheric data. Use official meteorological services (BMKG) for critical decisions.',
   },
+  ticTacToe: {
+    name: 'Tic Tac Toe',
+    description: 'Classic 3×3 strategy game with PvP and PvC modes.',
+    modes: {
+      pvp: 'Player vs Player',
+      pvc: 'Player vs Computer',
+    },
+    levels: {
+      easy: 'Easy',
+      medium: 'Medium',
+      hard: 'Hard',
+    },
+    levelDescriptions: {
+      easy: 'Picks a random cell',
+      medium: 'Wins or blocks when possible',
+      hard: 'Unbeatable (Minimax)',
+    },
+    statusIdle: 'Click a cell to start',
+    statusDraw: "It's a Draw",
+    statusBotThinking: 'Bot thinking...',
+    resetButton: 'Reset Game',
+    modeSectionLabel: 'Game Mode',
+    levelSectionLabel: 'Bot Difficulty',
+    howToPlayTitle: 'How to Play',
+    howToPlaySteps: [
+      'Get 3 in a row — horizontal, vertical, or diagonal.',
+      'X always goes first.',
+      'PvP — two players take turns on the same device.',
+      'PvC — you play as X, bot plays as O.',
+    ],
+  },
   splitBill: {
     name: 'Split Bill',
     description: 'Offline bill splitting with encrypted local storage.',

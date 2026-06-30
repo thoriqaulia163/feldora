@@ -711,3 +711,149 @@ src/components/playground/modules/split-bill/
 - No export/import for bulk data (only single bill via QR)
 - No partial payments (only paid/unpaid)
 - Clearing browser data = all bills lost (no cloud backup)
+
+---
+
+## Tic Tac Toe
+
+| Field | Value |
+|-------|-------|
+| ID | `tic-tac-toe` |
+| Label | Game |
+| Last Updated | 30 June 2026 |
+| Download Size | < 10 KB |
+| Offline | Yes (no assets to load) |
+
+### Deskripsi
+
+Classic 3×3 strategy game dengan dua mode permainan. **PvP** memungkinkan dua pemain bergantian pada satu device. **PvC** memungkinkan pemain (X) melawan bot (O) dengan tiga tingkat kesulitan: Easy, Medium, dan Hard.
+
+### Game Modes
+
+| Mode | Deskripsi |
+|------|-----------|
+| **PvP** (Player vs Player) | Dua pemain bergantian secara manual di device yang sama. X selalu jalan pertama. |
+| **PvC** (Player vs Computer) | Pemain selalu bermain sebagai X, bot bermain sebagai O. Bot merespons otomatis dengan delay 400ms untuk kesan natural. |
+
+### Bot Difficulty Levels
+
+| Level | Algoritma | Karakteristik |
+|-------|-----------|---------------|
+| **Easy** | Random | Pilih sel kosong secara acak. Bisa dikalahkan dengan mudah. |
+| **Medium** | Win → Block → Random | Menang jika bisa, blok kemenangan lawan jika perlu, selain itu acak. |
+| **Hard** | Minimax | Optimal sempurna — tidak pernah kalah. Selalu menang atau seri. Pusat dipilih pertama untuk efisiensi. |
+
+### Minimax Implementation
+
+Bot Hard menggunakan algoritma Minimax lengkap (tanpa alpha-beta pruning, board 3×3 sehingga tidak diperlukan):
+
+```
+minimax(board, isMaximizing, bot, human):
+  if winner == bot  → return +10
+  if winner == human → return -10
+  if board full     → return  0
+
+  if maximizing: return max score for each empty cell (bot plays)
+  if minimizing: return min score for each empty cell (human plays)
+```
+
+Optimasi opening: pusat (index 4) selalu diambil saat board kosong. Sudut acak diambil jika pusat sudah terisi. Ini mengurangi kedalaman rekursi pada 2 langkah pertama.
+
+### Confirm Modal Behavior
+
+Modal konfirmasi muncul saat ada aksi yang akan mereset game yang sedang berjalan (`moveCount > 0` AND `status === 'playing'`):
+
+| Aksi | Kapan Modal Muncul | Kapan Langsung Dieksekusi |
+|------|-------------------|--------------------------|
+| Reset Game | Game in progress | Game idle atau sudah selesai |
+| Ganti Mode (PvP ↔ PvC) | Game in progress | Mode sama / game idle / sudah selesai |
+| Ganti Bot Level | Game in progress | Level sama / game idle / sudah selesai |
+
+### Simbol & Warna
+
+| Simbol | Pemain | Warna | Tailwind |
+|--------|--------|-------|---------|
+| `X` | Player 1 / Human | Ungu | `text-feldora-accent` |
+| `O` | Player 2 / Bot | Orange | `text-feldora-accent-secondary` |
+
+Sel yang menjadi bagian dari kombinasi menang mendapat: `bg-{color}/10`, `border-{color}/60`, `scale-105`, dan `drop-shadow` berwarna (`glow`).
+
+### Status Bar States
+
+| Kondisi | Tampilan |
+|---------|---------|
+| `idle` | "Click a cell to start" |
+| `playing` (giliran X, PvP) | "X — Player X's turn" |
+| `playing` (giliran X, PvC) | "X — Your turn" |
+| `playing` (giliran O, PvC, bot thinking) | Spinner + "Bot thinking..." |
+| `won` (X, PvP) | "Player X Wins! — X takes it" |
+| `won` (X, PvC) | "You Win! — X takes it" |
+| `won` (O, PvC) | "Bot Wins! — O takes it" |
+| `draw` | "It's a Draw" |
+
+### File Structure
+
+```
+src/components/playground/modules/tic-tac-toe/
+├── types.ts              # Player, Cell, Board, GameMode, BotLevel, GameStatus, WIN_LINES, GameState
+├── botEngine.ts          # getBotMove(board, bot, human, level), checkWinner(board)
+├── useGameState.ts       # Full game state hook (board, status, actions, botThinking)
+├── GameBoard.tsx         # 3×3 grid — winning cells highlighted, corner-cut cell 8
+├── ConfirmModal.tsx      # Reusable confirm modal (amber warning icon, cancel + confirm)
+└── TicTacToeModule.tsx   # Main module — SegmentedControl, StatusBar, board, reset button
+
+src/routes/
+└── playground.tic-tac-toe.tsx   # Route file (lazy Suspense)
+```
+
+### State Management
+
+`useGameState` hook memiliki semua state dan logic permainan:
+
+```typescript
+// State
+board: Board           // 9-cell tuple
+currentPlayer: Player  // 'X' | 'O'
+status: GameStatus     // 'idle' | 'playing' | 'won' | 'draw'
+winner: Player | null
+winLine: [number, number, number] | null
+gameMode: GameMode     // 'pvp' | 'pvc'
+botLevel: BotLevel     // 'easy' | 'medium' | 'hard'
+moveCount: number      // untuk deteksi "in progress"
+botThinking: boolean   // untuk spinner state
+
+// Actions
+makeMove(index)    // klik sel (blocked di O's turn saat PvC)
+resetGame()        // reset ke board kosong, pertahankan mode & level
+setGameMode(mode)  // ganti mode + reset
+setBotLevel(level) // ganti level + reset
+```
+
+Bot turn di-trigger via `useEffect` yang watch `currentPlayer + status + gameMode`. Delay 400ms via `setTimeout` untuk kesan natural. Double-check status sebelum eksekusi (race condition safe).
+
+### UI Layout
+
+```
+[◆ TIC TAC TOE]
+
+Controls (kiri / atas mobile)     Board area (kanan / bawah mobile)
+─────────────────────────────    ─────────────────────────────────
+[PvP]  [PvC]                     ┌───┬───┬───┐
+Bot: [Easy] [Med] [Hard]         │ X │   │ O │
+                                 ├───┼───┼───┤
+X — You  |  O — Bot              │   │ X │   │
+                                 ├───┼───┼───┤
+[How to Play box]                │ O │   │ X │
+                                 └───┴───┴───┘
+                                 [Status: X Wins!]
+                                 [RESET GAME]
+```
+
+Layout responsif: desktop = 2 kolom (`lg:grid-cols-[1fr_auto]`), mobile = stacked vertikal. How to Play box: visible di desktop di dalam kolom kiri, visible di mobile di bawah setelah board.
+
+### Limitasi
+
+- Tidak ada animasi transisi antar sel (fade-in saat X/O muncul)
+- Tidak ada score tracking / win counter antar ronde
+- Tidak ada mode "Bot goes first"
+- Hard mode 100% optimal — tidak ada variasi/randomness, selalu main sempurna

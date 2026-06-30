@@ -34,10 +34,11 @@ export const PLAYGROUND_MODULES: PlaygroundModule[] = [
   {
     id: 'tic-tac-toe',
     name: 'Tic Tac Toe',
-    description: 'Coming soon',
+    description:
+      'Classic 3×3 strategy game. Play PvP (two players on one device) or PvC against a bot with three difficulty levels — Easy, Medium, and unbeatable Hard (Minimax).',
     label: 'Game',
-    lastUpdated: '-',
-    estimatedDownloadSize: '-',
+    lastUpdated: '30 June 2026',
+    estimatedDownloadSize: '< 10 KB',
   },
   {
     id: 'split-bill',
