@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { NAVIGATION_LINKS } from '~/constants/navigation'
+import { HOME_COPY } from '~/constants/copy'
 
 export function Footer() {
   return (
@@ -18,8 +19,7 @@ export function Footer() {
               </span>
             </Link>
             <p className="mt-5 text-feldora-text-secondary text-sm leading-relaxed max-w-sm">
-              A cinematic digital universe. Where technology meets bold visual
-              storytelling and angular design philosophy.
+              {HOME_COPY.hero.subtitle}
             </p>
             <div className="mt-6 flex items-center gap-2">
               <div className="w-12 h-[2px] bg-feldora-accent-secondary/40" />

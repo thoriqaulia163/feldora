@@ -8,6 +8,7 @@ export interface PlaceholderStory {
   category: Array<{ name: string; slug: string }>
   author: { name: string; photo?: { url: string } }
   content: { html: string }
+  localizations?: Array<{ locale: string; title: string; excerpt: string; content?: { html: string } }>
 }
 
 export const PLACEHOLDER_STORIES: PlaceholderStory[] = [

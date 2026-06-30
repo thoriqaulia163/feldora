@@ -12,6 +12,14 @@ export interface UpdateEntry {
 
 export const WEB_UPDATE_LOG: UpdateEntry[] = [
   {
+    date: '30 June 2026',
+    title: 'Story localization toggle, footer copy sync, navbar version',
+    status: 'minor',
+    type: 'update',
+    version: '1.14.8',
+    description: 'Story detail shows EN/ID toggle when Indonesian content exists. Footer subtitle synced from HOME_COPY. Navbar shows app version. GraphQL raw field removed.',
+  },
+  {
     date: '28 June 2026',
     title: 'Navbar version badge, weather about copy centralized',
     status: 'minor',

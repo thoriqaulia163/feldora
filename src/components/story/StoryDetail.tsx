@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { useGetPostDetail } from '~/lib/queries'
 import { getPlaceholderStory } from '~/constants/placeholderStories'
@@ -10,14 +11,25 @@ interface StoryDetailProps {
   slug: string
 }
 
+type Locale = 'en' | 'id_ID'
+
 export function StoryDetail({ slug }: StoryDetailProps) {
   const { data: post, isPending, isError, refetch } = useGetPostDetail(slug)
+  const [locale, setLocale] = useState<Locale>('en')
 
   // Cek placeholder dulu — kalau ada, langsung serve tanpa tunggu API
   const placeholderPost = getPlaceholderStory(slug)
 
   // Fallback to placeholder if API returns nothing
   const resolvedPost = post || placeholderPost || null
+
+  // Check if Indonesian localization exists
+  const idLocalization = resolvedPost?.localizations?.find((l: { locale: string }) => l.locale === 'id_ID')
+  const hasIndonesian = !!(idLocalization?.content?.html)
+
+  // Resolve content based on selected locale
+  const displayTitle = locale === 'id_ID' && idLocalization?.title ? idLocalization.title : resolvedPost?.title
+  const displayContent = locale === 'id_ID' && idLocalization?.content?.html ? idLocalization.content.html : resolvedPost?.content?.html
 
   // Hanya tampilkan skeleton kalau isPending DAN tidak ada placeholder fallback
   if (isPending && !placeholderPost) {
@@ -70,27 +82,57 @@ export function StoryDetail({ slug }: StoryDetailProps) {
           to="/story"
           className="inline-flex items-center gap-2 text-feldora-text-secondary text-sm hover:text-feldora-accent transition-colors duration-200 mb-8 group"
         >
-          <span className="group-hover:-translate-x-1 transition-transform duration-200">←</span>
+          <span className="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
           {STORY_COPY.detail.backLink}
         </Link>
 
-        {/* Category badges */}
-        {resolvedPost.category && resolvedPost.category.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-4">
-            {resolvedPost.category.map((cat, i) => (
-              <span
-                key={i}
-                className="text-feldora-accent-secondary font-mono text-[10px] uppercase tracking-wider border border-feldora-accent-secondary/20 bg-feldora-accent-glow px-2.5 py-1"
-              >
-                {cat.name}
-              </span>
-            ))}
+        {/* Category badges + Language toggle */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-wrap gap-2">
+            {resolvedPost.category && resolvedPost.category.length > 0 && (
+              resolvedPost.category.map((cat, i) => (
+                <span
+                  key={i}
+                  className="text-feldora-accent-secondary font-mono text-[10px] uppercase tracking-wider border border-feldora-accent-secondary/20 bg-feldora-accent-glow px-2.5 py-1"
+                >
+                  {cat.name}
+                </span>
+              ))
+            )}
           </div>
-        )}
+
+          {/* Language toggle — only shows if Indonesian content exists */}
+          {hasIndonesian && (
+            <div className="flex items-center border border-feldora-accent-secondary/50 rounded overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setLocale('en')}
+                className={`px-2.5 py-1 text-[10px] font-mono uppercase tracking-wider transition-colors ${
+                  locale === 'en'
+                    ? 'bg-feldora-accent-secondary text-white'
+                    : 'text-feldora-text-secondary hover:text-feldora-text'
+                }`}
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                onClick={() => setLocale('id_ID')}
+                className={`px-2.5 py-1 text-[10px] font-mono uppercase tracking-wider transition-colors ${
+                  locale === 'id_ID'
+                    ? 'bg-feldora-accent-secondary text-white'
+                    : 'text-feldora-text-secondary hover:text-feldora-text'
+                }`}
+              >
+                ID
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* Title */}
         <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-tight mb-6">
-          {resolvedPost.title}
+          {displayTitle}
         </h1>
 
         {/* Meta info */}
@@ -140,7 +182,7 @@ export function StoryDetail({ slug }: StoryDetailProps) {
           <div className="relative mb-10 overflow-hidden border border-feldora-border/20">
             <img
               src={resolvedPost.featuredImage.url}
-              alt={resolvedPost.title}
+              alt={displayTitle ?? resolvedPost.title}
               className="w-full aspect-video object-cover"
             />
             <div className="absolute inset-0 border border-white/5 pointer-events-none" />
@@ -148,10 +190,10 @@ export function StoryDetail({ slug }: StoryDetailProps) {
         )}
 
         {/* Post Content Body */}
-        {resolvedPost.content?.html && (
+        {displayContent && (
           <div
             className="prose-feldora"
-            dangerouslySetInnerHTML={{ __html: resolvedPost.content.html }}
+            dangerouslySetInnerHTML={{ __html: displayContent }}
           />
         )}
 
@@ -161,7 +203,7 @@ export function StoryDetail({ slug }: StoryDetailProps) {
             to="/story"
             className="inline-flex items-center gap-2 text-feldora-text-secondary text-sm hover:text-feldora-accent transition-colors duration-200 group"
           >
-            <span className="group-hover:-translate-x-1 transition-transform duration-200">←</span>
+            <span className="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
             {STORY_COPY.detail.backLinkAll}
           </Link>
         </div>

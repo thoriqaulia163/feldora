@@ -2,6 +2,13 @@ import { request, gql } from 'graphql-request'
 
 const GRAPHQL_ENDPOINT = import.meta.env.VITE_GRAPH_CMS_ENDPOINT as string
 
+export interface PostLocalization {
+  locale: string
+  title: string
+  excerpt: string
+  content?: { html: string }
+}
+
 export interface Post {
   author: {
     name: string
@@ -16,7 +23,8 @@ export interface Post {
   excerpt: string
   featuredImage: { url: string }
   category: Array<{ name: string; slug: string; color?: string }>
-  content?: { raw: unknown; html: string }
+  content?: { html: string }
+  localizations?: PostLocalization[]
 }
 
 export interface PostEdge {
@@ -113,7 +121,7 @@ export async function getPostDetail(slug: string): Promise<Post | null> {
 
   const query = gql`
     query GetPostDetail($slug: String!) {
-      post(where: { slug: $slug }) {
+      post(where: { slug: $slug }, locales: [en, id_ID]) {
         author {
           name
           id
@@ -136,8 +144,15 @@ export async function getPostDetail(slug: string): Promise<Post | null> {
           color
         }
         content {
-          raw
           html
+        }
+        localizations(includeCurrent: false) {
+          locale
+          title
+          excerpt
+          content {
+            html
+          }
         }
       }
     }

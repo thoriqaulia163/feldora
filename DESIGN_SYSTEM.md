@@ -626,6 +626,30 @@ Styling via `.prose-feldora` class yang men-style:
 - Lists (ordered & unordered)
 - Blockquotes (border-left accent)
 - Inline code & code blocks
+
+---
+
+## Localization (i18n)
+
+Story posts support optional Indonesian localization via Hygraph's built-in locale system.
+
+**Locales:** `en` (default), `id_ID` (Indonesian)
+
+**Localized fields:** `title`, `excerpt`, `content`
+
+**Behaviour:**
+- `getPostDetail` fetches both `en` content and `localizations(includeCurrent: false)` which returns `id_ID` if available
+- If Indonesian content exists → language toggle (EN | ID) shown on story detail page (orange border, orange active state)
+- Toggle switches title + content body between languages
+- If no Indonesian locale → toggle hidden, only English shown
+
+**Query approach:**
+```graphql
+post(where: { slug: $slug }, locales: [en, id_ID]) {
+  title, content { html }
+  localizations(includeCurrent: false) { locale, title, excerpt, content { html } }
+}
+```
 - Images (full-width, rounded)
 - First letter drop cap (text-5xl accent color)
 
