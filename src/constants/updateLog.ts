@@ -13,6 +13,14 @@ export interface UpdateEntry {
 export const WEB_UPDATE_LOG: UpdateEntry[] = [
   {
     date: '30 June 2026',
+    title: 'Tic Tac Toe: single-column layout, brighter board cells, primary reset button',
+    status: 'minor',
+    type: 'update',
+    version: '1.15.1',
+    description: 'Layout changed to single centered column for all screens. How to Play box removed. Board cells use border-white/20 for better visibility. Reset button changed to btn-angular-primary.',
+  },
+  {
+    date: '30 June 2026',
     title: 'Tic Tac Toe module — PvP and PvC with three bot difficulty levels',
     status: 'moderate',
     type: 'update',

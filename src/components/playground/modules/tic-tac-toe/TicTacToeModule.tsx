@@ -1,14 +1,14 @@
 /**
  * Tic Tac Toe — Main Module Component
  *
- * Layout:
+ * Layout (single column, centered):
  *   - Back link + title
- *   - Mode selector (PvP / PvC)
- *   - Bot level selector (Easy / Medium / Hard) — PvC only
- *   - Board
+ *   - Mode selector (PvP / PvC) — centered
+ *   - Bot level selector (Easy / Medium / Hard) — PvC only, centered
+ *   - Player legend — centered
+ *   - Board — centered
  *   - Status bar (whose turn / winner / draw)
  *   - Reset button
- *   - How to play info box
  */
 
 import { useState } from 'react'
@@ -39,11 +39,9 @@ function SegmentedControl<T extends string>({
 }) {
   return (
     <div className="flex">
-      {options.map((opt, i) => {
+      {options.map((opt) => {
         const isActive = opt.value === value
         const activeColor = colorMap?.[opt.value] ?? 'border-feldora-accent text-feldora-accent bg-feldora-accent/10'
-        const roundLeft = i === 0 ? 'border-r-0' : ''
-        const roundRight = i === options.length - 1 ? '' : 'border-r-0'
 
         return (
           <button
@@ -54,7 +52,7 @@ function SegmentedControl<T extends string>({
               isActive
                 ? activeColor
                 : 'border-feldora-border/50 text-feldora-muted hover:text-feldora-text-secondary hover:border-feldora-border'
-            } ${roundLeft} ${roundRight}`}
+            }`}
           >
             {opt.label}
           </button>
@@ -260,132 +258,82 @@ export default function TicTacToeModule() {
         <h2 className="text-lg font-bold uppercase tracking-wider">Tic Tac Toe</h2>
       </div>
 
-      {/* Controls + Board */}
-      <div className="grid lg:grid-cols-[1fr_auto] gap-8 items-start">
+      {/* Controls + Board — single column, centered */}
+      <div className="flex flex-col items-center gap-6">
 
-        {/* Left: Controls */}
-        <div className="space-y-6">
+        {/* Mode selector */}
+        <div className="flex flex-col items-center gap-2">
+          <span className="text-feldora-muted font-mono text-[10px] uppercase tracking-wider">
+            Game Mode
+          </span>
+          <SegmentedControl
+            options={modeOptions}
+            value={game.gameMode}
+            onChange={handleModeChange}
+          />
+        </div>
 
-          {/* Mode selector */}
-          <div>
-            <span className="block text-feldora-muted font-mono text-[10px] uppercase tracking-wider mb-2">
-              Game Mode
+        {/* Bot level — only in PvC */}
+        {game.gameMode === 'pvc' && (
+          <div className="flex flex-col items-center gap-2">
+            <span className="text-feldora-muted font-mono text-[10px] uppercase tracking-wider">
+              Bot Difficulty
             </span>
             <SegmentedControl
-              options={modeOptions}
-              value={game.gameMode}
-              onChange={handleModeChange}
+              options={levelOptions}
+              value={game.botLevel}
+              onChange={handleLevelChange}
+              colorMap={levelColorMap}
             />
           </div>
+        )}
 
-          {/* Bot level — only in PvC */}
-          {game.gameMode === 'pvc' && (
-            <div>
-              <span className="block text-feldora-muted font-mono text-[10px] uppercase tracking-wider mb-2">
-                Bot Difficulty
-              </span>
-              <SegmentedControl
-                options={levelOptions}
-                value={game.botLevel}
-                onChange={handleLevelChange}
-                colorMap={levelColorMap}
-              />
-            </div>
-          )}
-
-          {/* Legend */}
-          <div className="flex items-center gap-4 pt-1">
-            <div className="flex items-center gap-1.5">
-              <span className="font-black text-feldora-accent text-base leading-none">X</span>
-              <span className="text-feldora-muted font-mono text-[10px] uppercase tracking-wider">
-                {game.gameMode === 'pvp' ? 'Player 1' : 'You'}
-              </span>
-            </div>
-            <div className="w-px h-4 bg-feldora-border/40" />
-            <div className="flex items-center gap-1.5">
-              <span className="font-black text-feldora-accent-secondary text-base leading-none">O</span>
-              <span className="text-feldora-muted font-mono text-[10px] uppercase tracking-wider">
-                {game.gameMode === 'pvp' ? 'Player 2' : 'Bot'}
-              </span>
-            </div>
+        {/* Legend */}
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1.5">
+            <span className="font-black text-feldora-accent text-base leading-none">X</span>
+            <span className="text-feldora-muted font-mono text-[10px] uppercase tracking-wider">
+              {game.gameMode === 'pvp' ? 'Player 1' : 'You'}
+            </span>
           </div>
-
-          {/* How to play */}
-          <div className="bg-feldora-surface border border-feldora-border/30 p-4 clip-notch-br hidden lg:block">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="hex-badge w-5 h-5 text-[8px] font-bold text-white">?</div>
-              <h4 className="text-xs font-bold uppercase tracking-wider text-feldora-text">How to Play</h4>
-            </div>
-            <ul className="space-y-1.5 text-feldora-text-secondary text-xs leading-relaxed list-disc pl-4">
-              <li>Get <span className="text-feldora-text">3 in a row</span> — horizontal, vertical, or diagonal</li>
-              <li><span className="text-feldora-accent font-bold">X</span> always goes first</li>
-              <li>
-                <span className="text-feldora-text">PvP</span> — two players take turns on the same device
-              </li>
-              <li>
-                <span className="text-feldora-text">PvC</span> — you play as X, bot plays as O
-              </li>
-              <li>
-                Bot difficulty: <span className="text-emerald-400">Easy</span> (random) ·{' '}
-                <span className="text-amber-400">Medium</span> (win/block/random) ·{' '}
-                <span className="text-red-400">Hard</span> (unbeatable)
-              </li>
-            </ul>
+          <div className="w-px h-4 bg-feldora-border/40" />
+          <div className="flex items-center gap-1.5">
+            <span className="font-black text-feldora-accent-secondary text-base leading-none">O</span>
+            <span className="text-feldora-muted font-mono text-[10px] uppercase tracking-wider">
+              {game.gameMode === 'pvp' ? 'Player 2' : 'Bot'}
+            </span>
           </div>
         </div>
 
-        {/* Right: Board area */}
-        <div className="flex flex-col items-center gap-6 w-full lg:w-auto">
-
-          {/* Board */}
-          <div className="w-full max-w-xs">
-            <GameBoard
-              board={game.board}
-              onCellClick={game.makeMove}
-              winLine={game.winLine}
-              disabled={boardDisabled}
-            />
-          </div>
-
-          {/* Status */}
-          <div className="h-8 flex items-center justify-center w-full">
-            <StatusBar
-              status={game.status}
-              currentPlayer={game.currentPlayer}
-              winner={game.winner}
-              gameMode={game.gameMode}
-              botThinking={game.botThinking}
-            />
-          </div>
-
-          {/* Reset button */}
-          <button
-            type="button"
-            onClick={handleReset}
-            className="btn-angular-outline !px-8 !py-2 !text-[11px] w-full max-w-xs"
-          >
-            Reset Game
-          </button>
+        {/* Board */}
+        <div className="w-full max-w-xs">
+          <GameBoard
+            board={game.board}
+            onCellClick={game.makeMove}
+            winLine={game.winLine}
+            disabled={boardDisabled}
+          />
         </div>
-      </div>
 
-      {/* How to play — mobile only */}
-      <div className="bg-feldora-surface border border-feldora-border/30 p-4 clip-notch-br lg:hidden">
-        <div className="flex items-center gap-2 mb-3">
-          <div className="hex-badge w-5 h-5 text-[8px] font-bold text-white">?</div>
-          <h4 className="text-xs font-bold uppercase tracking-wider text-feldora-text">How to Play</h4>
+        {/* Status */}
+        <div className="h-8 flex items-center justify-center w-full">
+          <StatusBar
+            status={game.status}
+            currentPlayer={game.currentPlayer}
+            winner={game.winner}
+            gameMode={game.gameMode}
+            botThinking={game.botThinking}
+          />
         </div>
-        <ul className="space-y-1.5 text-feldora-text-secondary text-xs leading-relaxed list-disc pl-4">
-          <li>Get <span className="text-feldora-text">3 in a row</span> — horizontal, vertical, or diagonal</li>
-          <li><span className="text-feldora-accent font-bold">X</span> always goes first</li>
-          <li><span className="text-feldora-text">PvP</span> — two players take turns on the same device</li>
-          <li><span className="text-feldora-text">PvC</span> — you play as X, bot plays as O</li>
-          <li>
-            Bot difficulty: <span className="text-emerald-400">Easy</span> (random) ·{' '}
-            <span className="text-amber-400">Medium</span> (win/block/random) ·{' '}
-            <span className="text-red-400">Hard</span> (unbeatable)
-          </li>
-        </ul>
+
+        {/* Reset button */}
+        <button
+          type="button"
+          onClick={handleReset}
+          className="btn-angular-primary !px-8 !py-2 !text-[11px] w-full max-w-xs"
+        >
+          Reset Game
+        </button>
       </div>
 
       {/* Confirm Modal */}

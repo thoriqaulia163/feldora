@@ -42,8 +42,8 @@ export function GameBoard({ board, onCellClick, winLine, disabled }: GameBoardPr
         const stateClasses = isWinCell
           ? `${WIN_CELL_STYLES[cell as Player]} scale-105`
           : isEmpty && !disabled
-            ? 'bg-feldora-surface border-feldora-border/50 hover:border-feldora-accent/40 hover:bg-feldora-surface-light cursor-pointer'
-            : 'bg-feldora-surface border-feldora-border/30 cursor-default'
+            ? 'bg-feldora-surface-light border-white/20 hover:border-feldora-accent/60 hover:bg-feldora-surface-light cursor-pointer'
+            : 'bg-feldora-surface-light border-white/15 cursor-default'
 
         // Corner-cut on bottom-right cell to echo the card-polygon pattern
         const clipClass = index === 8 ? 'clip-notch-br' : ''
@@ -68,8 +68,8 @@ export function GameBoard({ board, onCellClick, winLine, disabled }: GameBoardPr
             {/* Subtle grid-line corner accents on empty cells */}
             {!cell && !disabled && (
               <>
-                <span className="absolute top-1 left-1 w-2 h-2 border-t border-l border-feldora-border/30" />
-                <span className="absolute bottom-1 right-1 w-2 h-2 border-b border-r border-feldora-border/30" />
+                <span className="absolute top-1 left-1 w-2 h-2 border-t border-l border-white/25" />
+                <span className="absolute bottom-1 right-1 w-2 h-2 border-b border-r border-white/25" />
               </>
             )}
           </button>

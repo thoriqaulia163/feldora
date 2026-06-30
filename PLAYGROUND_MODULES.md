@@ -778,6 +778,8 @@ Modal konfirmasi muncul saat ada aksi yang akan mereset game yang sedang berjala
 
 Sel yang menjadi bagian dari kombinasi menang mendapat: `bg-{color}/10`, `border-{color}/60`, `scale-105`, dan `drop-shadow` berwarna (`glow`).
 
+Sel normal menggunakan `bg-feldora-surface-light` dengan `border-white/20` agar terlihat jelas di atas background gelap. Sel terisi (non-interaktif) menggunakan `border-white/15`. Corner accent di sel kosong menggunakan `border-white/25`.
+
 ### Status Bar States
 
 | Kondisi | Tampilan |
@@ -836,20 +838,22 @@ Bot turn di-trigger via `useEffect` yang watch `currentPlayer + status + gameMod
 ```
 [◆ TIC TAC TOE]
 
-Controls (kiri / atas mobile)     Board area (kanan / bawah mobile)
-─────────────────────────────    ─────────────────────────────────
-[PvP]  [PvC]                     ┌───┬───┬───┐
-Bot: [Easy] [Med] [Hard]         │ X │   │ O │
-                                 ├───┼───┼───┤
-X — You  |  O — Bot              │   │ X │   │
-                                 ├───┼───┼───┤
-[How to Play box]                │ O │   │ X │
-                                 └───┴───┴───┘
-                                 [Status: X Wins!]
-                                 [RESET GAME]
+         [PvP]  [PvC]           ← centered
+    Bot: [Easy] [Med] [Hard]    ← centered, PvC only
+       X — You  |  O — Bot      ← centered
+
+              ┌───┬───┬───┐
+              │ X │   │ O │
+              ├───┼───┼───┤
+              │   │ X │   │
+              ├───┼───┼───┤
+              │ O │   │ X │
+              └───┴───┴───┘
+           [Status: X Wins!]
+           [■ RESET GAME ■]     ← btn-angular-primary (ungu solid)
 ```
 
-Layout responsif: desktop = 2 kolom (`lg:grid-cols-[1fr_auto]`), mobile = stacked vertikal. How to Play box: visible di desktop di dalam kolom kiri, visible di mobile di bawah setelah board.
+Layout single column, semua elemen center-aligned untuk semua ukuran layar. How to Play box dihapus.
 
 ### Limitasi
 
