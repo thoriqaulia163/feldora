@@ -1059,6 +1059,7 @@ quickUpscaler: {
 | Last Updated | 18 July 2026 |
 | Model Size | ~4.1 MB (.tflite, committed to repo) |
 | Runtime | LiteRT.js WASM ~9 MB (loaded from jsDelivr CDN) |
+| Total First Download | ~13 MB |
 | Offline | ✅ After first use (model cached by SW, WASM by browser HTTP cache) |
 
 ### Deskripsi

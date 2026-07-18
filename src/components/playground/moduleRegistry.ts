@@ -35,10 +35,10 @@ export const PLAYGROUND_MODULES: PlaygroundModule[] = [
     id: 'ai-upscaler',
     name: 'Advanced Image Upscaler',
     description:
-      'AI-powered 4× image upscaling using Real-ESRGAN x4v3. Runs entirely in-browser via LiteRT.js (WebGPU or WASM). Model ~4 MB — downloaded once, cached offline.',
+      'AI-powered 4× image upscaling using Real-ESRGAN x4v3. Runs entirely in-browser via LiteRT.js (WebGPU or WASM). Model ~4 MB + runtime ~9 MB — downloaded once, cached offline.',
     label: 'AI',
     lastUpdated: '18 July 2026',
-    estimatedDownloadSize: '~4 MB',
+    estimatedDownloadSize: '~13 MB',
     cacheCheckUrl: '/ai-models/ai-upscaler/model.tflite',
   },
   {

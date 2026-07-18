@@ -47,9 +47,9 @@ function ModelStatus({
 
       {/* CPU warning */}
       {!accelerated && (
-        <div className="border border-amber-500/30 bg-amber-500/5 px-3 py-2.5 flex items-start gap-2">
-          <span className="text-amber-400 text-sm flex-shrink-0 mt-px">⚠</span>
-          <p className="text-amber-400/90 text-xs leading-relaxed">
+        <div className="border border-red-500/30 bg-red-500/5 px-3 py-2.5 flex items-start gap-2">
+          <span className="text-red-400 text-sm flex-shrink-0 mt-px">⚠</span>
+          <p className="text-red-400/90 text-xs leading-relaxed">
             <span className="font-bold">WebGPU is not available</span> — running on CPU (WASM).
             Processing a large image may take <span className="font-bold">5–15 minutes</span>.
             For best performance, use Chrome or Edge with WebGPU support.
