@@ -48,7 +48,7 @@ src/
 │   ├── home/            # Homepage sections (Hero, Featured, Updates, CTA)
 │   ├── layout/          # Navbar, Footer (persistent layout)
 │   ├── playground/      # Playground shell, module registry, types
-│   │   └── modules/     # Module implementations (weather/, weather-v2/, weather-v2-5/, split-bill/, tic-tac-toe/)
+│   │   └── modules/     # Module implementations (weather/, weather-v2/, weather-v2-5/, split-bill/, tic-tac-toe/, quick-upscaler/)
 │   ├── story/           # Story list & detail components
 │   └── ui/              # Reusable UI components (LogCard, Carousel)
 ├── constants/
@@ -95,6 +95,7 @@ src/
 │   ├── playground.split-bill.detail.$id.tsx # Bill detail
 │   ├── playground.split-bill.edit.$id.tsx   # Edit bill
 │   ├── playground.tic-tac-toe.tsx           # Tic Tac Toe route (lazy loaded)
+│   ├── playground.quick-upscaler.tsx        # Quick Image Upscaler route (lazy loaded)
 │   ├── story.tsx        # Story layout (Outlet)
 │   ├── story.index.tsx  # Story list page (/story)
 │   └── story.$slug.tsx  # Story detail page (/story/:slug)
@@ -153,6 +154,7 @@ File types (`types.ts`, `typesV2.ts`) dan shared utilities (`cities.ts`, `prng.t
 | `/about` | About | Vision, design philosophy, development philosophy, update log (infinite scroll) |
 | `/playground` | Playground | Module eksperimen (AI, Tool, Game) — dynamic loading |
 | `/playground/tic-tac-toe` | Tic Tac Toe | Game 3×3, PvP & PvC (bot Easy/Medium/Hard Minimax) |
+| `/playground/quick-upscaler` | Quick Image Upscaler | In-browser upscaling via Bicubic, Lanczos3, FSR1, Jinc EWA — WebGPU accelerated |
 | `/story` | Story List | Grid card articles (dari Hygraph atau placeholder) |
 | `/story/:slug` | Story Detail | Full article — title, meta, image, content HTML |
 | `*` (catch-all) | 404 Not Found | Error page untuk route yang tidak ada |
@@ -735,7 +737,7 @@ npm run lint     # TypeScript type check (tsc --noEmit)
 
 9. **PWA & Service Worker** — Service worker (`public/sw.js`) hanya di-register di production (bukan localhost). Saat develop, SW tidak aktif sehingga perubahan langsung terlihat. Saat deploy perubahan besar, bump semua tiga cache name (`feldora-v2`, `feldora-pages-v2`, `feldora-assets-v2`) ke versi berikutnya secara bersamaan agar cache lama terhapus.
 
-10. **Copywriting terpusat** — Semua teks/copy di-manage dari `src/constants/copy/`. Setiap halaman punya file sendiri (`home.ts`, `about.ts`, `log.ts`, `story.ts`). Untuk ubah teks di website, cukup edit file di directory ini tanpa perlu sentuh komponen.
+10. **Copywriting terpusat** — Semua teks/copy di-manage dari `src/constants/copy/`. Setiap halaman punya file sendiri (`home.ts`, `about.ts`, `log.ts`, `story.ts`). Khusus playground, semua module menggunakan `playground.ts` yang berisi copy untuk setiap module: `weather`, `weatherV2`, `weatherV2_5`, `quickUpscaler`, `ticTacToe`, `splitBill`. Untuk ubah teks di website, cukup edit file di directory ini tanpa perlu sentuh komponen.
 
 11. **Auto-version di Footer** — Footer menampilkan versi website yang otomatis dibaca dari `package.json` via Vite `define`. Didefinisikan di `vite.config.ts` sebagai `__APP_VERSION__` (string replacement saat build, zero runtime cost). Cukup update `version` di `package.json`, footer otomatis ikut. Perlu restart dev server jika version berubah saat dev sedang jalan. Gunakan `typeof __APP_VERSION__ !== 'undefined'` guard untuk mencegah ReferenceError di SSR context.
 

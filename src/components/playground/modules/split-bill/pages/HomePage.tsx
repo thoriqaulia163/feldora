@@ -12,20 +12,18 @@ import { Link, useNavigate } from '@tanstack/react-router'
 import { useCryptoContext } from '../CryptoProvider'
 import { useParticipants, useBills } from '../hooks'
 import {
-  EmptyState,
-  ParticipantModal,
-  ParticipantList,
-  BillCard,
-  DeleteConfirmModal,
-  SkeletonParticipants,
-  SkeletonBills,
+  EmptyState, ParticipantModal, ParticipantList,
+  BillCard, DeleteConfirmModal, SkeletonParticipants, SkeletonBills,
 } from '../components'
 import { PinSetup } from '../components/PinSetup'
 import { ImportQRModal } from '../components/ImportQRModal'
+import { PLAYGROUND_COPY } from '~/constants/copy/playground'
 import type { DecryptedParticipant } from '../db'
 import { createBill } from '../db'
 import type { BillListItem } from '../hooks'
 import type { QRBillData } from '../qr'
+
+const C = PLAYGROUND_COPY.splitBill
 
 export default function HomePage() {
   const { status, dek, pinEnabled, enablePIN, disablePIN } = useCryptoContext()
@@ -80,10 +78,10 @@ export default function HomePage() {
             to="/playground"
             className="text-xs text-feldora-muted hover:text-feldora-accent font-mono uppercase tracking-wider transition-colors"
           >
-            &larr; Playground
+            {C.backToPlayground}
           </Link>
           <h1 className="text-2xl md:text-3xl font-black text-feldora-text uppercase tracking-tight mt-1">
-            Split <span className="text-feldora-accent">Bill</span>
+            {C.homeTitle} <span className="text-feldora-accent">{C.homeTitleAccent}</span>
           </h1>
         </div>
         <div className="flex items-center gap-3">
@@ -95,7 +93,7 @@ export default function HomePage() {
             type="button"
             onClick={() => setShowSettings(true)}
             className="w-8 h-8 flex items-center justify-center rounded border border-feldora-border/40 text-feldora-muted hover:text-feldora-text hover:border-feldora-accent/30 transition-colors"
-            aria-label="Settings"
+            aria-label={C.settingsAriaLabel}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
@@ -119,7 +117,7 @@ export default function HomePage() {
             onClick={() => setShowAddPerson(true)}
             className="text-xs text-feldora-accent hover:text-feldora-accent/80 font-semibold transition-colors"
           >
-            + Add
+            {C.addPersonButton}
           </button>
         </div>
 
@@ -138,13 +136,13 @@ export default function HomePage() {
             <svg className="w-4 h-4 text-feldora-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
             </svg>
-            Bills ({bills.length})
+            {C.billsSectionTitle} ({bills.length})
           </h2>
           <Link
             to="/playground/split-bill/create"
             className="text-xs text-feldora-accent hover:text-feldora-accent/80 font-semibold transition-colors"
           >
-            + Create
+            + {C.createBillButton}
           </Link>
         </div>
 
@@ -155,7 +153,7 @@ export default function HomePage() {
               type="text"
               value={billSearch}
               onChange={(e) => setBillSearch(e.target.value)}
-              placeholder="Search bills..."
+              placeholder={C.searchBillsPlaceholder}
               className="flex-1 bg-feldora-surface-light border border-feldora-border rounded px-3 py-1.5 text-xs text-feldora-text placeholder:text-feldora-muted focus:outline-none focus:border-feldora-accent/50 transition-colors"
             />
           )}
@@ -163,13 +161,13 @@ export default function HomePage() {
             type="button"
             onClick={() => setShowImportQR(true)}
             className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-feldora-accent-secondary border border-feldora-accent-secondary/40 hover:bg-feldora-accent-secondary/10 rounded transition-colors"
-            aria-label="Import bill from QR"
+            aria-label={C.importQRAriaLabel}
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 3.75 9.375v-4.5ZM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5ZM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 13.5 9.375v-4.5Z" />
               <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 6.75h.75v.75h-.75v-.75ZM6.75 16.5h.75v.75h-.75v-.75ZM16.5 6.75h.75v.75h-.75v-.75ZM13.5 13.5h.75v.75h-.75v-.75ZM13.5 19.5h.75v.75h-.75v-.75ZM19.5 13.5h.75v.75h-.75v-.75ZM19.5 19.5h.75v.75h-.75v-.75ZM16.5 16.5h.75v.75h-.75v-.75Z" />
             </svg>
-            QR
+              {C.importQRButton}
           </button>
         </div>
 
@@ -243,7 +241,7 @@ function SettingsModal({
       />
       <div className="relative w-full max-w-sm card-polygon p-6 animate-fade-in">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-feldora-text font-bold text-lg">Settings</h3>
+          <h3 className="text-feldora-text font-bold text-lg">{C.settingsTitle}</h3>
           <button
             type="button"
             onClick={onClose}

@@ -12,6 +12,22 @@ export interface UpdateEntry {
 
 export const WEB_UPDATE_LOG: UpdateEntry[] = [
   {
+    date: '18 July 2026',
+    title: 'Advanced Image Upscaler — Real-ESRGAN via LiteRT.js',
+    status: 'major',
+    type: 'update',
+    version: '1.17.0',
+    description: 'New AI module: Real-ESRGAN x4v3 (4.1 MB TFLite) via LiteRT.js. Overlapping-tile inference (stride 96px, 16px overlap) for seam-free output. Download consent flow — no auto-download. WebGPU/WASM fallback. Per-tile progress. CPU warning. Slider comparison.',
+  },
+  {
+    date: '18 July 2026',
+    title: 'Quick Image Upscaler — multi-algorithm WebGPU upscaling tool',
+    status: 'moderate',
+    type: 'update',
+    version: '1.16.0',
+    description: 'New Tool module: Quick Image Upscaler. 4 algorithms — Bicubic, Lanczos3, FSR1 (fixed), Jinc EWA. WebGPU explicit availability, no silent fallback. Slider comparison. Realtime params. All playground copy centralized.',
+  },
+  {
     date: '30 June 2026',
     title: 'Tic Tac Toe: single-column layout, brighter board cells, primary reset button',
     status: 'minor',

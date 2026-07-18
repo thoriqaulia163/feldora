@@ -1,14 +1,5 @@
 /**
  * Tic Tac Toe — Main Module Component
- *
- * Layout (single column, centered):
- *   - Back link + title
- *   - Mode selector (PvP / PvC) — centered
- *   - Bot level selector (Easy / Medium / Hard) — PvC only, centered
- *   - Player legend — centered
- *   - Board — centered
- *   - Status bar (whose turn / winner / draw)
- *   - Reset button
  */
 
 import { useState } from 'react'
@@ -16,9 +7,11 @@ import { Link } from '@tanstack/react-router'
 import { useGameState } from './useGameState'
 import { GameBoard } from './GameBoard'
 import { ConfirmModal } from './ConfirmModal'
+import { PLAYGROUND_COPY } from '~/constants/copy/playground'
 import type { GameMode, BotLevel } from './types'
 
-// ─── Confirm modal state type ─────────────────────────────────────────
+const C = PLAYGROUND_COPY.ticTacToe
+
 type PendingAction =
   | { type: 'reset' }
   | { type: 'mode'; value: GameMode }
@@ -27,10 +20,7 @@ type PendingAction =
 // ─── Sub-components ───────────────────────────────────────────────────
 
 function SegmentedControl<T extends string>({
-  options,
-  value,
-  onChange,
-  colorMap,
+  options, value, onChange, colorMap,
 }: {
   options: { value: T; label: string }[]
   value: T
@@ -42,7 +32,6 @@ function SegmentedControl<T extends string>({
       {options.map((opt) => {
         const isActive = opt.value === value
         const activeColor = colorMap?.[opt.value] ?? 'border-feldora-accent text-feldora-accent bg-feldora-accent/10'
-
         return (
           <button
             key={opt.value}
@@ -65,11 +54,7 @@ function SegmentedControl<T extends string>({
 // ─── Status bar ───────────────────────────────────────────────────────
 
 function StatusBar({
-  status,
-  currentPlayer,
-  winner,
-  gameMode,
-  botThinking,
+  status, currentPlayer, winner, gameMode, botThinking,
 }: {
   status: ReturnType<typeof useGameState>['status']
   currentPlayer: ReturnType<typeof useGameState>['currentPlayer']
@@ -80,7 +65,7 @@ function StatusBar({
   if (status === 'idle') {
     return (
       <p className="text-feldora-muted font-mono text-xs uppercase tracking-wider text-center">
-        Click a cell to start
+        {C.statusIdle}
       </p>
     )
   }
@@ -88,17 +73,14 @@ function StatusBar({
   if (status === 'won' && winner) {
     const isX = winner === 'X'
     const color = isX ? 'text-feldora-accent' : 'text-feldora-accent-secondary'
-    const label =
-      gameMode === 'pvc'
-        ? isX
-          ? 'You Win!'
-          : 'Bot Wins!'
-        : `Player ${winner} Wins!`
+    const label = gameMode === 'pvc'
+      ? (isX ? C.statusWinYou : C.statusWinBot)
+      : `Player ${winner} ${C.statusWins}`
 
     return (
       <div className="flex items-center justify-center gap-2">
         <span className={`text-xl font-black uppercase tracking-wider ${color}`}>{label}</span>
-        <span className="text-feldora-muted font-mono text-xs">{winner} takes it</span>
+        <span className="text-feldora-muted font-mono text-xs">{winner} {C.statusTakesIt}</span>
       </div>
     )
   }
@@ -106,18 +88,17 @@ function StatusBar({
   if (status === 'draw') {
     return (
       <p className="text-feldora-text-secondary font-bold text-base uppercase tracking-wider text-center">
-        It&apos;s a Draw
+        {C.statusDraw}
       </p>
     )
   }
 
-  // playing
   if (botThinking) {
     return (
       <div className="flex items-center justify-center gap-2">
         <div className="w-3 h-3 border-2 border-feldora-accent-secondary border-t-transparent rounded-full animate-spin" />
         <span className="text-feldora-muted font-mono text-xs uppercase tracking-wider">
-          Bot thinking...
+          {C.statusBotThinking}
         </span>
       </div>
     )
@@ -125,12 +106,11 @@ function StatusBar({
 
   const isX = currentPlayer === 'X'
   const color = isX ? 'text-feldora-accent' : 'text-feldora-accent-secondary'
-  const turnLabel =
-    gameMode === 'pvc' && !isX
-      ? "Bot's turn"
-      : gameMode === 'pvp'
-        ? `Player ${currentPlayer}'s turn`
-        : "Your turn"
+  const turnLabel = gameMode === 'pvc' && !isX
+    ? C.statusBotTurn
+    : gameMode === 'pvp'
+      ? `Player ${currentPlayer}${C.statusPlayerTurnSuffix}`
+      : C.statusYourTurn
 
   return (
     <div className="flex items-center justify-center gap-2">
@@ -148,35 +128,23 @@ export default function TicTacToeModule() {
   const game = useGameState()
   const [pending, setPending] = useState<PendingAction | null>(null)
 
-  // A game is "in progress" when at least one move has been made and it hasn't ended
   const isInProgress = game.moveCount > 0 && (game.status === 'playing' || game.status === 'idle')
-
-  // ─── Action handlers with confirm gate ─────────────────────────────
 
   function handleModeChange(mode: GameMode) {
     if (mode === game.gameMode) return
-    if (isInProgress) {
-      setPending({ type: 'mode', value: mode })
-    } else {
-      game.setGameMode(mode)
-    }
+    if (isInProgress) setPending({ type: 'mode', value: mode })
+    else game.setGameMode(mode)
   }
 
   function handleLevelChange(level: BotLevel) {
     if (level === game.botLevel) return
-    if (isInProgress) {
-      setPending({ type: 'level', value: level })
-    } else {
-      game.setBotLevel(level)
-    }
+    if (isInProgress) setPending({ type: 'level', value: level })
+    else game.setBotLevel(level)
   }
 
   function handleReset() {
-    if (isInProgress) {
-      setPending({ type: 'reset' })
-    } else {
-      game.resetGame()
-    }
+    if (isInProgress) setPending({ type: 'reset' })
+    else game.resetGame()
   }
 
   function handleConfirm() {
@@ -187,54 +155,44 @@ export default function TicTacToeModule() {
     setPending(null)
   }
 
-  // ─── Modal copy ─────────────────────────────────────────────────────
-
   const modalProps = (() => {
     if (!pending) return null
     if (pending.type === 'reset') {
-      return {
-        title: 'Reset Game?',
-        message: 'The current game will be cleared and a new one will start.',
-        confirmLabel: 'Reset',
-      }
+      return { title: C.modalResetTitle, message: C.modalResetMessage, confirmLabel: C.modalResetConfirm }
     }
     if (pending.type === 'mode') {
-      const label = pending.value === 'pvp' ? 'Player vs Player' : 'Player vs Computer'
+      const label = C.modes[pending.value]
       return {
-        title: 'Switch Mode?',
-        message: `Switching to ${label} will reset the current game.`,
-        confirmLabel: 'Switch',
+        title: C.modalSwitchModeTitle,
+        message: `${C.modalSwitchModePrefix} ${label} ${C.modalSwitchModeSuffix}`,
+        confirmLabel: C.modalSwitchConfirm,
       }
     }
-    // level
-    const labels: Record<BotLevel, string> = { easy: 'Easy', medium: 'Medium', hard: 'Hard' }
+    const label = C.levels[pending.value]
     return {
-      title: 'Change Difficulty?',
-      message: `Switching to ${labels[pending.value]} will reset the current game.`,
-      confirmLabel: 'Switch',
+      title: C.modalChangeDiffTitle,
+      message: `${C.modalSwitchModePrefix} ${label} ${C.modalSwitchModeSuffix}`,
+      confirmLabel: C.modalSwitchConfirm,
     }
   })()
 
-  // ─── Options ────────────────────────────────────────────────────────
-
   const modeOptions: { value: GameMode; label: string }[] = [
-    { value: 'pvp', label: 'PvP' },
-    { value: 'pvc', label: 'PvC' },
+    { value: 'pvp', label: C.modeOptions.pvp },
+    { value: 'pvc', label: C.modeOptions.pvc },
   ]
 
   const levelOptions: { value: BotLevel; label: string }[] = [
-    { value: 'easy', label: 'Easy' },
-    { value: 'medium', label: 'Med' },
-    { value: 'hard', label: 'Hard' },
+    { value: 'easy',   label: C.levelOptions.easy },
+    { value: 'medium', label: C.levelOptions.medium },
+    { value: 'hard',   label: C.levelOptions.hard },
   ]
 
   const levelColorMap: Partial<Record<BotLevel, string>> = {
-    easy: 'border-emerald-500/50 text-emerald-400 bg-emerald-500/10',
+    easy:   'border-emerald-500/50 text-emerald-400 bg-emerald-500/10',
     medium: 'border-amber-500/50 text-amber-400 bg-amber-500/10',
-    hard: 'border-red-500/50 text-red-400 bg-red-500/10',
+    hard:   'border-red-500/50 text-red-400 bg-red-500/10',
   }
 
-  // Board is non-interactive when game is over, or when it's bot's turn in PvC
   const boardDisabled =
     game.status === 'won' ||
     game.status === 'draw' ||
@@ -243,28 +201,25 @@ export default function TicTacToeModule() {
 
   return (
     <div className="space-y-8">
-      {/* Back link */}
       <Link
         to="/playground"
         className="inline-flex items-center gap-2 text-feldora-text-secondary text-sm hover:text-feldora-accent transition-colors duration-200 group"
       >
         <span className="group-hover:-translate-x-1 transition-transform duration-200">←</span>
-        Back to modules
+        {C.backLabel}
       </Link>
 
-      {/* Title */}
       <div className="flex items-center gap-3">
         <div className="diamond-marker !w-2.5 !h-2.5" />
-        <h2 className="text-lg font-bold uppercase tracking-wider">Tic Tac Toe</h2>
+        <h2 className="text-lg font-bold uppercase tracking-wider">{C.name}</h2>
       </div>
 
-      {/* Controls + Board — single column, centered */}
       <div className="flex flex-col items-center gap-6">
 
         {/* Mode selector */}
         <div className="flex flex-col items-center gap-2">
           <span className="text-feldora-muted font-mono text-[10px] uppercase tracking-wider">
-            Game Mode
+            {C.modeSectionLabel}
           </span>
           <SegmentedControl
             options={modeOptions}
@@ -273,11 +228,11 @@ export default function TicTacToeModule() {
           />
         </div>
 
-        {/* Bot level — only in PvC */}
+        {/* Bot level */}
         {game.gameMode === 'pvc' && (
           <div className="flex flex-col items-center gap-2">
             <span className="text-feldora-muted font-mono text-[10px] uppercase tracking-wider">
-              Bot Difficulty
+              {C.levelSectionLabel}
             </span>
             <SegmentedControl
               options={levelOptions}
@@ -293,14 +248,14 @@ export default function TicTacToeModule() {
           <div className="flex items-center gap-1.5">
             <span className="font-black text-feldora-accent text-base leading-none">X</span>
             <span className="text-feldora-muted font-mono text-[10px] uppercase tracking-wider">
-              {game.gameMode === 'pvp' ? 'Player 1' : 'You'}
+              {game.gameMode === 'pvp' ? C.legendPlayer1 : C.legendYou}
             </span>
           </div>
           <div className="w-px h-4 bg-feldora-border/40" />
           <div className="flex items-center gap-1.5">
             <span className="font-black text-feldora-accent-secondary text-base leading-none">O</span>
             <span className="text-feldora-muted font-mono text-[10px] uppercase tracking-wider">
-              {game.gameMode === 'pvp' ? 'Player 2' : 'Bot'}
+              {game.gameMode === 'pvp' ? C.legendPlayer2 : C.legendBot}
             </span>
           </div>
         </div>
@@ -326,17 +281,16 @@ export default function TicTacToeModule() {
           />
         </div>
 
-        {/* Reset button */}
+        {/* Reset */}
         <button
           type="button"
           onClick={handleReset}
           className="btn-angular-primary !px-8 !py-2 !text-[11px] w-full max-w-xs"
         >
-          Reset Game
+          {C.resetButton}
         </button>
       </div>
 
-      {/* Confirm Modal */}
       {pending && modalProps && (
         <ConfirmModal
           open

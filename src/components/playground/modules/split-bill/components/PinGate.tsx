@@ -5,6 +5,9 @@
  */
 
 import { useState, useRef, useEffect } from 'react'
+import { PLAYGROUND_COPY } from '~/constants/copy/playground'
+
+const C = PLAYGROUND_COPY.splitBill
 
 interface PinGateProps {
   readonly onUnlock: (pin: string) => Promise<boolean>
@@ -24,7 +27,7 @@ export function PinGate({ onUnlock, error: externalError }: PinGateProps) {
   async function handleSubmit(e: { preventDefault: () => void }) {
     e.preventDefault()
     if (!pin.trim()) {
-      setLocalError('Enter PIN')
+      setLocalError(C.pinEnterError)
       return
     }
 
@@ -34,7 +37,7 @@ export function PinGate({ onUnlock, error: externalError }: PinGateProps) {
     setLoading(false)
 
     if (!success) {
-      setLocalError('Wrong PIN')
+      setLocalError(C.pinWrongError)
       setPin('')
       inputRef.current?.focus()
     }
@@ -52,8 +55,8 @@ export function PinGate({ onUnlock, error: externalError }: PinGateProps) {
           </svg>
         </div>
 
-        <h2 className="text-feldora-text font-bold text-lg mb-1">Split Bill Locked</h2>
-        <p className="text-feldora-text-secondary text-xs mb-6">Enter PIN to unlock</p>
+        <h2 className="text-feldora-text font-bold text-lg mb-1">{C.pinLockedTitle}</h2>
+        <p className="text-feldora-text-secondary text-xs mb-6">{C.pinLockedSubtitle}</p>
 
         <form onSubmit={handleSubmit}>
           <input
@@ -65,7 +68,7 @@ export function PinGate({ onUnlock, error: externalError }: PinGateProps) {
               setPin(e.target.value)
               setLocalError('')
             }}
-            placeholder="PIN"
+            placeholder={C.pinPlaceholder}
             maxLength={20}
             className="w-full bg-feldora-surface-light border border-feldora-border rounded px-4 py-3 text-center text-lg text-feldora-text tracking-[0.5em] placeholder:text-feldora-muted placeholder:tracking-normal focus:outline-none focus:border-feldora-accent/50 transition-colors"
             disabled={loading}
@@ -81,7 +84,7 @@ export function PinGate({ onUnlock, error: externalError }: PinGateProps) {
             disabled={loading || !pin.trim()}
             className="w-full btn-angular-primary px-4 py-2.5 text-xs font-semibold uppercase tracking-wider mt-4 disabled:opacity-40"
           >
-            {loading ? 'Unlocking...' : 'Unlock'}
+          {loading ? C.pinUnlockingButton : C.pinUnlockButton}
           </button>
         </form>
       </div>

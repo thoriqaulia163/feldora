@@ -23,6 +23,7 @@ Open [http://localhost:3000](http://localhost:3000)
 
 ### AI Model Setup (optional, for Playground)
 
+**Weather Models** (pre-train dari script):
 ```bash
 # 1. Fetch weather dataset from Open-Meteo (~5-10 min)
 npx tsx scripts/local-weather-forecast/dataset-extract.ts --start 2021 --end 2025

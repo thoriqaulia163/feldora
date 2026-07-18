@@ -49,12 +49,11 @@ function PlaygroundIndex() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search modules..."
-            className="w-full bg-feldora-surface-light border border-feldora-border/50 text-feldora-text text-sm pl-10 pr-4 py-2.5 focus:outline-none focus:border-feldora-accent/60 transition-colors"
+            placeholder={PLAYGROUND_COPY.moduleList.searchPlaceholder}            className="w-full bg-feldora-surface-light border border-feldora-border/50 text-feldora-text text-sm pl-10 pr-4 py-2.5 focus:outline-none focus:border-feldora-accent/60 transition-colors"
           />
         </div>
         <p className="mt-3 text-feldora-muted text-xs">
-          Modules can be used offline after being opened once.
+          {PLAYGROUND_COPY.moduleList.offlineHint}
         </p>
       </section>
 
@@ -63,7 +62,7 @@ function PlaygroundIndex() {
         {filtered.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-feldora-muted font-mono text-xs uppercase tracking-wider">
-              No modules found
+              {PLAYGROUND_COPY.moduleList.noModulesFound}
             </p>
           </div>
         ) : (
@@ -97,7 +96,7 @@ function ModuleCard({ module: mod }: { module: PlaygroundModule }) {
 
   return (
     <Link
-      to={`/playground/${mod.id}` as '/playground/local-weather-forecast' | '/playground/local-weather-forecast-v2' | '/playground/local-weather-forecast-v2-5' | '/playground/split-bill' | '/playground/tic-tac-toe'}
+      to={`/playground/${mod.id}` as '/playground/local-weather-forecast' | '/playground/local-weather-forecast-v2' | '/playground/local-weather-forecast-v2-5' | '/playground/split-bill' | '/playground/tic-tac-toe' | '/playground/quick-upscaler' | '/playground/ai-upscaler'}
       className="card-polygon p-6 flex flex-col hover:border-feldora-accent/40 transition-all duration-300"
     >
       <div className="flex items-center justify-between mb-3">
@@ -118,16 +117,16 @@ function ModuleCard({ module: mod }: { module: PlaygroundModule }) {
             {PLAYGROUND_COPY.moduleList.sizeLabel}: {mod.estimatedDownloadSize}
           </span>
           <span className="text-feldora-muted font-mono text-[10px] uppercase tracking-wider">
-            Updated: {mod.lastUpdated}
+            {PLAYGROUND_COPY.moduleList.updatedLabel} {mod.lastUpdated}
           </span>
         </div>
         {offlineReady ? (
           <span className="font-mono text-[9px] uppercase tracking-wider px-2 py-0.5 border bg-emerald-500/10 text-emerald-400 border-emerald-500/30">
-            Offline Ready
+            {PLAYGROUND_COPY.moduleList.offlineReadyBadge}
           </span>
         ) : (
           <span className="font-mono text-[9px] uppercase tracking-wider px-2 py-0.5 border bg-feldora-surface-light text-feldora-muted border-feldora-border/30">
-            Not Loaded
+            {PLAYGROUND_COPY.moduleList.notLoadedBadge}
           </span>
         )}
       </div>

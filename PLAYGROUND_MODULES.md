@@ -861,3 +861,355 @@ Layout single column, semua elemen center-aligned untuk semua ukuran layar. How 
 - Tidak ada score tracking / win counter antar ronde
 - Tidak ada mode "Bot goes first"
 - Hard mode 100% optimal — tidak ada variasi/randomness, selalu main sempurna
+
+---
+
+## Quick Image Upscaler
+
+| Field | Value |
+|-------|-------|
+| ID | `quick-upscaler` |
+| Label | Tool |
+| Last Updated | 30 June 2026 |
+| Download Size | < 5 KB |
+| Offline | ✅ Always (no model downloads) |
+
+### Deskripsi
+
+In-browser image upscaling (2× / 4×) dengan empat pilihan algoritma. WebGPU algorithms berjalan as compute shaders — tidak ada API call, tidak ada download model. Bicubic tersedia di semua browser tanpa WebGPU.
+
+### Algorithms
+
+| Algoritma | Engine | Deskripsi | WebGPU required |
+|-----------|--------|-----------|-----------------|
+| **Bicubic** | Canvas 2D | Smooth interpolation (`imageSmoothingQuality: 'high'`). Baseline, selalu tersedia. | ❌ No |
+| **Lanczos3** | WebGPU | Separable 6-tap filter (H pass → V pass). Industry standard, very sharp. | ✅ Yes |
+| **FSR1** | WebGPU | AMD FidelityFX EASU (edge-adaptive) + optional RCAS sharpening. | ✅ Yes |
+| **Jinc EWA** | WebGPU | Elliptical Weighted Average, circular sampling, no separable artifacts. | ✅ Yes |
+
+### Shader Pipeline
+
+```
+┌────────────┬────────────────────────────────────────────────────────┐
+│ Bicubic    │ Canvas 2D drawImage (browser-native)                   │
+├────────────┼────────────────────────────────────────────────────────┤
+│ Lanczos3   │ L3H compute pass (outW × inH) →                        │
+│            │ L3V compute pass (outW × outH) →                       │
+│            │ RCAS compute pass (optional)                           │
+├────────────┼────────────────────────────────────────────────────────┤
+│ FSR1       │ EASU compute pass (fixed: B-spline kernel, 1.5× stretch max) → │
+│            │ RCAS compute pass (optional)                           │
+├────────────┼────────────────────────────────────────────────────────┤
+│ Jinc EWA   │ Jinc compute pass (single-pass, circular ~16-21 samples) → │
+│            │ RCAS compute pass (optional)                           │
+└────────────┴────────────────────────────────────────────────────────┘
+```
+
+All pipelines share the same RCAS compute shader and the same bind group layout (4 bindings: texture, storage texture, sampler, uniform buffer).
+
+### WebGPU Availability Design
+
+**No silent fallback** — jika user memilih Lanczos3/FSR1/Jinc tapi WebGPU tidak tersedia, error ditampilkan eksplisit. Tidak ada automatic fallback ke Bicubic tanpa sepengetahuan user.
+
+- `webGPUAvailable: boolean` di-expose dari hook ke UI
+- Default algorithm: `lanczos3` jika WebGPU available, `bicubic` jika tidak
+- Algorithm selector: Lanczos3, FSR1, Jinc tombolnya disabled + opacity 35% + tooltip "Requires WebGPU" bila unavailable
+- Amber warning note di ControlPanel saat WebGPU tidak available
+
+### FSR1 Fix (vs original implementation)
+
+Original FSR1 EASU menggunakan pure Lanczos2 kernel yang menyebabkan ringing artifacts, terutama pada 4× upscale. Fixed version:
+
+| Parameter | Original | Fixed |
+|-----------|----------|-------|
+| Kernel | Lanczos2 (negative lobes) | Quadratic B-spline (always ≥ 0) |
+| Max stretch | 2.5× | 1.5× |
+| Sample grid | 4×4 = 16 taps | 3×3 = 9 taps |
+
+### Lanczos3 Math
+
+Separable 2-pass, 6 taps per dimension:
+```
+L(x) = sinc(x) · sinc(x/3)   for |x| < 3
+Taps:  k = −2, −1, 0, 1, 2, 3  (relative to floor(inputPos))
+weight_k = lanczos3(k − frac)
+```
+
+Intermediate texture (H-pass result): `outW × inH` — prevents double-sampling artifacts.
+
+### Jinc EWA Math
+
+Single-pass circular sampling, 2-lobe windowed Jinc:
+```
+jinc(x) = 2·J1(πx)/(πx)      (normalised so jinc(0) = 1)
+weight   = jinc(r) · jinc(r/2) for dist r < 2.0
+Samples: dx, dy ∈ [−2, 2] → ~16–21 accepted per output pixel
+```
+
+J1 approximated via 5-term power series (accurate ±0.5% for x ∈ [0, 2]).
+
+### RCAS (Robust Contrast Adaptive Sharpening)
+
+Post-process sharpen tersedia untuk Lanczos3, FSR1, dan Jinc EWA. Tidak tersedia untuk Bicubic (butuh WebGPU).
+
+- Samples center + 4 NSEW neighbors
+- Sharpening strength inversely proportional to local contrast (no halos)
+- Strength slider: 0% = maximum, 100% = no sharpening (AMD convention)
+- `strength = 1.0` → perfect passthrough (WGSL verified)
+
+### Controls (Realtime)
+
+Semua perubahan parameter di-debounce 100ms dan langsung reprocess (tidak ada tombol "Process"):
+
+| Control | Options | Notes |
+|---------|---------|-------|
+| Algorithm | Bicubic / Lanczos3 / FSR1 / Jinc EWA | GPU options disabled bila WebGPU unavailable |
+| Upscale Factor | 2× / 4× | |
+| Sharpening (RCAS) | On / Off | Disabled bila Bicubic |
+| RCAS Strength | Slider 0–100% | Visible bila RCAS On |
+| Output Format | PNG / JPEG | |
+| JPEG Quality | Slider 50–95 | Visible bila JPEG |
+
+### Slider Comparison
+
+Result ditampilkan sebagai curtain/slider comparison (before ↔ after):
+- Result layer di bawah (full width)
+- Original layer di atas dengan `clip-path: inset(0 X% 0 0)` yang bergerak sesuai drag
+- Pointer capture API untuk drag support (mouse + touch)
+- Divider line + circular handle di tengah
+
+### Input/Output Spec
+
+**Input:**
+- Format: PNG, JPEG
+- Max file size: 10 MB
+- Max resolution: 4000×4000 px
+
+**Output:**
+- Filename: `{original_name}_{algorithm}_{scale}x.{ext}`
+- PNG: lossless
+- JPEG: quality 50–95 (default 82)
+
+### SSR / Node.js Compatibility
+
+`GPUShaderStage` adalah browser-only global — tidak tersedia di Node.js (Nitro SSR context). `RCAS_BGL_DESC` adalah module-level const yang dievaluasi saat import.
+
+**Fix:** `GPUShaderStage.COMPUTE` diganti dengan literal `4` (spec-defined constant, selalu valid).
+
+### File Structure
+
+```
+src/components/playground/modules/quick-upscaler/
+├── types.ts                    # UpscaleAlgorithm, ALGORITHM_NEEDS_WEBGPU, UpscalerState
+├── shaders/
+│   ├── easu.wgsl.ts            # FSR1 EASU (fixed: B-spline kernel)
+│   ├── rcas.wgsl.ts            # RCAS sharpening (no sampler, textureLoad)
+│   ├── lanczos3-h.wgsl.ts      # Lanczos3 horizontal pass
+│   ├── lanczos3-v.wgsl.ts      # Lanczos3 vertical pass
+│   └── jinc.wgsl.ts            # EWA Jinc single-pass
+├── webgpu/
+│   └── renderer.ts             # FSR1Renderer: create(), upscaleLanczos3/FSR1/Jinc()
+├── fallback/
+│   └── bicubic.ts              # Canvas 2D fallback (OffscreenCanvas)
+├── useUpscaler.ts              # Hook: webGPUAvailable, processImage, realtime debounce
+├── ImageDropzone.tsx           # Drag-drop + click upload
+├── SliderComparison.tsx        # Curtain comparison (clip-path + pointer capture)
+├── ControlPanel.tsx            # AlgorithmSelector, ToggleGroup, RangeSlider
+└── QuickUpscalerModule.tsx     # Main module component
+
+src/routes/
+└── playground.quick-upscaler.tsx   # Route (lazy Suspense)
+```
+
+### Copy
+
+Semua UI strings diambil dari `PLAYGROUND_COPY.quickUpscaler` di `src/constants/copy/playground.ts`:
+
+```typescript
+quickUpscaler: {
+  name, description, backLabel, moduleLabel,
+  webGPUAvailable, webGPUUnavailable, webGPURequiredTooltip, webGPUDisabledNote,
+  algorithmLabel, scaleLabel, sharpeningLabel, strengthLabel, formatLabel, qualityLabel,
+  algorithms: { bicubic, lanczos3, fsr1, jinc } × { label, desc },
+  rcasOn, rcasOff, rcasNotAvailable,
+  scale2x, scale4x, formatPng, formatJpeg,
+  processingLabels: { bicubic, lanczos3, fsr1, jinc, fallback, updating },
+  dropzonePrompt, dropzonePromptAccent, dropzoneReplaceHint, dropzoneAriaLabel,
+  sliderOriginalLabel, sliderResultLabel, sliderResultAlt, sliderOriginalAlt, sliderHint,
+  downloadButton,
+}
+```
+
+### Limitasi
+
+- Semua algoritma adalah mathematical interpolation — tidak ada detail reconstruction (tidak add texture yang tidak ada di input)
+- Jinc EWA hasilnya terlalu smooth untuk gambar foto natural (less preferred vs FSR1)
+- WebGPU availability: Chrome 113+, Edge 113+, Safari 18+; Firefox 141+ (Windows only, 2025)
+- 4× upscale pada gambar besar (misal 2000×2000 → 8000×8000) membutuhkan significant GPU memory
+- Output file size bisa jauh lebih besar dari input jika input JPEG heavily-compressed — ini expected behavior
+
+---
+
+## Advanced Image Upscaler
+
+| Field | Value |
+|-------|-------|
+| ID | `ai-upscaler` |
+| Label | AI |
+| Last Updated | 18 July 2026 |
+| Model Size | ~4.1 MB (.tflite, committed to repo) |
+| Runtime | LiteRT.js WASM ~9 MB (loaded from jsDelivr CDN) |
+| Offline | ✅ After first use (model cached by SW, WASM by browser HTTP cache) |
+
+### Deskripsi
+
+AI-powered 4× image upscaling menggunakan Real-ESRGAN x4v3 yang berjalan seluruhnya di browser via LiteRT.js. Berbeda dengan quick-upscaler (mathematical interpolation), model ini menggunakan deep learning untuk **menambahkan detail yang plausible** — tidak sekadar memperbesar pixel yang ada.
+
+Catatan: model berbasis GAN cenderung menghasilkan output yang terlihat lebih "stylized" / "perceptually sharp" dibanding original. Untuk foto natural hasilnya sangat baik; untuk digital illustration output bisa terlihat lebih "kartun".
+
+### Model
+
+**Real-ESRGAN General x4v3 — LiteRT format**
+
+| Properti | Value |
+|----------|-------|
+| Source | `litert-community/real-esrgan-x4v3-litert` (Hugging Face) |
+| Arsitektur | SRVGGNetCompact (~1.2M params) |
+| Format | TFLite FP16 |
+| Input | `[1, 128, 128, 3]` NHWC, RGB, 0–1 |
+| Output | `[1, 3, 512, 512]` **NCHW**, RGB, 0–1 ← channels-first, perlu transpose |
+| GPU compatibility | 211/211 nodes GPU-resident, zero fallback ops |
+
+Output NCHW perlu di-transpose ke NHWC saat paste ke canvas: `srcIdx = ch * H * W + row * W + col`.
+
+### LiteRT.js Runtime
+
+WASM runtime di-load dari CDN (bukan committed ke repo — terlalu besar):
+
+```typescript
+await loadLiteRt('https://cdn.jsdelivr.net/npm/@litertjs/core@2.5.3/wasm/')
+```
+
+Browser mendownload hanya satu WASM variant (~9 MB) yang sesuai kemampuannya:
+- `litert_wasm_internal` — standard
+- `litert_wasm_compat` — browser compat
+- `litert_wasm_threaded` — SharedArrayBuffer
+- `litert_wasm_jspi` — JSPI (async partitioning)
+
+Setelah download pertama, WASM di-cache di HTTP cache browser (bukan SW cache).
+
+### Akselerasi
+
+| Mode | Kondisi | Performa estimasi |
+|------|---------|-------------------|
+| **WebGPU** | Chrome 113+, Edge 113+, Safari 18+ | 5–30 detik per gambar |
+| **WASM (CPU)** | Semua browser | 5–15 menit per gambar |
+
+Model dikompilasi dengan `accelerator: 'webgpu'`. Jika gagal, auto-fallback ke `'wasm'`. UI menampilkan warning eksplisit saat CPU mode aktif.
+
+### Tiling Pipeline (Overlapping)
+
+Model menerima input tetap 128×128 → output 512×512. Untuk gambar lebih besar, gambar dibagi menjadi tiles yang **saling overlap** untuk menghindari seam artifacts:
+
+```
+TILE_SIZE   = 128 px
+TILE_OVERLAP = 16 px (per sisi)
+TILE_STRIDE  = 96 px (128 - 2×16)
+
+Untuk setiap tile:
+  input region  = 128×128 (termasuk 16px overlap dari tetangga)
+  output region = 512×512
+  crop region   = output[cropY:cropY+cropH, cropX:cropX+cropW]
+                  (buang 64px border = 16px input × 4 scale)
+  paste di      = (effX × 4, effY × 4) pada output canvas
+```
+
+Tile count untuk 1500×1500: `ceil(1500/96) × ceil(1500/96) = 16 × 16 = 256 tiles`
+
+Tanpa overlap (stride=128): 144 tiles tapi terlihat patah-patah. Dengan overlap: 256 tiles, seamless.
+
+### Download Consent Flow
+
+User **tidak auto-download** saat membuka module. Alurnya:
+
+```
+Buka module
+  ↓ Cek SW cache: caches.match(MODEL_URL)
+  ├─ HIT  → langsung load model (sudah pernah download)
+  └─ MISS → tampilkan DownloadConsentPrompt
+                User klik "Download & Enable Module"
+                  ↓ loadLiteRt(CDN) + loadAndCompile(model)
+                User tidak klik → tetap di consent page
+```
+
+State machine: `checking` → `needs-download` → `loading-model` → `idle` → `processing`/`assembling` → `done`
+
+Reset tidak kembali ke `'checking'` — jika model sudah loaded, reset ke `'idle'`.
+
+### Input / Output Spec
+
+**Input:**
+- Format: PNG, JPEG
+- Max file size: 8 MB
+- Max resolusi: 1500×1500 px
+- Validasi saat upload
+
+**Output:**
+- Resolusi: selalu 4× (satu-satunya mode yang didukung model)
+- Format: PNG atau JPEG (quality 60–95, default 85)
+- Filename: `{original_name}_realesrgan_4x.{ext}`
+
+### File Structure
+
+```
+src/components/playground/modules/ai-upscaler/
+├── types.ts                    AIUpscalerStatus, AIUpscalerState, AI_LIMITS, LITERT_WASM_CDN, MODEL_URL
+├── tiling/
+│   ├── splitter.ts             splitIntoTiles() — overlapping tiles (stride 96, overlap 16)
+│   └── assembler.ts            pasteTile() NCHW→RGBA crop-aware, createOutputCanvas, canvasToBlob
+├── inference/
+│   └── runner.ts               loadModel() WebGPU→WASM, runTile() singleton cache
+├── useAIUpscaler.ts            State machine, cache check, consent flow, tile loop
+├── DownloadConsentPrompt.tsx   Consent UI (what will be downloaded, sizes, CDN URL)
+├── DisclaimerBox.tsx           Always-visible warnings (model characteristics, limits)
+├── ImageDropzone.tsx
+├── ProgressBar.tsx             current/total per-tile + percentage
+├── SliderComparison.tsx        Curtain comparison (identical pattern to quick-upscaler)
+└── AIUpscalerModule.tsx        Main: consent gate, model status, CPU warning, original preview
+
+public/ai-models/ai-upscaler/
+└── model.tflite                Real-ESRGAN x4v3 (4.1 MB, committed to repo)
+
+src/routes/
+└── playground.ai-upscaler.tsx
+```
+
+### State Management
+
+```typescript
+type AIUpscalerStatus =
+  | 'checking'        // mount: cek SW cache
+  | 'needs-download'  // cache miss, menunggu user consent
+  | 'loading-model'   // loadLiteRt() + loadAndCompile()
+  | 'idle'            // model ready, menunggu gambar + "Start"
+  | 'processing'      // tile loop berjalan
+  | 'assembling'      // canvasToBlob()
+  | 'done'
+  | 'error'
+```
+
+### UI Khusus
+
+- **DownloadConsentPrompt** — ditampilkan saat model belum di-cache. Menampilkan ukuran download (model 4.1MB + WASM 9MB dari CDN), user harus klik untuk memulai download.
+- **CPU Warning** — banner amber saat `modelAccelerated === false`: "WebGPU not available — running on CPU. Processing may take 5–15 minutes."
+- **Original Preview** — setelah upload, gambar original ditampilkan dengan info dimensi sebelum processing dimulai.
+- **Processing Indicator** — spinner "Preparing tiles…" sebelum tile pertama, ProgressBar saat tile berjalan.
+- `setTimeout(0)` setelah `PROCESSING_START` dispatch dan setelah setiap `TILE_DONE` — memastikan React flush dan repaint sebelum WASM memblokir main thread.
+
+### Limitasi
+
+- 4× upscale only (fixed by model architecture)
+- Model GAN menghasilkan output "stylized" — detail yang ditambahkan adalah interpretasi AI, bukan rekonstruksi akurat
+- Untuk digital illustration/artwork, output bisa terlihat lebih "kartun" karena training data model mayoritas foto
+- WASM fallback sangat lambat (5–15 menit untuk gambar besar) — disarankan gunakan Chrome/Edge untuk WebGPU
+- LiteRT runtime (~9 MB) perlu internet untuk download pertama kali (setelah itu browser HTTP cache)

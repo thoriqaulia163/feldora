@@ -32,6 +32,25 @@ export const PLAYGROUND_MODULES: PlaygroundModule[] = [
     cacheCheckUrl: '/ai-models/local-weather-forecast-v2-5/model.json',
   },
   {
+    id: 'ai-upscaler',
+    name: 'Advanced Image Upscaler',
+    description:
+      'AI-powered 4× image upscaling using Real-ESRGAN x4v3. Runs entirely in-browser via LiteRT.js (WebGPU or WASM). Model ~4 MB — downloaded once, cached offline.',
+    label: 'AI',
+    lastUpdated: '18 July 2026',
+    estimatedDownloadSize: '~4 MB',
+    cacheCheckUrl: '/ai-models/ai-upscaler/model.tflite',
+  },
+  {
+    id: 'quick-upscaler',
+    name: 'Quick Image Upscaler',
+    description:
+      'In-browser image upscaling via Bicubic, Lanczos3, FSR1 (Edge-Adaptive), or EWA Jinc. WebGPU-accelerated — no downloads, no API calls.',
+    label: 'Tool',
+    lastUpdated: '30 June 2026',
+    estimatedDownloadSize: '< 5 KB',
+  },
+  {
     id: 'tic-tac-toe',
     name: 'Tic Tac Toe',
     description:
