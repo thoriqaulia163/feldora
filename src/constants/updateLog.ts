@@ -12,9 +12,17 @@ export interface UpdateEntry {
 
 export const WEB_UPDATE_LOG: UpdateEntry[] = [
   {
+    date: '21 July 2026',
+    title: 'Device compatibility badges on playground module cards',
+    status: 'minor',
+    type: 'update',
+    version: '1.17.1',
+    description: 'Each module card now shows Desktop and Mobile compatibility badges (smooth/limited/unsupported) with hover tooltips. Defined as required field in moduleRegistry. AI Upscaler disclaimer updated with performance lag warning.',
+  },
+  {
     date: '18 July 2026',
     title: 'Advanced Image Upscaler — Real-ESRGAN via LiteRT.js',
-    status: 'major',
+    status: 'moderate',
     type: 'update',
     version: '1.17.0',
     description: 'New AI module: Real-ESRGAN x4v3 (4.1 MB TFLite) via LiteRT.js. Overlapping-tile inference (stride 96px, 16px overlap) for seam-free output. Download consent flow — no auto-download. WebGPU/WASM fallback. Per-tile progress. CPU warning. Slider comparison.',

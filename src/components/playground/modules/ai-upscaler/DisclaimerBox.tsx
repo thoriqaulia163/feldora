@@ -1,3 +1,4 @@
+
 import { AI_LIMITS } from './types'
 
 export function DisclaimerBox() {
@@ -36,6 +37,14 @@ export function DisclaimerBox() {
           reconstruction.
         </li>
       </ul>
+
+      {/* Performance warning */}
+      <div className="border border-red-500/30 bg-red-500/5 px-3 py-2.5 flex items-start gap-2">
+        <span className="text-red-400 text-sm flex-shrink-0 mt-px">⚠</span>
+        <p className="text-red-400/90 text-xs leading-relaxed">
+          This feature may cause your device <span className="font-bold">lagging or freezing</span> due to local device processing.
+        </p>
+      </div>
     </div>
   )
 }

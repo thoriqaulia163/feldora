@@ -4,6 +4,30 @@ Dokumentasi lengkap semua module yang tersedia di `/playground`.
 
 ---
 
+## Device Support — Aturan & Ringkasan
+
+Setiap module **wajib** mendefinisikan `deviceSupport` di `moduleRegistry.ts` dengan nilai untuk `desktop` dan `mobile`.
+
+| Nilai | Badge | Arti |
+|-------|-------|------|
+| `smooth` | ✓ hijau | Berjalan tanpa catatan |
+| `limited` | ⚠ amber | Berjalan tapi ada batasan (misal: fitur tertentu tidak tersedia di browser) |
+| `unsupported` | ✗ muted | Tidak berjalan |
+
+**Ringkasan semua module:**
+
+| Module | Desktop | Mobile | Catatan |
+|--------|---------|--------|---------|
+| Local Weather Forecast | ✅ smooth | ✅ smooth | Pure JS, no special API |
+| Local Weather Forecast V2 | ✅ smooth | ✅ smooth | Pure JS, no special API |
+| Local Weather Forecast V2.5 | ✅ smooth | ✅ smooth | Pure JS, no special API |
+| AI Upscaler | ✅ smooth | ⚠ limited | WebGPU tidak tersedia di mobile → WASM CPU (5–15 menit) |
+| Quick Upscaler | ✅ smooth | ⚠ limited | GPU algorithms (Lanczos3/FSR1/Jinc) tidak tersedia → hanya Bicubic |
+| Tic Tac Toe | ✅ smooth | ✅ smooth | Pure JS |
+| Split Bill | ✅ smooth | ✅ smooth | IndexedDB + WebCrypto + Camera QR semua tersedia |
+
+---
+
 ## Local Weather Forecast
 
 | Field | Value |

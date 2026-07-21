@@ -3,7 +3,7 @@ import { Link, createFileRoute } from '@tanstack/react-router'
 import { PageHeader } from '~/components/ui/PageHeader'
 import { PLAYGROUND_COPY } from '~/constants/copy'
 import { PLAYGROUND_MODULES } from '~/components/playground/moduleRegistry'
-import type { PlaygroundModule, ModuleLabel } from '~/components/playground/types'
+import type { PlaygroundModule, ModuleLabel, DeviceCompatibility } from '~/components/playground/types'
 
 export const Route = createFileRoute('/playground/')({
   head: () => ({
@@ -77,6 +77,28 @@ function PlaygroundIndex() {
   )
 }
 
+const DC = PLAYGROUND_COPY.moduleList.deviceSupport
+
+const deviceBadgeStyles: Record<DeviceCompatibility, { icon: string; color: string; border: string }> = {
+  smooth:      { icon: '✓', color: 'text-emerald-400', border: 'border-emerald-500/30 bg-emerald-500/5' },
+  limited:     { icon: '⚠', color: 'text-amber-400',   border: 'border-amber-500/30 bg-amber-500/5' },
+  unsupported: { icon: '✗', color: 'text-feldora-muted', border: 'border-feldora-border/30 bg-feldora-surface-light' },
+}
+
+function DeviceBadge({ compat, label, device }: { compat: DeviceCompatibility; label: string; device: 'desktop' | 'mobile' }) {
+  const { icon, color, border } = deviceBadgeStyles[compat]
+  const tooltipKey = `${device}_${compat}` as keyof typeof DC.tooltips
+  return (
+    <span
+      title={DC.tooltips[tooltipKey]}
+      className={`flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider border px-2 py-0.5 cursor-default ${color} ${border}`}
+    >
+      <span className="text-sm mb-1 leading-none">{icon}</span>
+      <span>{label}</span>
+    </span>
+  )
+}
+
 function ModuleCard({ module: mod }: { module: PlaygroundModule }) {
   const [offlineReady, setOfflineReady] = useState(false)
 
@@ -129,6 +151,12 @@ function ModuleCard({ module: mod }: { module: PlaygroundModule }) {
             {PLAYGROUND_COPY.moduleList.notLoadedBadge}
           </span>
         )}
+      </div>
+
+      {/* Device compatibility */}
+      <div className="flex items-center gap-3 pt-3 border-t border-feldora-border/20 mt-2">
+        <DeviceBadge compat={mod.deviceSupport.desktop} label={DC.desktopLabel} device="desktop" />
+        <DeviceBadge compat={mod.deviceSupport.mobile}  label={DC.mobileLabel}  device="mobile" />
       </div>
     </Link>
   )

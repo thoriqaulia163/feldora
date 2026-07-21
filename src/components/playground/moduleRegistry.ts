@@ -10,6 +10,7 @@ export const PLAYGROUND_MODULES: PlaygroundModule[] = [
     lastUpdated: '20 June 2026',
     estimatedDownloadSize: '~130 KB',
     cacheCheckUrl: '/ai-models/local-weather-forecast/model.json',
+    deviceSupport: { desktop: 'smooth', mobile: 'smooth' },
   },
   {
     id: 'local-weather-forecast-v2',
@@ -20,6 +21,7 @@ export const PLAYGROUND_MODULES: PlaygroundModule[] = [
     lastUpdated: '22 June 2026',
     estimatedDownloadSize: '~420 KB',
     cacheCheckUrl: '/ai-models/local-weather-forecast-v2/model.json',
+    deviceSupport: { desktop: 'smooth', mobile: 'smooth' },
   },
   {
     id: 'local-weather-forecast-v2-5',
@@ -30,6 +32,7 @@ export const PLAYGROUND_MODULES: PlaygroundModule[] = [
     lastUpdated: '23 June 2026',
     estimatedDownloadSize: '~320 KB',
     cacheCheckUrl: '/ai-models/local-weather-forecast-v2-5/model.json',
+    deviceSupport: { desktop: 'smooth', mobile: 'smooth' },
   },
   {
     id: 'ai-upscaler',
@@ -40,6 +43,8 @@ export const PLAYGROUND_MODULES: PlaygroundModule[] = [
     lastUpdated: '18 July 2026',
     estimatedDownloadSize: '~13 MB',
     cacheCheckUrl: '/ai-models/ai-upscaler/model.tflite',
+    // WebGPU not available on most mobile browsers → WASM CPU fallback (5–15 min per image)
+    deviceSupport: { desktop: 'smooth', mobile: 'limited' },
   },
   {
     id: 'quick-upscaler',
@@ -49,6 +54,8 @@ export const PLAYGROUND_MODULES: PlaygroundModule[] = [
     label: 'Tool',
     lastUpdated: '30 June 2026',
     estimatedDownloadSize: '< 5 KB',
+    // GPU algorithms unavailable on mobile (WebGPU browser support), but Bicubic runs smoothly
+    deviceSupport: { desktop: 'smooth', mobile: 'limited' },
   },
   {
     id: 'tic-tac-toe',
@@ -58,6 +65,7 @@ export const PLAYGROUND_MODULES: PlaygroundModule[] = [
     label: 'Game',
     lastUpdated: '30 June 2026',
     estimatedDownloadSize: '< 10 KB',
+    deviceSupport: { desktop: 'smooth', mobile: 'smooth' },
   },
   {
     id: 'split-bill',
@@ -66,5 +74,6 @@ export const PLAYGROUND_MODULES: PlaygroundModule[] = [
     label: 'Tool',
     lastUpdated: '23 June 2026',
     estimatedDownloadSize: '~150 KB',
+    deviceSupport: { desktop: 'smooth', mobile: 'smooth' },
   },
 ]

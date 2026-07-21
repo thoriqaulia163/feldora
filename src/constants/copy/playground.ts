@@ -17,6 +17,21 @@ export const PLAYGROUND_COPY = {
     offlineReadyBadge: 'Offline Ready',
     notLoadedBadge: 'Not Loaded',
     updatedLabel: 'Updated:',
+    deviceSupport: {
+      desktopLabel: 'Desktop',
+      mobileLabel: 'Mobile',
+      smooth: 'smooth',
+      limited: 'limited',
+      unsupported: 'unsupported',
+      tooltips: {
+        desktop_smooth: 'This module runs smoothly on desktop devices.',
+        desktop_limited: 'This module works on desktop devices, but some features may be limited.',
+        desktop_unsupported: 'This module is not supported on desktop devices.',
+        mobile_smooth: 'This module runs smoothly on mobile devices.',
+        mobile_limited: 'This module works on mobile devices, but some features may be unavailable or slower.',
+        mobile_unsupported: 'This module is not supported on mobile devices.',
+      },
+    },
   },
   weather: {
     name: 'Local Weather Forecast',

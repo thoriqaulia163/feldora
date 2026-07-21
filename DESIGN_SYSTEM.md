@@ -775,12 +775,25 @@ interface PlaygroundModule {
   lastUpdated: string            // Tanggal update terakhir (format: "20 June 2026")
   estimatedDownloadSize: string  // Estimasi ukuran chunk + asset
   cacheCheckUrl?: string         // URL asset utama untuk cek offline status (opsional)
+  deviceSupport: DeviceSupportSpec  // WAJIB — kompatibilitas desktop & mobile
+}
+
+type DeviceCompatibility = 'smooth' | 'limited' | 'unsupported'
+
+interface DeviceSupportSpec {
+  desktop: DeviceCompatibility
+  mobile: DeviceCompatibility
 }
 ```
 
 `cacheCheckUrl` opsional karena:
 - Module dengan external model/data (AI) perlu cek apakah asset sudah di-cache
 - Module pure client-side (Game, Tool) offline by default setelah JS chunk ter-cache — tidak perlu field ini
+
+`deviceSupport` **wajib** untuk semua module. Nilai yang valid:
+- `smooth` — berjalan tanpa catatan (✓ hijau di module card)
+- `limited` — berjalan tapi ada batasan signifikan, misal WebGPU tidak tersedia di browser tersebut (⚠ amber)
+- `unsupported` — tidak berjalan (✗ muted)
 
 ### Label Warna
 
