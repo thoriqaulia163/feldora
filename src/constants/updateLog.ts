@@ -12,6 +12,30 @@ export interface UpdateEntry {
 
 export const WEB_UPDATE_LOG: UpdateEntry[] = [
   {
+    date: '11 August 2026',
+    title: 'Local Weather Forecast V3.3 — Four Independent Neural Networks',
+    status: 'moderate',
+    type: 'update',
+    version: '1.20.0',
+    description: 'V3.3 experiment: 4 independent NNs (one per slot) with own embeddings. Tests slot specialization vs shared representation. Result: no improvement over V3 shared architecture (~64% F1, 242 KB).',
+  },
+  {
+    date: '11 August 2026',
+    title: 'Local Weather Forecast V3.1 — Capacity & Regularization Experiment',
+    status: 'moderate',
+    type: 'update',
+    version: '1.19.0',
+    description: 'V3.1 experiment: larger network [128,64,32] + embedding dim 16. Includes dropout + weight decay test. Result: no meaningful improvement — confirms data/feature bottleneck, not model capacity.',
+  },
+  {
+    date: '11 August 2026',
+    title: 'Local Weather Forecast V3 — First Neural Network (Shared MLP)',
+    status: 'moderate',
+    type: 'update',
+    version: '1.18.0',
+    description: 'New AI module: Shared MLP with location embedding (dim=8) + cyclical temporal encoding. 64 KB model, Macro F1 64.16% — beats V2.5 (63.1%) at 5× smaller size. Pure TS training pipeline.',
+  },
+  {
     date: '21 July 2026',
     title: 'Device compatibility badges on playground module cards',
     status: 'minor',

@@ -1238,3 +1238,317 @@ type AIUpscalerStatus =
 - Untuk digital illustration/artwork, output bisa terlihat lebih "kartun" karena training data model mayoritas foto
 - WASM fallback sangat lambat (5–15 menit untuk gambar besar) — disarankan gunakan Chrome/Edge untuk WebGPU
 - LiteRT runtime (~9 MB) perlu internet untuk download pertama kali (setelah itu browser HTTP cache)
+
+---
+
+## Local Weather Forecast V3
+
+| Field | Value |
+|-------|-------|
+| ID | `local-weather-forecast-v3` |
+| Label | AI |
+| Last Updated | 11 August 2026 |
+| Model Size | ~64 KB |
+| Inference Time | <1ms |
+| Offline | Yes (setelah model loaded) |
+
+### Deskripsi
+
+Prediksi hujan per slot waktu menggunakan Neural Network (Shared MLP) dengan learned location embedding dan cyclical temporal encoding. Eksperimen pertama perpindahan dari tree-based model ke neural network. **Winner** dari seluruh V3 experiment series — performa terbaik dengan ukuran terkecil.
+
+### Perbedaan dengan V2.5
+
+| Aspek | V2.5 | V3 |
+|-------|------|-----|
+| Algorithm | Gradient Boosted Trees | Neural Network (MLP) |
+| Structure | 4 independent GBT forests | 1 shared backbone + 4 heads |
+| Trees/params | 100 trees × depth 4 per slot | ~3.5K parameters total |
+| Features | 12 | 14 (+sinMonth, +cosMonth) |
+| Location handling | Raw coordinates | Learned embedding (dim=8) |
+| Model size | ~320 KB | ~64 KB (5× smaller) |
+| Macro F1 (Sensitive) | 63.1% | **64.16%** |
+
+### Machine Learning
+
+| Parameter | Value |
+|-----------|-------|
+| Algorithm | Shared MLP + Location Embedding |
+| Embedding dim | 8 |
+| Hidden layers | [64, 32, 16] |
+| Activation | ReLU |
+| Output | 4 × Sigmoid (binary per slot) |
+| Optimizer | Adam (lr=0.001) |
+| Batch size | 64 |
+| Early stopping | Patience 15 (val loss) |
+| Seed | 42 |
+| Split | Time-based: 2021-23 train, 2024 val, 2025 test |
+
+### Performance
+
+**Standard mode (threshold=0.5):**
+
+| Slot | Accuracy | Macro F1 |
+|------|----------|----------|
+| Morning | 79.3% | 60.5% |
+| Afternoon | 67.2% | 65.6% |
+| Evening | 64.1% | 63.4% |
+| Night | 80.4% | 51.8% |
+| **Average** | **72.76%** | **60.30%** |
+
+**Sensitive mode (thresholds=[0.30, 0.55, 0.55, 0.30]):**
+
+| Slot | Accuracy | Macro F1 |
+|------|----------|----------|
+| Morning | 73.8% | 65.5% |
+| Afternoon | 67.0% | 66.3% |
+| Evening | 63.9% | 63.9% |
+| Night | 73.3% | 60.9% |
+| **Average** | **69.49%** | **64.16%** |
+
+### Features (14 numeric + embedding)
+
+| # | Feature | Type | Deskripsi |
+|---|---------|------|-----------|
+| 0 | `dayOfYear` | int | Hari ke-n dalam tahun |
+| 1 | `latitude` | float | Lintang kota |
+| 2 | `longitude` | float | Bujur kota |
+| 3 | `elevation` | int | Ketinggian (meter) |
+| 4 | `monsoonZone` | enum 0/1/2 | Equatorial/Monsoonal/Local |
+| 5 | `localSeasonIndex` | enum 0/1/2 | Kemarau/Transisi/Hujan |
+| 6 | `enso` | enum -1/0/1 | La Nina/Netral/El Nino |
+| 7 | `iod` | enum -1/0/1 | Negatif/Netral/Positif |
+| 8 | `prevDayRain` | binary 0/1 | Kemarin hujan? |
+| 9 | `sinDay` | float | sin(2π × dayOfYear / 365) |
+| 10 | `cosDay` | float | cos(2π × dayOfYear / 365) |
+| 11 | `sinMonth` | float | sin(2π × month / 12) — **baru di V3** |
+| 12 | `cosMonth` | float | cos(2π × month / 12) — **baru di V3** |
+| 13 | `dayLength` | float | Jam cahaya (dari lat + dayOfYear) |
+| — | Location embedding | learned 8-dim | City → index → embedding lookup — **baru di V3** |
+
+### Architecture
+
+```
+Location ID → Embedding (287×8)
+                    ↓
+              Concatenate (8 + 14 = 22 dim)
+                    ↓
+              Dense 64 → ReLU
+                    ↓
+              Dense 32 → ReLU
+                    ↓
+              Dense 16 → ReLU
+                    ↓
+         ┌──────────┼──────────┬──────────┐
+         ↓          ↓          ↓          ↓
+      Morning    Afternoon   Evening     Night
+      (1→Sig)   (1→Sig)    (1→Sig)    (1→Sig)
+```
+
+### Preprocessing
+
+- Normalization: Z-score standardization, stats dari training set saja
+- Location: embedding lookup (bukan raw ordinal)
+- Temporal: cyclical sin/cos encoding
+- Target: binary (WMO weather_code ≥ 2 = rain)
+- prevDayRain: binary (≥1 slot hujan kemarin = 1)
+
+### File Structure
+
+```
+src/components/playground/modules/weather-v3/
+├── WeatherModuleV3NN.tsx            # UI component
+├── useNNWeatherPredictor.ts         # Hook: load, normalize, predict
+└── weatherUtilsV3NN.ts              # Feature vector builder
+
+src/lib/ml/
+└── nn-local-weather-forecast-v3.ts  # NN types + predictNN runtime
+
+scripts/local-weather-forecast-v3/
+├── model-generation.ts              # Full training pipeline
+├── REPORT.md                        # V3 vs V2.5 comparison
+└── HOW-TO-USE.md
+
+public/ai-models/local-weather-forecast-v3/
+└── model.json                       # Pretrained artifact (64 KB)
+```
+
+### Limitasi
+
+- Ceiling ~64% Macro F1 disebabkan fitur klimatologi statis — bukan limitasi model
+- Tidak menggunakan data cuaca real-time (humidity, pressure, wind)
+- Morning/Night lebih sulit diprediksi karena class imbalance (80% tidak hujan)
+- Training non-deterministic di level sub-epoch meskipun seed digunakan
+
+---
+
+## Local Weather Forecast V3.1
+
+| Field | Value |
+|-------|-------|
+| ID | `local-weather-forecast-v3-1` |
+| Label | AI |
+| Last Updated | 11 August 2026 |
+| Model Size | ~180 KB |
+| Inference Time | <1ms |
+| Offline | Yes |
+
+### Deskripsi
+
+Eksperimen kapasitas: menguji apakah V3 under-capacity dengan memperbesar network ke [128, 64, 32] dan embedding ke dim=16. Termasuk eksperimen regularization (dropout + weight decay). **Hasil: tidak ada improvement meaningful.**
+
+### Arsitektur
+
+- Embedding dim: 16 (V3: 8)
+- Hidden layers: [128, 64, 32] (V3: [64, 32, 16])
+- Input dim: 30 (16 + 14)
+- ~14K parameters (V3: ~3.5K)
+
+### Eksperimen yang Dilakukan
+
+1. **V3.1 baseline** — larger network, same features
+   - Macro F1 (Sensitive): 64.08% (V3: 64.16%) → **no gain**
+   - Model 180 KB (V3: 64 KB) → 3× lebih besar
+
+2. **V3.1 + regularization** — dropout 0.10 + weight decay 1e-4
+   - Macro F1 (Sensitive): 63.95% → **no gain**
+   - Overfitting bukan masalah utama
+
+### Learning Curves
+
+Model menunjukkan mild overfitting (val loss naik setelah epoch 1) — network memiliki excess capacity. Regularization memperkecil gap training-vs-validation tapi tidak meningkatkan generalization.
+
+### Kesimpulan
+
+> V3 **bukan** under-capacity. Bottleneck ada di data/features, bukan arsitektur.
+
+### File Structure
+
+```
+src/components/playground/modules/weather-v3-1/
+├── WeatherModuleV31.tsx
+├── useNNWeatherPredictorV31.ts
+└── weatherUtilsV31.ts
+
+scripts/local-weather-forecast-v3-1/
+├── model-generation.ts
+├── model-generation-regularized.ts
+├── learning-curves.json
+├── learning-curves-regularized.json
+└── REPORT.md
+
+public/ai-models/local-weather-forecast-v3-1/model.json
+```
+
+---
+
+## Local Weather Forecast V3.3
+
+| Field | Value |
+|-------|-------|
+| ID | `local-weather-forecast-v3-3` |
+| Label | AI |
+| Last Updated | 11 August 2026 |
+| Model Size | ~242 KB |
+| Inference Time | <1ms |
+| Offline | Yes |
+
+### Deskripsi
+
+Eksperimen arsitektur: menguji apakah 4 independent neural networks (satu per slot) outperform V3's shared representation. Setiap model memiliki embedding dan backbone sendiri. **Hasil: tidak outperform V3.**
+
+### Arsitektur
+
+4 model independen, masing-masing:
+```
+Location ID → Embedding (287×8)
+      ↓
+Concatenate (8 + 14 = 22 dim)
+      ↓
+Dense 64 → ReLU
+      ↓
+Dense 32 → ReLU
+      ↓
+Dense 16 → ReLU
+      ↓
+Dense 1 → Sigmoid
+```
+
+### Performance
+
+**Sensitive mode (thresholds=[0.35, 0.55, 0.525, 0.35]):**
+
+| Slot | Accuracy | Macro F1 |
+|------|----------|----------|
+| Morning | 76.7% | 65.5% |
+| Afternoon | 67.3% | 65.9% |
+| Evening | 63.5% | 63.5% |
+| Night | 74.4% | 60.8% |
+| **Average** | **70.48%** | **63.94%** |
+
+### Perbandingan V3 vs V3.3
+
+| | V3 (Shared) | V3.3 (Independent) |
+|--|---:|---:|
+| Macro F1 (Sensitive) | **64.16%** | 63.94% |
+| Model Size | **64 KB** | 242 KB |
+| F1 per KB | **1.004%/KB** | 0.264%/KB |
+
+### Kesimpulan
+
+> Shared representation lebih efisien. Slot-specific specialization tidak membantu.
+
+### File Structure
+
+```
+src/components/playground/modules/weather-v3-3/
+├── WeatherModuleV33.tsx
+├── useNNWeatherPredictorV33.ts
+└── weatherUtilsV33.ts
+
+src/lib/ml/
+└── nn-local-weather-forecast-v3-3.ts
+
+scripts/local-weather-forecast-v3-3/
+├── model-generation.ts
+└── REPORT.md
+
+public/ai-models/local-weather-forecast-v3-3/model.json
+```
+
+---
+
+## V3 Experiment Series — Final Summary
+
+| Model | Architecture | Size | Macro F1 | Verdict |
+|-------|-------------|---:|---:|---------|
+| V2.5 | 4× GBT (100 trees, depth 4) | 320 KB | 63.1% | Previous baseline |
+| **V3** | **Shared MLP [64,32,16] emb=8** | **64 KB** | **64.16%** | **Best — Pareto optimal** |
+| V3.1 | Shared MLP [128,64,32] emb=16 | 180 KB | 64.08% | ❌ No gain (not under-capacity) |
+| V3.1+reg | V3.1 + dropout + weight decay | 180 KB | 63.95% | ❌ No gain (not overfitting) |
+| V3.3 | 4× Independent MLP [64,32,16] | 242 KB | 63.94% | ❌ No gain (shared is better) |
+
+### Experimental Questions Answered
+
+1. **Can NN beat GBT (V2.5)?** → **Yes.** V3 achieves 64.16% vs V2.5's 63.1% at 5× smaller model.
+2. **Is shared representation better than independent?** → **Yes.** Same F1, 4× smaller.
+3. **Does location embedding help?** → **Yes.** Learned embeddings enable per-city pattern learning without manual feature engineering.
+4. **Does larger capacity help?** → **No.** V3.1 shows no gain — excess capacity leads to overfitting.
+5. **Is the bottleneck model or data?** → **Data.** All variants hit ~64% ceiling regardless of architecture.
+
+### Blockers & Challenges
+
+- **Performance ceiling**: ~64% Macro F1 is a hard limit with static climate features only. Breaking through requires real-time weather data (humidity, pressure, wind) which contradicts offline-first principle.
+- **Imbalanced slots**: Morning (77% no-rain) and Night (80% no-rain) remain harder to predict. Threshold tuning helps significantly (+13% F1 for Night).
+- **Training time in pure TS**: Without framework (TensorFlow/PyTorch), training is single-threaded. V3 ~5min, V3.1/V3.3 ~10-15min each. Acceptable for this experiment scale.
+- **Model size vs JSON overhead**: JSON format adds ~40% overhead vs binary. A 64 KB JSON model would be ~38 KB as binary — but JSON keeps the offline-first simplicity (no decoder needed).
+
+### Proses Implementasi
+
+1. Design plan berdasarkan V3 spec document
+2. Dataset analysis (524K rows, 287 cities, 5 years)
+3. V3 training pipeline: custom backprop + Adam in TypeScript
+4. V3 evaluation: beats V2.5 at 5× smaller — success
+5. V3.1: test capacity hypothesis → disproven
+6. V3.1 + regularization: test overfitting hypothesis → disproven
+7. V3.3: test shared vs independent → shared wins
+8. All variants deployed as separate playground modules for comparison

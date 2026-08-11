@@ -48,7 +48,7 @@ src/
 │   ├── home/            # Homepage sections (Hero, Featured, Updates, CTA)
 │   ├── layout/          # Navbar, Footer (persistent layout)
 │   ├── playground/      # Playground shell, module registry, types
-│   │   └── modules/     # Module implementations (weather/, weather-v2/, weather-v2-5/, split-bill/, tic-tac-toe/, quick-upscaler/)
+│   │   └── modules/     # Module implementations (weather/, weather-v2/, weather-v2-5/, weather-v3/, weather-v3-1/, weather-v3-3/, split-bill/, tic-tac-toe/, quick-upscaler/)
 │   ├── story/           # Story list & detail components
 │   └── ui/              # Reusable UI components (LogCard, Carousel)
 ├── constants/
@@ -89,6 +89,9 @@ src/
 │   ├── playground.local-weather-forecast.tsx  # Weather module V1 route
 │   ├── playground.local-weather-forecast-v2.tsx  # Weather module V2 route
 │   ├── playground.local-weather-forecast-v2-5.tsx  # Weather module V2.5 route
+│   ├── playground.local-weather-forecast-v3.tsx    # Weather module V3 route (NN)
+│   ├── playground.local-weather-forecast-v3-1.tsx  # Weather module V3.1 route
+│   ├── playground.local-weather-forecast-v3-3.tsx  # Weather module V3.3 route
 │   ├── playground.split-bill.tsx            # Split Bill layout (crypto gate)
 │   ├── playground.split-bill.index.tsx      # Split Bill home
 │   ├── playground.split-bill.create.tsx     # Create bill
@@ -136,6 +139,8 @@ File predictor di `src/lib/ml/` menggunakan format:
 | `rf-local-weather-forecast-v1.ts` | Random Forest | Local Weather Forecast | V1 |
 | `rf-local-weather-forecast-v2.ts` | Random Forest | Local Weather Forecast | V2 |
 | `gbt-local-weather-forecast-v2-5.ts` | Gradient Boosted Trees | Local Weather Forecast | V2.5 |
+| `nn-local-weather-forecast-v3.ts` | Neural Network | Local Weather Forecast | V3 / V3.1 |
+| `nn-local-weather-forecast-v3-3.ts` | Neural Network (Independent) | Local Weather Forecast | V3.3 |
 
 Konvensi ini memudahkan identifikasi:
 - **Model** yang digunakan (rf, gbt, nn, dll)

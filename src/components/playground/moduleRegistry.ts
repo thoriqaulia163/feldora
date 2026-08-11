@@ -35,6 +35,39 @@ export const PLAYGROUND_MODULES: PlaygroundModule[] = [
     deviceSupport: { desktop: 'smooth', mobile: 'smooth' },
   },
   {
+    id: 'local-weather-forecast-v3',
+    name: 'Local Weather Forecast V3',
+    description:
+      'Per-slot rain prediction using a small Neural Network with learned location embeddings and temporal encoding. First NN experiment — fully offline.',
+    label: 'AI',
+    lastUpdated: '11 August 2026',
+    estimatedDownloadSize: '~64 KB',
+    cacheCheckUrl: '/ai-models/local-weather-forecast-v3/model.json',
+    deviceSupport: { desktop: 'smooth', mobile: 'smooth' },
+  },
+  {
+    id: 'local-weather-forecast-v3-1',
+    name: 'Local Weather Forecast V3.1',
+    description:
+      'Improved NN experiment: larger network (128→64→32) and embedding (dim=16). Tests whether V3 was capacity-limited — fully offline.',
+    label: 'AI',
+    lastUpdated: '11 August 2026',
+    estimatedDownloadSize: '~180 KB',
+    cacheCheckUrl: '/ai-models/local-weather-forecast-v3-1/model.json',
+    deviceSupport: { desktop: 'smooth', mobile: 'smooth' },
+  },
+  {
+    id: 'local-weather-forecast-v3-3',
+    name: 'Local Weather Forecast V3.3',
+    description:
+      'Four independent Neural Networks (one per time slot). Tests whether slot-specific specialization outperforms shared representation — fully offline.',
+    label: 'AI',
+    lastUpdated: '11 August 2026',
+    estimatedDownloadSize: '~242 KB',
+    cacheCheckUrl: '/ai-models/local-weather-forecast-v3-3/model.json',
+    deviceSupport: { desktop: 'smooth', mobile: 'smooth' },
+  },
+  {
     id: 'ai-upscaler',
     name: 'Advanced Image Upscaler',
     description:
