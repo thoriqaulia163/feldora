@@ -13,6 +13,14 @@ export interface UpdateEntry {
 export const WEB_UPDATE_LOG: UpdateEntry[] = [
   {
     date: '11 August 2026',
+    title: 'Dark/Light theme toggle with CSS Variables',
+    status: 'moderate',
+    type: 'update',
+    version: '1.21.0',
+    description: 'Dual theme support via CSS Variables (RGB space-separated + Tailwind alpha-value). Light mode: warm parchment fantasy style. Toggle in navbar, persists to localStorage. Flash-prevention script in head.',
+  },
+  {
+    date: '11 August 2026',
     title: 'Local Weather Forecast V3.3 — Four Independent Neural Networks',
     status: 'moderate',
     type: 'update',

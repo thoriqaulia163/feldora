@@ -11,25 +11,23 @@ export default {
       },
       colors: {
         feldora: {
-          bg: '#0a0a0f',
-          surface: '#12121a',
-          'surface-light': '#1a1a26',
-          border: '#2a2a3a',
-          accent: '#8b5cf6',
-          'accent-soft': '#6d28d9',
-          'accent-glow': 'rgba(139, 92, 246, 0.15)',
-          'accent-secondary': '#f97316',
-          muted: '#6b7280',
-          text: '#f5f5f7',
-          'text-secondary': '#a1a1aa',
+          bg: 'rgb(var(--feldora-bg) / <alpha-value>)',
+          surface: 'rgb(var(--feldora-surface) / <alpha-value>)',
+          'surface-light': 'rgb(var(--feldora-surface-light) / <alpha-value>)',
+          border: 'rgb(var(--feldora-border) / <alpha-value>)',
+          accent: 'rgb(var(--feldora-accent) / <alpha-value>)',
+          'accent-soft': 'rgb(var(--feldora-accent-soft) / <alpha-value>)',
+          'accent-glow': 'var(--feldora-accent-glow)',
+          'accent-secondary': 'rgb(var(--feldora-accent-secondary) / <alpha-value>)',
+          muted: 'rgb(var(--feldora-muted) / <alpha-value>)',
+          text: 'rgb(var(--feldora-text) / <alpha-value>)',
+          'text-secondary': 'rgb(var(--feldora-text-secondary) / <alpha-value>)',
         },
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-cinematic':
-          'linear-gradient(180deg, rgba(10,10,15,0) 0%, rgba(10,10,15,0.8) 50%, rgba(10,10,15,1) 100%)',
-        'gradient-hero':
-          'linear-gradient(135deg, rgba(139,92,246,0.08) 0%, transparent 50%)',
+        'gradient-cinematic': 'var(--feldora-gradient-cinematic)',
+        'gradient-hero': 'var(--feldora-gradient-hero)',
       },
       animation: {
         'fade-in': 'fadeIn 0.6s ease-out forwards',
@@ -53,8 +51,8 @@ export default {
           '100%': { opacity: '1', transform: 'translateX(0)' },
         },
         glow: {
-          '0%': { boxShadow: '0 0 5px rgba(139,92,246,0.2)' },
-          '100%': { boxShadow: '0 0 20px rgba(139,92,246,0.4)' },
+          '0%': { boxShadow: '0 0 5px var(--feldora-glow-shadow-sm)' },
+          '100%': { boxShadow: '0 0 20px var(--feldora-glow-shadow-lg)' },
         },
         loadingBar: {
           '0%': { transform: 'translateX(-100%)' },

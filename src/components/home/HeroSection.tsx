@@ -51,8 +51,8 @@ export function HeroSection() {
       {/* Bottom angular cut */}
       <div className="absolute bottom-0 left-0 right-0">
         <svg viewBox="0 0 1440 60" className="w-full h-[60px]" preserveAspectRatio="none">
-          <polygon points="0,60 1440,60 1440,20 0,60" fill="#0a0a0f" />
-          <polygon points="0,60 1440,60 1440,30 0,50" fill="#12121a" opacity="0.5" />
+          <polygon points="0,60 1440,60 1440,20 0,60" fill="rgb(var(--feldora-bg))" />
+          <polygon points="0,60 1440,60 1440,30 0,50" fill="rgb(var(--feldora-surface))" opacity="0.5" />
         </svg>
       </div>
     </section>

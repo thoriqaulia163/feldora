@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useRouterState } from '@tanstack/react-router'
 import { NAVIGATION_LINKS } from '~/constants/navigation'
+import { ThemeToggle } from '~/components/ui/ThemeToggle'
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -32,7 +33,7 @@ export function Navbar() {
                 to={link.path}
                 className={`relative px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
                   isActive
-                    ? 'text-white'
+                    ? 'text-feldora-text'
                     : 'text-feldora-text-secondary hover:text-feldora-text'
                 }`}
               >
@@ -43,19 +44,23 @@ export function Navbar() {
               </Link>
             )
           })}
+          <ThemeToggle />
         </div>
 
         {/* Mobile Menu Button */}
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="md:hidden relative z-10 w-9 h-9 flex flex-col justify-center items-center gap-[5px] border border-feldora-border/50 hover:border-feldora-accent/50 transition-colors"
-          aria-label="Toggle menu"
-          aria-expanded={isOpen}
-        >
-          <span className={`block w-4 h-[2px] bg-feldora-text transition-all duration-300 ${isOpen ? 'rotate-45 translate-y-[7px]' : ''}`} />
-          <span className={`block w-4 h-[2px] bg-feldora-text transition-all duration-300 ${isOpen ? 'opacity-0 scale-0' : ''}`} />
-          <span className={`block w-4 h-[2px] bg-feldora-text transition-all duration-300 ${isOpen ? '-rotate-45 -translate-y-[7px]' : ''}`} />
-        </button>
+        <div className="md:hidden flex items-center gap-2">
+          <ThemeToggle />
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="relative z-10 w-9 h-9 flex flex-col justify-center items-center gap-[5px] border border-feldora-border/50 hover:border-feldora-accent/50 transition-colors"
+            aria-label="Toggle menu"
+            aria-expanded={isOpen}
+          >
+            <span className={`block w-4 h-[2px] bg-feldora-text transition-all duration-300 ${isOpen ? 'rotate-45 translate-y-[7px]' : ''}`} />
+            <span className={`block w-4 h-[2px] bg-feldora-text transition-all duration-300 ${isOpen ? 'opacity-0 scale-0' : ''}`} />
+            <span className={`block w-4 h-[2px] bg-feldora-text transition-all duration-300 ${isOpen ? '-rotate-45 -translate-y-[7px]' : ''}`} />
+          </button>
+        </div>
       </nav>
 
       {/* Mobile Menu Overlay */}

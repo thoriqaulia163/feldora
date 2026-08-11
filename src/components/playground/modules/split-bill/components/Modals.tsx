@@ -74,7 +74,7 @@ export function ParticipantModal({
         </h3>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label htmlFor="participant-name" className="block text-xs text-white font-mono uppercase tracking-wider mb-2">
+            <label htmlFor="participant-name" className="block text-xs text-feldora-text font-mono uppercase tracking-wider mb-2">
               Name
             </label>
             <input

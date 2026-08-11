@@ -134,7 +134,7 @@ export default function WeatherModule() {
                   type="date"
                   value={selectedDate}
                   onChange={(e) => { setSelectedDate(e.target.value); setResult(null); setPredictState('idle') }}
-                  className="w-full bg-feldora-surface-light border border-feldora-border/50 text-feldora-text text-sm px-3 py-2.5 focus:outline-none focus:border-feldora-accent/60 transition-colors cursor-pointer [color-scheme:dark]"
+                  className="w-full bg-feldora-surface-light border border-feldora-border/50 text-feldora-text text-sm px-3 py-2.5 focus:outline-none focus:border-feldora-accent/60 transition-colors cursor-pointer"
                 />
               </div>
             </div>

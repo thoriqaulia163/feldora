@@ -209,6 +209,53 @@ Dark-only theme dengan dual-tone accent (purple + orange). Semua warna didefinis
 
 ---
 
+## Theme System (Dark / Light)
+
+Feldora menggunakan dual-theme system berbasis CSS Variables dengan Tailwind alpha-value support.
+
+### Mekanisme
+
+- Warna didefinisikan sebagai **RGB space-separated** di CSS Variables: `--feldora-bg: 10 10 15;`
+- Tailwind config menggunakan `rgb(var(--feldora-bg) / <alpha-value>)` — memungkinkan opacity modifiers (`/20`, `/50`) berfungsi native
+- Theme dikontrol via class `light` pada `<html>` — tanpa class = dark (default variables di `:root`)
+- Preference disimpan di `localStorage('feldora-theme')`
+- Default (tanpa stored preference): **light**
+- Flash prevention: inline `<script>` di `<head>` membaca localStorage dan set class sebelum paint
+
+### File
+
+| File | Fungsi |
+|------|--------|
+| `src/styles/global.css` | CSS Variables definition (`:root` = dark, `html.light` = light) |
+| `tailwind.config.ts` | Color tokens menggunakan `rgb(var(...) / <alpha-value>)` |
+| `src/components/ui/ThemeToggle.tsx` | Toggle button (sun/moon icon) |
+| `src/routes/__root.tsx` | Flash-prevention script di `<head>` |
+
+### Light Theme Palette ("Fantasy Daylight")
+
+| Token | RGB | Hex Equivalent | Kesan |
+|-------|-----|----------------|-------|
+| `feldora-bg` | `244 242 239` | `#f4f2ef` | Warm parchment/ivory |
+| `feldora-surface` | `255 255 255` | `#ffffff` | Clean elevated card |
+| `feldora-surface-light` | `234 231 227` | `#eae7e3` | Subtle depth layer |
+| `feldora-border` | `212 208 203` | `#d4d0cb` | Warm gray border |
+| `feldora-accent` | `124 58 237` | `#7c3aed` | Purple (deeper for contrast) |
+| `feldora-accent-secondary` | `234 88 12` | `#ea580c` | Orange (warmer) |
+| `feldora-text` | `26 26 46` | `#1a1a2e` | Dark navy |
+| `feldora-text-secondary` | `74 74 92` | `#4a4a5c` | Muted navy |
+| `feldora-muted` | `138 138 154` | `#8a8a9a` | Placeholder |
+
+### Aturan
+
+1. **Dark mode tidak boleh berubah** — semua perubahan theme hanya via CSS variable swap
+2. Opacity modifiers (`/20`, `/50`) berfungsi native karena format RGB space-separated
+3. Non-RGB values (gradients, shadows, scrollbar) didefinisikan sebagai full CSS values di variable
+4. SVG fills yang perlu theme-aware menggunakan `fill="rgb(var(--feldora-*))"` langsung
+5. `text-white` pada colored backgrounds (buttons, badges) tetap `text-white` — tidak perlu di-theme-kan
+6. `ThemeToggle` membaca DOM class saat mount (bukan localStorage) untuk menghindari SSR hydration mismatch
+
+---
+
 ## Typography
 
 - **Sans-serif**: Inter (weight 300-900) — headings & body
@@ -728,7 +775,7 @@ npm run lint     # TypeScript type check (tsc --noEmit)
 
 3. **Hygraph endpoint** — Didefinisikan di `.env` sebagai `VITE_GRAPH_CMS_ENDPOINT`. Tanpa ini, Story page akan menampilkan placeholder data.
 
-4. **Design adalah dark-only** — Tidak ada light theme. Background selalu `#0a0a0f`. Semua warna di-hardcode di Tailwind config, bukan CSS variables.
+4. **Design dual-theme** — Dark mode (default di `:root`) dan Light mode (`html.light`). Semua warna menggunakan CSS Variables dalam format RGB space-separated agar kompatibel dengan Tailwind opacity modifiers. Lihat section "Theme System" untuk detail.
 
 5. **Clip-path components** — Card dan button menggunakan CSS `clip-path`. Ini berarti `border-radius` tidak berlaku pada elemen-elemen ini. Visual "rounded" diganti dengan "angular cut".
 

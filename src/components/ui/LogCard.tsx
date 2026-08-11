@@ -111,7 +111,7 @@ export function LogCard({ entry, number, showAccentBar = false }: LogCardProps) 
             </div>
           </div>
           <div className="flex items-center gap-3 flex-1 min-w-0">
-            <p className={`text-feldora-text text-sm leading-relaxed group-hover:text-white transition-colors duration-300 ${isOpen ? '' : 'truncate'}`}>
+            <p className={`text-feldora-text text-sm leading-relaxed group-hover:text-feldora-text transition-colors duration-300 ${isOpen ? '' : 'truncate'}`}>
               {entry.title}
             </p>
           </div>

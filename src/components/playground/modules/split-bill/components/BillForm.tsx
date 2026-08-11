@@ -425,7 +425,7 @@ function FieldGroup({
 }>) {
   return (
     <div>
-      <p className="flex items-center gap-1.5 text-xs text-white font-mono uppercase tracking-wider mb-2">
+      <p className="flex items-center gap-1.5 text-xs text-feldora-text font-mono uppercase tracking-wider mb-2">
         {icon}
         {label}
       </p>

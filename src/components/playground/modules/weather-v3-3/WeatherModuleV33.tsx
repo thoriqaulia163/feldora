@@ -60,7 +60,7 @@ export default function WeatherModuleV33() {
             <div>
               <label className="text-feldora-text font-mono text-[10px] uppercase tracking-wider block mb-2">{COPY.dateLabel}</label>
               <div className="relative w-full cursor-pointer" role="group" aria-label="Date picker" onClick={(e) => { (e.currentTarget as HTMLElement).querySelector('input')?.showPicker() }} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') (e.currentTarget as HTMLElement).querySelector('input')?.showPicker() }}>
-                <input type="date" value={selectedDate} onChange={(e) => { setSelectedDate(e.target.value); setResult(null); setPredictState('idle') }} className="w-full bg-feldora-surface-light border border-feldora-border/50 text-feldora-text text-sm px-3 py-2.5 focus:outline-none focus:border-feldora-accent/60 transition-colors cursor-pointer [color-scheme:dark]" />
+                <input type="date" value={selectedDate} onChange={(e) => { setSelectedDate(e.target.value); setResult(null); setPredictState('idle') }} className="w-full bg-feldora-surface-light border border-feldora-border/50 text-feldora-text text-sm px-3 py-2.5 focus:outline-none focus:border-feldora-accent/60 transition-colors cursor-pointer" />
               </div>
             </div>
             <div className="relative">

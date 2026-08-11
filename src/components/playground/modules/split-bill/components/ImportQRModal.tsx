@@ -150,7 +150,7 @@ export function ImportQRModal({ open, onClose, onImport, dek }: ImportQRModalPro
           <div className="space-y-4">
             <p className="text-sm text-feldora-text-secondary">Add this bill?</p>
             <div>
-              <label htmlFor="import-title" className="block text-xs text-white font-mono uppercase tracking-wider mb-2">
+              <label htmlFor="import-title" className="block text-xs text-feldora-text font-mono uppercase tracking-wider mb-2">
                 Title
               </label>
               <input

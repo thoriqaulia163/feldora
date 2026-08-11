@@ -2,11 +2,74 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Theme Variables ────────────────────────────────────────────────────── */
+
+:root {
+  /* Dark theme (default) — values in R G B for Tailwind alpha support */
+  --feldora-bg: 10 10 15;
+  --feldora-surface: 18 18 26;
+  --feldora-surface-light: 26 26 38;
+  --feldora-border: 42 42 58;
+  --feldora-accent: 139 92 246;
+  --feldora-accent-soft: 109 40 217;
+  --feldora-accent-secondary: 249 115 22;
+  --feldora-muted: 107 114 128;
+  --feldora-text: 245 245 247;
+  --feldora-text-secondary: 161 161 170;
+
+  /* Non-RGB values (used directly, not with opacity) */
+  --feldora-accent-glow: rgba(139, 92, 246, 0.15);
+  --feldora-gradient-cinematic: linear-gradient(180deg, rgba(10,10,15,0) 0%, rgba(10,10,15,0.8) 50%, rgba(10,10,15,1) 100%);
+  --feldora-gradient-hero: linear-gradient(135deg, rgba(139,92,246,0.08) 0%, transparent 50%);
+  --feldora-glow-shadow-sm: rgba(139, 92, 246, 0.2);
+  --feldora-glow-shadow-lg: rgba(139, 92, 246, 0.4);
+  --feldora-cinematic-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 30px rgba(139, 92, 246, 0.05);
+  --feldora-border-glow-shadow: 0 0 15px rgba(249, 115, 22, 0.1);
+  --feldora-selection-bg: rgba(139, 92, 246, 0.3);
+  --feldora-selection-text: #ffffff;
+  --feldora-scrollbar-track: #0a0a0f;
+  --feldora-scrollbar-thumb: #2a2a3a;
+  --feldora-scrollbar-hover: #f97316;
+  --feldora-color-scheme: dark;
+}
+
+html.light {
+  /* Light theme — Fantasy Daylight */
+  --feldora-bg: 244 242 239;
+  --feldora-surface: 255 255 255;
+  --feldora-surface-light: 234 231 227;
+  --feldora-border: 212 208 203;
+  --feldora-accent: 124 58 237;
+  --feldora-accent-soft: 109 40 217;
+  --feldora-accent-secondary: 234 88 12;
+  --feldora-muted: 138 138 154;
+  --feldora-text: 26 26 46;
+  --feldora-text-secondary: 74 74 92;
+
+  /* Non-RGB values */
+  --feldora-accent-glow: rgba(124, 58, 237, 0.08);
+  --feldora-gradient-cinematic: linear-gradient(180deg, rgba(244,242,239,0) 0%, rgba(244,242,239,0.8) 50%, rgba(244,242,239,1) 100%);
+  --feldora-gradient-hero: linear-gradient(135deg, rgba(124,58,237,0.05) 0%, transparent 50%);
+  --feldora-glow-shadow-sm: rgba(124, 58, 237, 0.08);
+  --feldora-glow-shadow-lg: rgba(124, 58, 237, 0.15);
+  --feldora-cinematic-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08), 0 0 30px rgba(124, 58, 237, 0.04);
+  --feldora-border-glow-shadow: 0 0 15px rgba(234, 88, 12, 0.08);
+  --feldora-selection-bg: rgba(124, 58, 237, 0.2);
+  --feldora-selection-text: #1a1a2e;
+  --feldora-scrollbar-track: #f4f2ef;
+  --feldora-scrollbar-thumb: #d4d0cb;
+  --feldora-scrollbar-hover: #ea580c;
+  --feldora-color-scheme: light;
+}
+
+/* ─── Base ───────────────────────────────────────────────────────────────── */
+
 @layer base {
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    color-scheme: var(--feldora-color-scheme);
   }
 
   body {
@@ -15,9 +78,12 @@
   }
 
   ::selection {
-    @apply bg-feldora-accent/30 text-white;
+    background: var(--feldora-selection-bg);
+    color: var(--feldora-selection-text);
   }
 }
+
+/* ─── Components ─────────────────────────────────────────────────────────── */
 
 @layer components {
   /* Diamond accent marker */
@@ -69,9 +135,11 @@
   }
 }
 
+/* ─── Utilities ──────────────────────────────────────────────────────────── */
+
 @layer utilities {
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-white to-feldora-text-secondary;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-feldora-text to-feldora-text-secondary;
   }
 
   .text-gradient-accent {
@@ -79,7 +147,8 @@
   }
 
   .border-glow {
-    @apply border border-feldora-accent-secondary/20 shadow-[0_0_15px_rgba(249,115,22,0.1)];
+    @apply border border-feldora-accent-secondary/20;
+    box-shadow: var(--feldora-border-glow-shadow);
   }
 
   .surface-elevated {
@@ -87,9 +156,7 @@
   }
 
   .cinematic-shadow {
-    box-shadow:
-      0 25px 50px -12px rgba(0, 0, 0, 0.8),
-      0 0 30px rgba(139, 92, 246, 0.05);
+    box-shadow: var(--feldora-cinematic-shadow);
   }
 
   .clip-notch-br {
@@ -105,7 +172,8 @@
   }
 }
 
-/* Story content prose styling */
+/* ─── Story Prose ────────────────────────────────────────────────────────── */
+
 .prose-feldora {
   @apply text-feldora-text-secondary leading-relaxed;
 }
@@ -137,8 +205,9 @@
   @apply text-5xl font-bold text-feldora-accent-secondary float-left mr-2 leading-none;
 }
 
-/* Scrollbar */
+/* ─── Scrollbar ──────────────────────────────────────────────────────────── */
+
 ::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #0a0a0f; }
-::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #f97316; }
+::-webkit-scrollbar-track { background: var(--feldora-scrollbar-track); }
+::-webkit-scrollbar-thumb { background: var(--feldora-scrollbar-thumb); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--feldora-scrollbar-hover); }
